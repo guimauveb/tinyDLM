@@ -16,8 +16,8 @@ class cursesForm {
         void setFieldBack(int fieldIdx, chtype attr);
         void fieldOptsOff(int fieldIdx, Field_Options opts);
         void fieldOptsOn(int fieldIdx, Field_Options opts);
-        void setFormWin(std::shared_ptr<cursesWindow>& win);
-        void setFormSubwin(std::shared_ptr<cursesWindow>& win, int nlines, int ncols, int begy, int begx);        
+        void setFormWin(std::unique_ptr<cursesWindow>& win);
+        void setFormSubwin(std::unique_ptr<cursesWindow>& win, int nlines, int ncols, int begy, int begx);        
         void postForm();
 
         int formDriver(int c);
@@ -25,7 +25,6 @@ class cursesForm {
 
         void populateField(int fieldIdx, const std::string str);
         void saveFieldBuffer();
-        void restoreFieldBuffer(std::shared_ptr<cursesWindow> win);
         void clearForm();
         /* TODO - move to misc */
         std::string trimSpaces(std::string str);

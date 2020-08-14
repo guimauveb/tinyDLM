@@ -51,12 +51,12 @@ void cursesForm::fieldOptsOn(int fieldIdx, Field_Options opts)
     field_opts_on(fields.at(fieldIdx), opts);
 }
 
-void cursesForm::setFormWin(std::shared_ptr<cursesWindow>& win)
+void cursesForm::setFormWin(std::unique_ptr<cursesWindow>& win)
 {
     set_form_win(form, win->getRawPtr());
 }
 
-void cursesForm::setFormSubwin(std::shared_ptr<cursesWindow>& win, int nlines, int ncols, int begy, int begx)        
+void cursesForm::setFormSubwin(std::unique_ptr<cursesWindow>& win, int nlines, int ncols, int begy, int begx)        
 {
     set_form_sub(form, derwin(win->getRawPtr(), nlines, ncols, begy, begx));
 }
@@ -118,47 +118,6 @@ void cursesForm::saveFieldBuffer()
         std::string tmp = field_buffer(fields.at(i), 0);
         tmp = trimSpaces(tmp);
         fieldBuffers.push_back(tmp);
-    }
-}
-
-/* TODO */
-void cursesForm::restoreFieldBuffer(std::shared_ptr<cursesWindow> win)
-{
-    clearForm();
-
-    for (size_t i = 0; i < nFields - 1; ++i)   {
-        fields.emplace_back();
-    }
-    fields.at(fields.size() - 1) = nullptr;
-
-    initForm();
-
-    point maxyx = win->getMaxyx();
-
-    /* Set field size and location */
-    setField(0, 1, maxyx.x - 10, 3, 4, 0, 0);
-    setField(1, 1, maxyx.x - 10, 6, 4, 0, 0);
-
-    /* Set field options */
-    setFieldBack(0, A_UNDERLINE);
-    setFieldBack(0, O_AUTOSKIP);
-    fieldOptsOff(0, O_STATIC);
-    setFieldBack(1, A_UNDERLINE);
-    setFieldBack(1, O_AUTOSKIP);
-    fieldOptsOff(1, O_STATIC);
-
-    /* Initialize form */
-    setFormWin(win);
-    setFormSubwin(win, 20, 10, maxyx.x/ 2, 2);
-    postForm();
-
-    int curField = REQ_FIRST_FIELD;
-    form_driver(form, curField);
-    for (size_t i = 0; i < fieldBuffers.size(); ++i) {
-        /* TODO - assert fieldBuffers.size() == fields.size() */
-        populateField(curField, fieldBuffers.at(i));
-        form_driver(form, curField);
-        curField = REQ_NEXT_FIELD;
     }
 }
 

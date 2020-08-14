@@ -11,7 +11,6 @@ dlManagerUI::dlManagerUI()
     initColors();
     setWinsSize();
     mainWinsInit();
-    initDownloadsMenu();
     refreshMainWins();        
     /* Display a nice message at first start */
     firstStart();
@@ -45,10 +44,9 @@ void dlManagerUI::initColors()
     init_pair(16, COLOR_GREEN, COLOR_GREEN);
 }
 
-/* TODO */
+/* Resize program when terminal window size is detected */
 void dlManagerUI::resizeUI()
 {
-    /* Update window sizes */
     // TODO - will return a struct of winSizes objects */
     setWinsSize();
 
@@ -58,7 +56,6 @@ void dlManagerUI::resizeUI()
     mainWindows.at(labelsWinIdx)->resizeWin(labelsSz);
     paintLabelsWin(mainWindows.at(labelsWinIdx));
 
-    /* TODO - properly update menu */
     /* Refresh the downloads list */
     mainWindows.at(dlsWinIdx)->resizeWin(mainWinSz);
     paintMainWinWin(mainWindows.at(dlsWinIdx));
@@ -93,14 +90,13 @@ void dlManagerUI::setWinsSize()
     //return struct of winSizes
 }
 
-/* TODO - firststart() */
 void dlManagerUI::firstStart()
 {
     std::unique_ptr<cursesWindow> welWin = welcomeWinInit();
     paintWelWin(welWin);
     welWin->refreshWin();
     /* Move to current active subwins so we know we have to resize them */
-    //activeSubwins.emplace_back(std::move(welWin));
+
     /* Disable cursor because I can't print to the screen without moving it */
     curs_set(0);
     bool done = false;
@@ -110,13 +106,11 @@ void dlManagerUI::firstStart()
             case KEY_RESIZE:
                 resizeUI();
                 /* TODO - move to resizeUI */
-                //welWin->resizeWin(welWinSz);
-                //paintWelWin(welWin);
-                //welWin->refreshWin();
+                welWin->resizeWin(welWinSz);
+                paintWelWin(welWin);
+                welWin->refreshWin();
                 break;
             case 'a':
-                /* TODO - erase welcome message here */
-                /* TODOint - create a window to display it */
                 done = true;
                 break;
             case 'h':
@@ -125,15 +119,14 @@ void dlManagerUI::firstStart()
                 break;
         }
         if (done) {
-            welWin->eraseWin();
-            welWin->refreshWin();
+            //welWin->eraseWin();
+            //welWin->refreshWin();
             /* Open an window and exiting the constructor - program will continue in browser() */
             addNewDl();
             break;
         }
     }
     refreshMainWins();
-    activeSubwins.clear();
 }
 
 void dlManagerUI::refreshMainWins()
@@ -148,18 +141,15 @@ void dlManagerUI::refreshMainWins()
 dlManagerUI::~dlManagerUI()
 {
     stopStatusUpdate();
+    stopProgressBarThread();
     /* Pause all downloads -> we use pause to stop them since it does the same thing */
     dlManagerControl->pauseAll();
 
-    /* Delete active subwindows */
-    // TODO
     /* Delete main windows */
     mainWindows.clear();
 
-
     /* TODO - save downloads list */
     /* Empty the downloads list menu */
-    //    downloadsClearMenu(my_items, &menu, freeMenuDls);
     endwin();
 }
 
@@ -173,8 +163,8 @@ int dlManagerUI::stopStatusUpdate()
     }
 
     /* Wait for the thread to stop before moving on */
-    if (!(futureIsReady(ft))) {
-        while (!futureIsReady(ft))
+    if (!(futureIsReady(futureUpdateDlsStatus))) {
+        while (!futureIsReady(futureUpdateDlsStatus))
             //wait unitl execution is done
             ;
     } 
@@ -192,8 +182,8 @@ int dlManagerUI::stopProgressBarThread()
     }
 
     /* Wait for the thread to stop before moving on */
-    if (!(futureIsReady(ftP))) {
-        while (!futureIsReady(ftP))
+    if (!(futureIsReady(futureProgressBar))) {
+        while (!futureIsReady(futureProgressBar))
             //wait unitl execution is done
             ;
     } 
@@ -209,31 +199,30 @@ void dlManagerUI::startStatusUpdate()
     }
     else {
         updateStatus = true;
-        ft = std::async(std::launch::async, &dlManagerUI::updateDownloadsStatusWindow, this);
+        futureUpdateDlsStatus = std::async(std::launch::async, &dlManagerUI::updateDownloadsStatusWindow, this);
     }
 }
 
-/* TODO - move to main ? */
 /* Navigate the download manager menus */
 void dlManagerUI::Browser()
 {
-    /* TODO - see what variables can be defined here */
-    int ch = 0;
     bool EXIT = false;
     bool PAUSEDALL = false;
-    /* TODO - create a function for each key */
+    int ch = 0;
     while ((ch = getch()) != KEY_F(1)) {
         switch(ch) {
             case KEY_RESIZE:
                 {
-                    /* TODO - reset menu */
+                    stopStatusUpdate();
                     resizeUI();
                     updateDownloadsMenu(dlManagerControl->getDownloadsList());
+                    startStatusUpdate();
                     break;
                 }
 
             case KEY_DOWN:
                 {
+                    /* Make sure that the menu is not be empty */
                     if (dlManagerControl->isActive()) {
                         menu->menuDriver(REQ_DOWN_ITEM);
                     }
@@ -242,22 +231,21 @@ void dlManagerUI::Browser()
 
             case KEY_UP:
                 {
+                    /* Make sure that the menu is not be empty */
                     if (dlManagerControl->isActive()) {
                         menu->menuDriver(REQ_UP_ITEM);
                     }
                     break;
                 }
 
-                /* Enter - user has selected an item */
             case 10:
+                /* Enter - user has selected an item */
                 {
                     /* Make sure that the menu is not be empty */
                     if (!dlManagerControl->isActive()) {
                         break;
                     }
                     stopStatusUpdate();
-                    /* TODO - move to getItemInfo() */
-                    /* Select the current item and open a subwindow showing its details */
                     showDetails(menu->getItemName());
                     updateDownloadsMenu(dlManagerControl->getDownloadsList());
                     startStatusUpdate(); 
@@ -303,9 +291,7 @@ void dlManagerUI::Browser()
                     dlManagerControl->pauseAll();
                     PAUSEDALL = true;
                     /* Update key actions window */
-                    /* updateKeyActWinMessage() */
-                    mainWindows.at(keyActWinIdx)->eraseWin();
-                    mainWindows.at(keyActWinIdx)->printInMiddle(0, 0, col / 2, msgKeyInfoR, COLOR_PAIR(8));
+                    updateKeyActWinMessage(PAUSEDALL);
                     startStatusUpdate();
                     break;
                 }
@@ -319,15 +305,13 @@ void dlManagerUI::Browser()
                     dlManagerControl->resumeAll();
                     PAUSEDALL = false;
                     /* Update key actions window */
-                    /* updateKeyActWinMessage() */
-                    mainWindows.at(keyActWinIdx)->eraseWin();
-                    mainWindows.at(keyActWinIdx)->printInMiddle(0, 0, col / 2, msgKeyInfoP, COLOR_PAIR(8));
+                    updateKeyActWinMessage(PAUSEDALL);
                     startStatusUpdate();
                     break;
                 }
 
-                /* TODO - Clear inactive downloads - see where the bug comes from */
             case 'c':
+                /* TODO - Clear inactive downloads - see where the bug comes from */
                 {
                     stopStatusUpdate();
                     dlManagerControl->clearInactive();
@@ -385,11 +369,17 @@ void dlManagerUI::Browser()
     }
 }
 
-void dlManagerUI::updateKeyActWinMessage()
+void dlManagerUI::updateKeyActWinMessage(bool& p)
 {
-    /* TODO - updateKeyActMessage() */
     mainWindows.at(keyActWinIdx)->eraseWin();
-    mainWindows.at(keyActWinIdx)->printInMiddle(0, 0, col / 2, msgKeyInfoR, COLOR_PAIR(8));
+    if (p) {
+        /* Display 'resume' if paused */
+        mainWindows.at(keyActWinIdx)->printInMiddle(0, 0, col / 2, msgKeyInfoR, COLOR_PAIR(8));
+    }
+    else {
+        /* Display 'pause' if not paused */
+        mainWindows.at(keyActWinIdx)->printInMiddle(0, 0, col / 2, msgKeyInfoP, COLOR_PAIR(8));
+    }
 }
 
 /* Init the main windows */
@@ -491,20 +481,14 @@ void dlManagerUI::setDownloadsMenu()
     menu->setMenuWin(mainWindows.at(dlsWinIdx));
     menu->setMenuSub(mainWindows.at(dlsWinIdx), pMax.y - 1, pMax.x - 4, 1, 2);
     menu->setMenuFormat(pMax.y - 6, 0);
-    menu->setMenuMark(mark.c_str());
     menu->postMenu();
 }
 
 /* toDO - see how I can save the current menu and only add one item without reposting the entire menu */
 /* display downloads as a menu */
-void dlManagerUI::initDownloadsMenu()
-{
-    menu = std::make_shared<cursesMenu>();
-}
-
 void dlManagerUI::initDownloadsMenu(std::vector<std::string> itemsData)
 {
-    menu = std::make_shared<cursesMenu>(itemsData);
+    menu = std::make_unique<cursesMenu>(itemsData);
 }
 
 /* init the downloads status window */
@@ -534,7 +518,7 @@ void dlManagerUI::updateDownloadsStatusWindow()
          * so it doesn't monopolize time / ressources */ 
         std::this_thread::sleep_for(std::chrono::milliseconds(100));
         /* y represents the y postion of the infos to print on the screen - it matches the location
-         * of the corresponding download item on the left part of the screen */
+         * of the corresponding download item on the lefutureUpdateDlsStatus part of the screen */
         std::vector<downloadWinInfo> vec;
         dlManagerControl->getAllDownloadsInfos(vec); 
         populateStatusWin(vec);
@@ -585,12 +569,12 @@ std::unique_ptr<cursesWindow> dlManagerUI::mainWinDlInfosInit()
 void dlManagerUI::addNewDl()
 {
     curs_set(1);   
-    std::shared_ptr<cursesWindow> addDlWin = addDlInitWin();
-    std::shared_ptr<cursesForm> addForm = initForm(2);
-    setAddDlForm(addForm, addDlWin);
-    paintAddDlWin(addDlWin);
+    addDlWin = addDlInitWin();
+    addDlForm = initAddDlForm(2);
+    setAddDlForm();
+    paintAddDlWin();
     addDlWin->refreshWin();
-    addDlNav(addDlWin, addForm);
+    addDlNav();
     /* No need to call free() for win and form -> class destructor will take care of it */
     curs_set(0);   
 }
@@ -601,7 +585,7 @@ std::unique_ptr<cursesWindow> dlManagerUI::addDlInitWin()
     return std::make_unique<cursesWindow>(row / 2, col - (col / 2), (row / 4), col / 4);
 }
 
-void dlManagerUI::paintAddDlWin(std::shared_ptr<cursesWindow> addDlWin)
+void dlManagerUI::paintAddDlWin()
 {
     char titleAdd[col / 2];
     int i;
@@ -622,45 +606,58 @@ void dlManagerUI::paintAddDlWin(std::shared_ptr<cursesWindow> addDlWin)
     addDlWin->drawBox(0, 0);
 }
 
-std::shared_ptr<cursesForm> dlManagerUI::initFormShared(int numFields)
+std::unique_ptr<cursesForm> dlManagerUI::initAddDlForm(int numFields)
 {
     return std::make_unique<cursesForm>(numFields);
 }
 
-
-std::unique_ptr<cursesForm> dlManagerUI::initForm(int numFields)
+void dlManagerUI::initDetForm(int numFields)
 {
-    return std::make_unique<cursesForm>(numFields);
+    detForm = std::make_unique<cursesForm>(numFields);
 }
 
-void dlManagerUI::setAddDlForm(std::shared_ptr<cursesForm> form, std::shared_ptr<cursesWindow> win)
+void dlManagerUI::setAddDlForm()
 {
-    point maxyx = win->getMaxyx();
+    point maxyx = addDlWin->getMaxyx();
 
     /* Set field size and location */
-    form->setField(0, 1, maxyx.x - 10, 3, 4, 0, 0);
-    form->setField(1, 1, maxyx.x - 10, 6, 4, 0, 0);
+    addDlForm->setField(0, 1, maxyx.x - 10, 3, 4, 0, 0);
+    addDlForm->setField(1, 1, maxyx.x - 10, 6, 4, 0, 0);
 
     /* Set field options */
-    form->setFieldBack(0, A_UNDERLINE);
-    form->setFieldBack(0, O_AUTOSKIP);
-    form->fieldOptsOff(0, O_STATIC);
-    form->setFieldBack(1, A_UNDERLINE);
-    form->setFieldBack(1, O_AUTOSKIP);
-    form->fieldOptsOff(1, O_STATIC);
+    addDlForm->setFieldBack(0, A_UNDERLINE);
+    addDlForm->setFieldBack(0, O_AUTOSKIP);
+    addDlForm->fieldOptsOff(0, O_STATIC);
+    addDlForm->setFieldBack(1, A_UNDERLINE);
+    addDlForm->setFieldBack(1, O_AUTOSKIP);
+    addDlForm->fieldOptsOff(1, O_STATIC);
 
-    /* Initialize form */
-    form->initForm();
-    form->setFormWin(win);
-    form->setFormSubwin(win, 20, 10, row / 2, 2);
+    /* Initialize addDlForm */
+    addDlForm->initForm();
+    addDlForm->setFormWin(addDlWin);
+    addDlForm->setFormSubwin(addDlWin, 20, 10, row / 2, 2);
 
-    form->postForm();
+    addDlForm->postForm();
+}
+
+void dlManagerUI::resizeAddDlNav(std::string url, std::string filename)
+{
+    url = trimSpaces(url);
+    filename = trimSpaces(filename);
+    resizeUI();
+    addDlWin = addDlInitWin();
+    addDlForm = initAddDlForm(2);
+    setAddDlForm();
+    paintAddDlWin();
+    addDlForm->populateField(REQ_FIRST_FIELD, url);
+    addDlForm->populateField(REQ_LAST_FIELD, filename);
+    addDlWin->refreshWin();
 }
 
 /* Navigate through the 'Add a download' window */
-void dlManagerUI::addDlNav(std::shared_ptr<cursesWindow> win, std::shared_ptr<cursesForm> form)
+void dlManagerUI::addDlNav()
 {
-    point maxyx = win->getMaxyx();
+    point maxyx = addDlWin->getMaxyx();
     int ch = 0;
     bool done = false;
     while ((ch = getch())) {
@@ -668,45 +665,45 @@ void dlManagerUI::addDlNav(std::shared_ptr<cursesWindow> win, std::shared_ptr<cu
             case KEY_RESIZE:
                 /* TODO - save all user input then update */
                 {
-                    resizeUI();
-                    /* TODO - move to resizeUI() */
-                    win->resizeWin(dlAddSz);
-                    paintAddDlWin(win);
-                    /* TODO */
-                    form->saveFieldBuffer();
-                    //form->restoreFieldBuffer();
-                    win->refreshWin();
+                    if (addDlForm->formDriver(REQ_VALIDATION) != E_OK) {
+                        ;
+                    }
+                    std::string url = addDlForm->getFieldBuffer(0);
+                    std::string filename = addDlForm->getFieldBuffer(1);
+                    url.push_back('\0');
+                    filename.push_back('\0');
+                    resizeAddDlNav(url, filename);
                 }
                 break;
 
             case KEY_UP:
-                form->formDriver(REQ_PREV_FIELD);
-                form->formDriver(REQ_END_LINE);
+                addDlForm->formDriver(REQ_PREV_FIELD);
+                addDlForm->formDriver(REQ_END_LINE);
                 break;
 
             case KEY_DOWN:
-                form->formDriver(REQ_NEXT_FIELD);
-                form->formDriver(REQ_END_LINE);
+                addDlForm->formDriver(REQ_NEXT_FIELD);
+                addDlForm->formDriver(REQ_END_LINE);
                 break;
 
             case KEY_LEFT:
-                form->formDriver(REQ_PREV_CHAR);
+                addDlForm->formDriver(REQ_PREV_CHAR);
                 break;
 
             case KEY_RIGHT:
-                form->formDriver(REQ_NEXT_CHAR);
+                addDlForm->formDriver(REQ_NEXT_CHAR);
                 break;
 
             case 127:
-                form->formDriver(REQ_DEL_PREV);
+                addDlForm->formDriver(REQ_DEL_PREV);
                 break;
 
             case KEY_DC:
-                form->formDriver(REQ_DEL_CHAR);
+                addDlForm->formDriver(REQ_DEL_CHAR);
                 break;
 
             case CTRL('x'):
-                /* Close window */
+                /* Close addDlWindow */
                 done = true;
                 break;
 
@@ -717,24 +714,24 @@ void dlManagerUI::addDlNav(std::shared_ptr<cursesWindow> win, std::shared_ptr<cu
 
             case 10:
                 {
-                    if (form->formDriver(REQ_VALIDATION) != E_OK) {
+                    if (addDlForm->formDriver(REQ_VALIDATION) != E_OK) {
                         //check error 
                         ;
                     }
                     else {
                         /* TODO - create a checUserInput class / function that will call everyone */
                         /* Get user input from the fields */
-                        std::string url = form->getFieldBuffer(0);
-                        std::string filename = form->getFieldBuffer(1);
+                        std::string url = addDlForm->getFieldBuffer(0);
+                        std::string filename = addDlForm->getFieldBuffer(1);
                         std::string URLcleaned = trimSpaces(url);                        
                         std::string filenameCleaned =trimSpaces(filename);
                         /* Must be at least 7 char long -> http:// */
                         if (checkURL(url) == 1) {
-                            win->printInMiddle(maxyx.y - 4, 0, maxyx.x, msgInvalidURL, COLOR_PAIR(1));
+                            addDlWin->printInMiddle(maxyx.y - 4, 0, maxyx.x, msgInvalidURL, COLOR_PAIR(1));
                             break;
                         }
                         if (!checkFilename(filename)){
-                            win->printInMiddle(maxyx.y - 4, 0, maxyx.x, msgInvalidFilename, COLOR_PAIR(1));
+                            addDlWin->printInMiddle(maxyx.y - 4, 0, maxyx.x, msgInvalidFilename, COLOR_PAIR(1));
                             break;
                         }
                         URLcleaned.push_back('\0');
@@ -751,15 +748,15 @@ void dlManagerUI::addDlNav(std::shared_ptr<cursesWindow> win, std::shared_ptr<cu
                 }
                 break;
             default:
-                form->formDriver(ch);
+                addDlForm->formDriver(ch);
                 break;
         }
         if (done) {
-            /* Exit subwin if done */
+            /* Exit subaddDlWin if done */
             break;
         }
         /* No mutex needed since all threads have stopped */
-        win->refreshWin();
+        addDlWin->refreshWin();
         /* TODO - get rid of them */
     }
 }
@@ -773,30 +770,31 @@ void dlManagerUI::updateDownloadsMenu(std::vector<std::string> vec)
 /* Init a subwindow containg infos about the selected download */
 void dlManagerUI::showDetails(std::string itemName)
 {
-    std::shared_ptr<cursesWindow> detWin = initDetWin();
-    std::shared_ptr<cursesForm> detForm = initForm(2);
-    setDetForm(detWin, detForm);
-    paintDetWin(detWin, itemName);
+    initDetWin();
+    initDetForm(2);
+    setDetForm();
+    paintDetWin(itemName);
 
     detForm->populateField(REQ_FIRST_FIELD, dlManagerControl->getURL(itemName));
     detForm->populateField(REQ_LAST_FIELD, itemName);
     detWin->refreshWin();
 
-    /* TODO - detWin is only used to get progressWin dimensions - not used in the actual thread */
-    startProgressBarThread(detWin, itemName);
+    curs_set(0);
 
+    /* detWin is only used to get progressWin dimensions - not used in the actual thread */
+    startProgressBarThread(itemName);
+    /* Disable cursor */
     /* Navigate through the details window */
-    detNav(detWin, detForm, itemName);
-
+    detNav(itemName);
     stopProgressBarThread();
 }
 
-std::shared_ptr<cursesWindow> dlManagerUI::initDetWin(/* pass winsize */)
+void dlManagerUI::initDetWin(/* pass winsize */)
 {
-    return std::make_shared<cursesWindow>(row / 2, col - (col / 2), (row / 4), col / 4);
+    detWin = std::make_unique<cursesWindow>(row / 2, col - (col / 2), (row / 4), col / 4);
 }
 
-void dlManagerUI::paintDetWin(std::shared_ptr<cursesWindow> detWin, std::string& itemName)
+void dlManagerUI::paintDetWin(std::string& itemName)
 {
     point maxyx = detWin->getMaxyx();
     detWin->drawBox(0, 0);
@@ -825,84 +823,79 @@ std::string dlManagerUI::initDetailsTitle(std::string itemName)
 }
 
 /* Init details window form in order to populate */
-void dlManagerUI::setDetForm(std::shared_ptr<cursesWindow> win, std::shared_ptr<cursesForm> form)
+void dlManagerUI::setDetForm()
 {
-    point maxyx = win->getMaxyx();
+    point maxyx = detWin->getMaxyx();
 
     /* Set field size and location */
-    form->setField(0, 1, maxyx.x - 10, 3, 4, 0, 0);
-    form->setField(1, 1, maxyx.x - 10, 6, 4, 0, 0);
+    detForm->setField(0, 1, maxyx.x - 10, 3, 4, 0, 0);
+    detForm->setField(1, 1, maxyx.x - 10, 6, 4, 0, 0);
 
     /* Set field options */
-    form->setFieldBack(0, A_UNDERLINE);
-    form->setFieldBack(0, O_AUTOSKIP);
-    form->fieldOptsOff(0, O_STATIC);
-    form->setFieldBack(1, A_UNDERLINE);
-    form->setFieldBack(1, O_AUTOSKIP);
-    form->fieldOptsOff(1, O_STATIC);
+    detForm->setFieldBack(0, A_UNDERLINE);
+    detForm->setFieldBack(0, O_AUTOSKIP);
+    detForm->fieldOptsOff(0, O_STATIC);
+    detForm->setFieldBack(1, A_UNDERLINE);
+    detForm->setFieldBack(1, O_AUTOSKIP);
+    detForm->fieldOptsOff(1, O_STATIC);
 
-    /* Initialize form */
-    form->initForm();
-    form->setFormWin(win);
-    form->setFormSubwin(win, 20, 10, row / 2, 2);
+    /* Initialize detForm */
+    detForm->initForm();
+    detForm->setFormWin(detWin);
+    detForm->setFormSubwin(detWin, 20, 10, row / 2, 2);
 
-    form->postForm();
+    detForm->postForm();
 }
 
 /* shared_ptr that will be moved to progressWin own thread */
-std::shared_ptr<cursesWindow> dlManagerUI::initProgressWin(point begyx, point maxyx)
+std::unique_ptr<cursesWindow> dlManagerUI::initProgressWin(point begyx, point maxyx)
 {
-    return std::make_shared<cursesWindow>(4, maxyx.x-10, maxyx.y, begyx.x+4);
+    return std::make_unique<cursesWindow>(4, maxyx.x-10, maxyx.y, begyx.x+4);
 }
 
-void dlManagerUI::startProgressBarThread(std::shared_ptr<cursesWindow> detWin, std::string& filename)
+void dlManagerUI::startProgressBarThread(std::string& filename)
 {
     /* Initialize progress bar according to its parent win (details win) dimensions */
     point begyx = detWin->getBegyx();
     point maxyx = detWin->getMaxyx();
     auto progressWin = initProgressWin(begyx, maxyx);
     progressWin->drawBox(0, 0);
-    ftP = std::async(std::launch::async, &dlManagerUI::progressBar, this, std::move(progressWin), filename);
+    futureProgressBar = std::async(std::launch::async, &dlManagerUI::progressBar, this, std::move(progressWin), filename);
 }
 
-void dlManagerUI::resetDetWin(std::shared_ptr<cursesWindow> win, std::shared_ptr<cursesForm> form, 
-        std::string filename)
+void dlManagerUI::resetDetWin(std::string filename)
 {
     stopProgressBarThread();
     resizeUI();
 
-    win = initDetWin();
-    form = initForm(2);
-    setDetForm(win, form);
-    paintDetWin(win, filename);
-    form->populateField(REQ_FIRST_FIELD, dlManagerControl->getURL(filename));
-    form->populateField(REQ_LAST_FIELD, filename);
-    win->refreshWin();
+    initDetWin();
+    initDetForm(2);
+    setDetForm();
+    paintDetWin(filename);
+    detForm->populateField(REQ_FIRST_FIELD, dlManagerControl->getURL(filename));
+    detForm->populateField(REQ_LAST_FIELD, filename);
+    detWin->refreshWin();
 
-    startProgressBarThread(win, filename);
+    startProgressBarThread(filename);
 }
 
 /* Navigate through a download details subwindow */
-void dlManagerUI::detNav(std::shared_ptr<cursesWindow> win, std::shared_ptr<cursesForm> form, 
-        std::string filename)
+void dlManagerUI::detNav(std::string filename)
 {
     int ch = 0;
     bool done = false;
-    curs_set(0);
 
-    /* Make sure ch gets updated for every loop iteration ! */
     while ((ch = getch())) {
         switch (ch) {
             case KEY_RESIZE:
                 {
-                    resetDetWin(win, form, filename);    
+                    resetDetWin(filename);    
                     break;
                 }
             case 'r':
                 /* Resume transfer - if the transfer is ongoing - does nothing */
                 {
                     std::lock_guard<std::mutex> guard(dlManagerUI::dlsInfoMutex);
-                    /* TODO - dlManagerController here */
                     dlManagerControl->resume(filename);
                 }
                 break;
@@ -910,7 +903,6 @@ void dlManagerUI::detNav(std::shared_ptr<cursesWindow> win, std::shared_ptr<curs
                 /* Pause transfer - if the transfer is already paused - does nothing */
                 {
                     std::lock_guard<std::mutex> guard(dlManagerUI::dlsInfoMutex);
-                    /* TODO - dlManagerController here */
                     dlManagerControl->pause(filename);
                 }
                 break;
@@ -941,7 +933,7 @@ void dlManagerUI::progressBar(std::shared_ptr<cursesWindow> progressWin, std::st
     float progCounter = dlManagerControl->getProgress(filename);
 
     if (progCounter == 100.0) {
-        /* TODO - paintFullProgressBar() */
+        /* TODO - bug here - bar size isn't correct */
         std::string progStr;
         for (i = 0; i < progBarWidth; ++i)
             progStr.push_back(' ');
@@ -958,6 +950,7 @@ void dlManagerUI::progressBar(std::shared_ptr<cursesWindow> progressWin, std::st
     }
 
     else {
+        /* TODO - bug here - bar size isn't correct */
         while (progCounter != 100.0) {
             /* Write char until value of progress */
             std::string progStr;
@@ -967,6 +960,7 @@ void dlManagerUI::progressBar(std::shared_ptr<cursesWindow> progressWin, std::st
             for (i = 0; i < curProg ; ++i)
                 progStr.push_back(' ');
             {
+                /* TODO - temporary */
                 std::lock_guard<std::mutex> guard(dlProgMutex);
                 progressWin->printInMiddle(1, 0, maxyx.x, percent, COLOR_PAIR(2));
                 progressWin->winAttrOn(COLOR_PAIR(16));
