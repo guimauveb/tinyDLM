@@ -69,10 +69,6 @@ class dlManagerUI
         void startStatusUpdate();
         int stopStatusUpdate();
 
-        /* TODO - unique_ptr */
-        void startProgressBarThread(std::string& filename);       
-        int stopProgressBarThread();
-
         /* Menu holding downloads items */
         void initDownloadsMenu();
         void initDownloadsMenu(std::vector<std::string> itemsData);
@@ -87,6 +83,7 @@ class dlManagerUI
         void updateDownloadsMenu(std::vector<std::string> vec);
 
         void updateKeyActWinMessage(bool& p);
+
         /* "Add a new download" routine */
         /* Function that will call all the needed functions to create a new "Add a new dl" window */
         /* Program's subwindows */
@@ -96,24 +93,27 @@ class dlManagerUI
         void setAddDlForm();
         /* Navigation */
         void addDlNav();
+        std::unique_ptr<cursesForm> addDlForm;
+        std::unique_ptr<cursesWindow> addDlWin;
+        void populateForm(std::string filename);
+        void resizeAddDlNav(std::string url, std::string filename);
+        std::unique_ptr<cursesForm> initAddDlForm(int numFields);
 
         /* Details window routine */
         void showDetails(std::string itemName);
         void setDetForm();
         std::unique_ptr<cursesForm> detForm;
-        std::unique_ptr<cursesForm> addDlForm;
-        std::unique_ptr<cursesWindow> addDlWin;
-        void populateForm(std::string filename);
+        std::unique_ptr<cursesWindow> initProgressWin(point begyx, point maxyx);
         void paintDetWin(std::string& itemName);
-        void resizeAddDlNav(std::string url, std::string filename);
-        std::unique_ptr<cursesForm> initAddDlForm(int numFields);
-        void initDetForm(int numFields);
         std::string initDetailsTitle(std::string itemName);
+        void initDetForm(int numFields);
         void detNav(std::string filename);
         void resetDetWin(std::string filename);
-        std::unique_ptr<cursesWindow> initProgressWin(point begyx, point maxyx);
+
         /* Download progress bar updated in a separate thread */
         void progressBar(std::shared_ptr<cursesWindow> progressWin, std::string filename);
+        void startProgressBarThread(std::string& filename);       
+        int stopProgressBarThread();
 
         /* TODO - Create a struct on the stack */
         winSize welWinSz;
