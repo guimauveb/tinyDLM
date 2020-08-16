@@ -1,1 +1,1 @@
-Port number ended with ':'
+Could not resolve host: ssign the detWin pointer first and then try to reassign detForm, since      * detForm has to free some memory corresponding to the old window (now deleted), we end up with a segfault *

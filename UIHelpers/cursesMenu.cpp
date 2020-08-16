@@ -36,6 +36,7 @@ void cursesMenu::clearItems()
     for(int i = 0; i < n; ++i)
         free_item(items[i]);
     items.clear();
+    itemStrings.clear();
 }
 
 void cursesMenu::menuOptsOff(Menu_Options)

@@ -1,6 +1,7 @@
 #include "dlManagerController/dlManagerController.hpp"
 /* cursesMenu.hpp includes cursesWindow and cursesForm */
 /* TODO - use header protections (?) */
+#include <iostream>
 #include "UIHelpers/cursesMenu.hpp"
 
 /* TODO - is there a way to avoid a macro in this case ? */
@@ -27,93 +28,96 @@ class dlManagerUI
         void initColors();
         void setWinsSize();
 
-        /* Display a welcome message at first start */
-        void firstStart();
         /* Window holding the welcome message at first start */
         std::unique_ptr<cursesWindow> welcomeWinInit();
-
-        void resizeUI();
+        void paintWelWin(std::unique_ptr<cursesWindow>& welWin);
+        /* Display a welcome message at first start */
+        void firstStart();
 
         /* Initialize program's main windows */
         void mainWinsInit();
+        void refreshMainWins();
+        void resizeUI();
         std::unique_ptr<cursesWindow> mainWinTopBarInit();
-        std::unique_ptr<cursesWindow> mainWinLabelsInit();
-        std::unique_ptr<cursesWindow> mainWinMainInit();
-        std::unique_ptr<cursesWindow> mainWinKeyActInit();
-        std::unique_ptr<cursesWindow> mainWinDlInfosInit();
-        std::unique_ptr<cursesWindow> mainWinDownloadsStatusInit();
-
-        std::unique_ptr<cursesWindow> detWin; 
-        void initDetWin();
-
-        /* Draw what needs to be drawn in main windows */
-        void paintWelWin(std::unique_ptr<cursesWindow>& welWin);
         void paintTopWin(std::unique_ptr<cursesWindow>& topWin);
+        std::unique_ptr<cursesWindow> mainWinLabelsInit();
         void paintLabelsWin(std::unique_ptr<cursesWindow>& labelsWin);
+        std::unique_ptr<cursesWindow> mainWinMainInit();
         void paintMainWinWin(std::unique_ptr<cursesWindow>& mainWinWin);
+        std::unique_ptr<cursesWindow> mainWinKeyActInit();
+        void paintKeyActWin(std::unique_ptr<cursesWindow>& keyActWin);
+        /* Update message displayed in the key act window */
+        void updateKeyActWinMessage(bool& p);
+        std::unique_ptr<cursesWindow> mainWinDownloadsStatusInit();
+        /* Menu holding downloads items */
+        std::unique_ptr<cursesMenu> menu;
+        std::unique_ptr<cursesMenu> initDownloadsMenu(std::vector<std::string> itemsData);
+        void setDownloadsMenu();
         void paintDlsStatusWin(std::unique_ptr<cursesWindow>& dlsStatusWin);
         void populateStatusWin(std::vector<downloadWinInfo>& vec);
-        void paintKeyActWin(std::unique_ptr<cursesWindow>& keyActWin);
+        /* Update status window in a designated thread */
+        void updateDownloadsStatusWindow();
+        void updateDownloadsMenu(std::vector<std::string> vec);
+        //std::unique_ptr<cursesWindow> mainWinDlInfosInit();
 
-        void refreshMainWins();
+        /* Main windows are then moved into a vector */
+        std::vector<std::unique_ptr<cursesWindow>> mainWindows;
+
+        /* Initialized by the constructor */
+        std::unique_ptr<dlManagerController> dlManagerControl;
 
         /* TODO - move to the designated function */
         int row = 0, col = 0;
 
-        /* Initialized by the constructor */
-        std::unique_ptr<dlManagerController> dlManagerControl;
-        /* Main 5 windows */
-        std::vector<std::unique_ptr<cursesWindow>> mainWindows;
-
-        /* Start / stop downloads status update */
+        /* Start / stop downloads status update thread */
         void startStatusUpdate();
         int stopStatusUpdate();
 
-        /* Menu holding downloads items */
-        void initDownloadsMenu();
-        void initDownloadsMenu(std::vector<std::string> itemsData);
-        std::unique_ptr<cursesMenu> menu;
-        void setDownloadsMenu();
-
-        /* Update message displayed in the key act window */
-        void updateKeyActWinMessage();
-
-        /* Update status window in a designated thread */
-        void updateDownloadsStatusWindow();
-        void updateDownloadsMenu(std::vector<std::string> vec);
-
-        void updateKeyActWinMessage(bool& p);
+        /* Program's subwindows - 'Add a download' window / 'Details' window - 'Progress bar' window  */
 
         /* "Add a new download" routine */
         /* Function that will call all the needed functions to create a new "Add a new dl" window */
-        /* Program's subwindows */
-        void addNewDl();
+        std::unique_ptr<cursesWindow> addDlWin;
         std::unique_ptr<cursesWindow> addDlInitWin();
+        std::unique_ptr<cursesForm> addDlForm;
+        std::unique_ptr<cursesForm> initAddDlForm(int numFields);
+        void addNewDl();
         void paintAddDlWin();
         void setAddDlForm();
-        /* Navigation */
+
+        /* Navigate through the 'Add a download' subwindow */
         void addDlNav();
-        std::unique_ptr<cursesForm> addDlForm;
-        std::unique_ptr<cursesWindow> addDlWin;
         void populateForm(std::string filename);
         void resizeAddDlNav(std::string url, std::string filename);
-        std::unique_ptr<cursesForm> initAddDlForm(int numFields);
 
         /* Details window routine */
         void showDetails(std::string itemName);
-        void setDetForm();
-        std::unique_ptr<cursesForm> detForm;
-        std::unique_ptr<cursesWindow> initProgressWin(point begyx, point maxyx);
+        std::unique_ptr<cursesWindow> detWin; 
+        std::unique_ptr<cursesWindow> initDetWin();
         void paintDetWin(std::string& itemName);
+        std::unique_ptr<cursesForm> detForm;
+        std::unique_ptr<cursesForm> initDetForm(int numFields);
+        void setDetForm();
+
         std::string initDetailsTitle(std::string itemName);
-        void initDetForm(int numFields);
         void detNav(std::string filename);
         void resetDetWin(std::string filename);
 
         /* Download progress bar updated in a separate thread */
-        void progressBar(std::shared_ptr<cursesWindow> progressWin, std::string filename);
+        std::unique_ptr<cursesWindow> initProgressWin(point begyx, point maxyx);
+        void progressBar(std::unique_ptr<cursesWindow>&& progressWin, std::string filename);
         void startProgressBarThread(std::string& filename);       
         int stopProgressBarThread();
+
+        /* Bool signaling if the status window should be updated -> set to true when naviagating the download
+         * list window, otherwise set to false. Used by the status window thread and the main thread so it's
+         * protected by a mutex. */
+        bool updateStatus = false;
+
+        /* future that will execute the status update function */
+        std::future<void> futureUpdateDlsStatus;
+        /* future that will execute the progress bar update function */
+        std::future<void> futureProgressBar;
 
         /* TODO - Create a struct on the stack */
         winSize welWinSz;
@@ -127,14 +131,6 @@ class dlManagerUI
         winSize dlDetSz;
         winSize dlProgSz;
 
-        /* Bool signaling if the status window should be updated -> set to true when naviagating the download
-         * list window, otherwise set to false */
-        bool updateStatus = false;
-
-        /* future that will execute the status update function */
-        std::future<void> futureUpdateDlsStatus;
-        std::future<void> futureProgressBar;
-
         /* Signals to stop refreshing progress subwindow */
         bool progRef = false;
 
@@ -146,6 +142,7 @@ class dlManagerUI
         const int lowSpeedLim = 56;
         const int lowSpeedTim = 60;
 
+        /* TODO - enum class */
         const int topWinIdx = 0;
         const int labelsWinIdx = 1;
         const int dlsWinIdx = 2;

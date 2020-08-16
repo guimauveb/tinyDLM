@@ -1,10 +1,11 @@
 #include "cursesWindow.hpp"
+#include <thread>
+#include <iostream>
 
 cursesWindow::cursesWindow(int r, int c, int by, int bx)
     :row{r}, col{c}, begy{by}, begx{bx}
 {
     if ((win = newwin(row, col, begy, begx)) == nullptr) {
-        //displayErrMsg(MAIN_WIN_0_FAIL);
     }
     wrefresh(win);
 }
@@ -47,7 +48,7 @@ void cursesWindow::eraseWin()
 /* reset == erase then refresh */
 void cursesWindow::resetWin()
 {
-    werase(win);
+    //werase(win);
     wrefresh(win);
 }
 /* We need to delete the reinit the window to properly resize it - wresize() only changes row and col */

@@ -18,6 +18,23 @@ dlManagerUI::dlManagerUI()
     startStatusUpdate();
 }
 
+/* Free memory and exit curses */
+dlManagerUI::~dlManagerUI()
+{
+    stopStatusUpdate();
+    stopProgressBarThread();
+    /* Pause all downloads -> we use pause to stop them since it does the same thing */
+    dlManagerControl->pauseAll();
+
+    /* Delete main windows */
+    mainWindows.clear();
+
+    /* TODO - save downloads list */
+    /* Empty the downloads list menu */
+    endwin();
+    std::cout << "Goodbye." << std::endl;
+}
+
 /* Initialize curses */
 void dlManagerUI::initCurses()
 {
@@ -44,6 +61,103 @@ void dlManagerUI::initColors()
     init_pair(16, COLOR_GREEN, COLOR_GREEN);
 }
 
+void dlManagerUI::setWinsSize()
+{
+    /* Get terminal screen size in columns and rows */
+    getmaxyx(stdscr, row, col);
+
+    welWinSz = {row - 8, col, 4, 0};
+
+    topBarSz = {1, col, 0, 0};
+    labelsSz = {1, col, 2, 0};
+    mainWinSz = {row - 4, col / 2, 3, 0};
+    dlStatusSz = {row - 4, col / 2, 3, col / 2};
+    keyActSz = {1, col / 2, row - 1, 0};
+    dlInfosSz = {1, col / 2, row - 1, col / 2};
+
+    dlAddSz = {row / 2, col - (col / 2), (row / 4), col / 4};
+    dlDetSz = {row / 2, col - (col / 2), (row / 4), col / 4};
+    dlProgSz = {4, (col - (col / 2)) -10, row / 2, col / 4 + 4};
+
+    //return struct of winSizes
+}
+
+/* Window displaying a welcome message*/
+std::unique_ptr<cursesWindow> dlManagerUI::welcomeWinInit()
+{
+    return std::make_unique<cursesWindow>(row - 8, col, 4, 0);
+}
+
+void dlManagerUI::paintWelWin(std::unique_ptr<cursesWindow>& welWin)
+{
+    welWin->printInMiddle(row / 4, 0, col,  tinyDLMWelcome, COLOR_PAIR(7));
+    welWin->printInMiddle(row / 4 + 1, 0, col,  tinyDLMVer, COLOR_PAIR(7));
+    welWin->printInMiddle(row / 4 + 2, 0, col,  tinyHelp, COLOR_PAIR(7));
+}
+
+void dlManagerUI::firstStart()
+{
+    std::unique_ptr<cursesWindow> welWin = welcomeWinInit();
+    paintWelWin(welWin);
+    welWin->refreshWin();
+    /* Move to current active subwins so we know we have to resize them */
+
+    /* Disable cursor because I can't print to the screen without moving it */
+    curs_set(0);
+    bool done = false;
+    int ch = 0;
+    while ((ch = getch())) {
+        switch(ch) {
+            case KEY_RESIZE:
+                resizeUI();
+                welWin->resizeWin(welWinSz);
+                paintWelWin(welWin);
+                welWin->refreshWin();
+                break;
+            case 'a':
+                /* Open a window and exit the function  - program will continue in Browser() */
+                addNewDl();
+                done = true;
+                break;
+            case 'h':
+                break;
+            default:
+                break;
+        }
+        if (done) {
+            break;
+        }
+    }
+    refreshMainWins();
+}
+
+/* Init the main windows */
+void dlManagerUI::mainWinsInit()
+{
+    mainWindows.emplace_back(mainWinTopBarInit());
+    paintTopWin(mainWindows.at(topWinIdx));
+
+    mainWindows.emplace_back(mainWinLabelsInit());
+    paintLabelsWin(mainWindows.at(labelsWinIdx));
+
+    mainWindows.emplace_back(mainWinMainInit());
+    paintMainWinWin(mainWindows.at(dlsWinIdx));
+
+    mainWindows.emplace_back(mainWinDownloadsStatusInit());
+    paintDlsStatusWin(mainWindows.at(dlsStatusWinIdx));
+
+    mainWindows.emplace_back(mainWinKeyActInit());
+    paintKeyActWin(mainWindows.at(keyActWinIdx));
+}
+
+void dlManagerUI::refreshMainWins()
+{
+    for (size_t i = 0; i < mainWindows.size(); ++i) {
+        mainWindows.at(i)->touchWin();
+        mainWindows.at(i)->refreshWin();
+    }
+}
+
 /* Resize program when terminal window size is detected */
 void dlManagerUI::resizeUI()
 {
@@ -67,354 +181,6 @@ void dlManagerUI::resizeUI()
     paintKeyActWin(mainWindows.at(keyActWinIdx));
 
     refreshMainWins();
-}
-
-void dlManagerUI::setWinsSize()
-{
-    /* Get terminal screen size in columns and rows */
-    getmaxyx(stdscr, row, col);
-
-    welWinSz = {row - 8, col, 4, 0};
-
-    topBarSz = {1, col, 0, 0};
-    labelsSz = {1, col, 2, 0};
-    mainWinSz = {row - 4, col / 2, 3, 0};
-    dlStatusSz = {row - 4, col / 2, 3, col / 2};
-    keyActSz = {1, col / 2, row - 1, 0};
-    dlInfosSz = {1, col / 2, row - 1, col / 2};
-
-    dlAddSz = {row / 2, col - (col / 2), (row / 4), col / 4};
-    dlDetSz = {row / 2, col - (col / 2), (row / 4), col / 4};
-    dlProgSz = {4, (col - (col / 2)) -10, row / 2, col / 4 + 4};
-
-    //return struct of winSizes
-}
-
-void dlManagerUI::firstStart()
-{
-    std::unique_ptr<cursesWindow> welWin = welcomeWinInit();
-    paintWelWin(welWin);
-    welWin->refreshWin();
-    /* Move to current active subwins so we know we have to resize them */
-
-    /* Disable cursor because I can't print to the screen without moving it */
-    curs_set(0);
-    bool done = false;
-    int ch = 0;
-    while ((ch = getch())) {
-        switch(ch) {
-            case KEY_RESIZE:
-                resizeUI();
-                /* TODO - move to resizeUI */
-                welWin->resizeWin(welWinSz);
-                paintWelWin(welWin);
-                welWin->refreshWin();
-                break;
-            case 'a':
-                done = true;
-                break;
-            case 'h':
-                break;
-            default:
-                break;
-        }
-        if (done) {
-            //welWin->eraseWin();
-            //welWin->refreshWin();
-            /* Open an window and exiting the constructor - program will continue in browser() */
-            addNewDl();
-            break;
-        }
-    }
-    refreshMainWins();
-}
-
-void dlManagerUI::refreshMainWins()
-{
-    for (size_t i = 0; i < mainWindows.size(); ++i) {
-        mainWindows.at(i)->touchWin();
-        mainWindows.at(i)->refreshWin();
-    }
-}
-
-/* Free memory and exit curses */
-dlManagerUI::~dlManagerUI()
-{
-    stopStatusUpdate();
-    stopProgressBarThread();
-    /* Pause all downloads -> we use pause to stop them since it does the same thing */
-    dlManagerControl->pauseAll();
-
-    /* Delete main windows */
-    mainWindows.clear();
-
-    /* TODO - save downloads list */
-    /* Empty the downloads list menu */
-    endwin();
-}
-
-/* Signals to the downloads status update thread to stop */
-int dlManagerUI::stopStatusUpdate()
-{
-    {
-        std::lock_guard<std::mutex> guard(dlManagerUI::dlsInfoMutex);
-        if (!updateStatus) { return 1; }
-        updateStatus = false;
-    }
-
-    /* Wait for the thread to stop before moving on */
-    if (!(futureIsReady(futureUpdateDlsStatus))) {
-        while (!futureIsReady(futureUpdateDlsStatus))
-            //wait unitl execution is done
-            ;
-    } 
-    return 0;
-}
-
-/* Stop progress subwindow */
-int dlManagerUI::stopProgressBarThread()
-{
-    /* Signal to stop progress bar thread once we exit the details window */
-    {
-        std::lock_guard<std::mutex> guard(dlProgMutex);
-        if (!progRef) { return 1; }
-        progRef = false;
-    }
-
-    /* Wait for the thread to stop before moving on */
-    if (!(futureIsReady(futureProgressBar))) {
-        while (!futureIsReady(futureProgressBar))
-            //wait unitl execution is done
-            ;
-    } 
-    return 0;
-}
-
-void dlManagerUI::startStatusUpdate()
-{
-    /* If no downloads - erase the window and break out of here */
-    if (!dlManagerControl->isActive()) {
-        std::lock_guard<std::mutex> guard(dlManagerUI::dlsInfoMutex);
-        mainWindows.at(dlsStatusWinIdx)->refreshWin();
-    }
-    else {
-        updateStatus = true;
-        futureUpdateDlsStatus = std::async(std::launch::async, &dlManagerUI::updateDownloadsStatusWindow, this);
-    }
-}
-
-/* Navigate the download manager menus */
-void dlManagerUI::Browser()
-{
-    bool EXIT = false;
-    bool PAUSEDALL = false;
-    int ch = 0;
-    while ((ch = getch()) != KEY_F(1)) {
-        switch(ch) {
-            case KEY_RESIZE:
-                {
-                    stopStatusUpdate();
-                    resizeUI();
-                    updateDownloadsMenu(dlManagerControl->getDownloadsList());
-                    startStatusUpdate();
-                    break;
-                }
-
-            case KEY_DOWN:
-                {
-                    /* Make sure that the menu is not be empty */
-                    if (dlManagerControl->isActive()) {
-                        menu->menuDriver(REQ_DOWN_ITEM);
-                    }
-                    break;
-                }
-
-            case KEY_UP:
-                {
-                    /* Make sure that the menu is not be empty */
-                    if (dlManagerControl->isActive()) {
-                        menu->menuDriver(REQ_UP_ITEM);
-                    }
-                    break;
-                }
-
-            case 10:
-                /* Enter - user has selected an item */
-                {
-                    /* Make sure that the menu is not be empty */
-                    if (!dlManagerControl->isActive()) {
-                        break;
-                    }
-                    stopStatusUpdate();
-                    showDetails(menu->getItemName());
-                    updateDownloadsMenu(dlManagerControl->getDownloadsList());
-                    startStatusUpdate(); 
-                    break;
-                }
-
-                /* Opens a subwindow in which we'll enter the download item info */
-            case 'a':
-                {
-                    /* Stop status thread */
-                    stopStatusUpdate();
-                    /* Open the window containing a form in which the user enters the download infos */
-                    addNewDl();
-                    startStatusUpdate();
-                    break;
-                }
-
-                /* TODO - Display help window */
-            case 'h':
-                {
-                    break;
-                }
-
-                /* Pause all active downloads */
-            case 'p':
-                {
-                    if (!dlManagerControl->isActive()) {
-                        break;
-                    }
-                    std::string tmp = menu->getItemName();
-                    dlManagerControl->stop(tmp);
-                    break;
-                }
-            case 'P':
-                {
-                    if (!dlManagerControl->isActive()) {
-                        break;
-                    }
-                    /* Break if already paused */
-                    if (PAUSEDALL)
-                        break;
-                    stopStatusUpdate();
-                    dlManagerControl->pauseAll();
-                    PAUSEDALL = true;
-                    /* Update key actions window */
-                    updateKeyActWinMessage(PAUSEDALL);
-                    startStatusUpdate();
-                    break;
-                }
-
-            case 'r':
-                {
-                    if (!dlManagerControl->isActive()) {
-                        break;
-                    }
-                    stopStatusUpdate();
-                    dlManagerControl->resumeAll();
-                    PAUSEDALL = false;
-                    /* Update key actions window */
-                    updateKeyActWinMessage(PAUSEDALL);
-                    startStatusUpdate();
-                    break;
-                }
-
-            case 'c':
-                /* TODO - Clear inactive downloads - see where the bug comes from */
-                {
-                    stopStatusUpdate();
-                    dlManagerControl->clearInactive();
-                    startStatusUpdate();
-                    break;
-                }
-
-                /* Kill all downloads */
-            case 'k':
-                {
-                    stopStatusUpdate();
-                    dlManagerControl->killAll();
-                    updateDownloadsMenu(dlManagerControl->getDownloadsList());
-                    PAUSEDALL = false;
-                    /* Erase all windows and start from scratch */
-                    /* TODO - routine here */
-                    mainWindows.at(dlsStatusWinIdx)->resetWin();
-                    mainWindows.at(keyActWinIdx)->eraseWin();
-                    mainWindows.at(keyActWinIdx)->printInMiddle(0, 0, 0, msgKeyInfoP, COLOR_PAIR(8));
-                    mainWindows.at(keyActWinIdx)->refreshWin();
-                    startStatusUpdate();
-                    break;
-                }
-
-                /* Terminates the program */
-            case CTRL('t'):
-                {
-                    stopStatusUpdate();
-                    EXIT = true;
-                    break;
-                }
-
-                /* TODO - catch sigint - exit gracefully */
-            case CTRL('z'):
-                {
-                    //stopStatusUpdate();
-                    break;
-                }
-
-            default:
-                {
-                    break;
-                }
-        }
-
-        /* Consistantly update main windows */
-        {
-            std::lock_guard<std::mutex> guard(dlManagerUI::dlsInfoMutex);
-            refreshMainWins();        
-        }
-
-        if (EXIT) {
-            break;
-        }
-    }
-}
-
-void dlManagerUI::updateKeyActWinMessage(bool& p)
-{
-    mainWindows.at(keyActWinIdx)->eraseWin();
-    if (p) {
-        /* Display 'resume' if paused */
-        mainWindows.at(keyActWinIdx)->printInMiddle(0, 0, col / 2, msgKeyInfoR, COLOR_PAIR(8));
-    }
-    else {
-        /* Display 'pause' if not paused */
-        mainWindows.at(keyActWinIdx)->printInMiddle(0, 0, col / 2, msgKeyInfoP, COLOR_PAIR(8));
-    }
-}
-
-/* Init the main windows */
-void dlManagerUI::mainWinsInit()
-{
-    mainWindows.emplace_back(mainWinTopBarInit());
-    paintTopWin(mainWindows.at(topWinIdx));
-
-    mainWindows.emplace_back(mainWinLabelsInit());
-    paintLabelsWin(mainWindows.at(labelsWinIdx));
-
-    mainWindows.emplace_back(mainWinMainInit());
-    paintMainWinWin(mainWindows.at(dlsWinIdx));
-
-    mainWindows.emplace_back(mainWinDownloadsStatusInit());
-    paintDlsStatusWin(mainWindows.at(dlsStatusWinIdx));
-
-    mainWindows.emplace_back(mainWinKeyActInit());
-    paintKeyActWin(mainWindows.at(keyActWinIdx));
-
-    //mainWindows.emplace_back(mainWinDlInfosInit());
-    //paintTopWin(mainWindows.at(5));
-}
-
-/* Window displaying a welcome message*/
-std::unique_ptr<cursesWindow> dlManagerUI::welcomeWinInit()
-{
-    return std::make_unique<cursesWindow>(row - 8, col, 4, 0);
-}
-
-void dlManagerUI::paintWelWin(std::unique_ptr<cursesWindow>& welWin)
-{
-    welWin->printInMiddle(row / 4, 0, col,  tinyDLMWelcome, COLOR_PAIR(7));
-    welWin->printInMiddle(row / 4 + 1, 0, col,  tinyDLMVer, COLOR_PAIR(7));
-    welWin->printInMiddle(row / 4 + 2, 0, col,  tinyHelp, COLOR_PAIR(7));
 }
 
 /* Window containing top bar title */
@@ -473,6 +239,62 @@ void dlManagerUI::paintMainWinWin(std::unique_ptr<cursesWindow>& mainWInWin)
     // do somehting
 }
 
+/* Init the download progress subwindow */ 
+std::unique_ptr<cursesWindow> dlManagerUI::mainWinKeyActInit()
+{
+    return std::make_unique<cursesWindow>(1, col / 2, row - 1, 0);
+}
+
+void dlManagerUI::paintKeyActWin(std::unique_ptr<cursesWindow>& keyActWin)
+{
+    /* Display keys and their associated functions at the bottom of the window */
+    keyActWin->printInMiddle(0, 0, col / 2, msgKeyInfoP, COLOR_PAIR(8));
+}
+
+void dlManagerUI::updateKeyActWinMessage(bool& p)
+{
+    mainWindows.at(keyActWinIdx)->eraseWin();
+    if (p) {
+        /* Display 'resume' if paused */
+        mainWindows.at(keyActWinIdx)->printInMiddle(0, 0, col / 2, msgKeyInfoR, COLOR_PAIR(8));
+    }
+    else {
+        /* Display 'pause' if not paused */
+        mainWindows.at(keyActWinIdx)->printInMiddle(0, 0, col / 2, msgKeyInfoP, COLOR_PAIR(8));
+    }
+}
+/* init the global download info subwindow in a separated thread - displays number of downloads + speed */ 
+//std::unique_ptr<cursesWindow> dlManagerUI::mainWinDlInfosInit()
+//{
+//    return std::make_unique<cursesWindow>(1, col / 2, row - 1, col / 2);
+//}
+
+/* init the downloads status window */
+std::unique_ptr<cursesWindow> dlManagerUI::mainWinDownloadsStatusInit()
+{
+    return std::make_unique<cursesWindow>(row - 4, col / 2, 3, col / 2);
+}
+
+void dlManagerUI::paintDlsStatusWin(std::unique_ptr<cursesWindow>& dlsStatusWin)
+{
+    // do something
+}
+
+/* Populate the status window with downloads informations such as their status / speed / progress */
+void dlManagerUI::populateStatusWin(std::vector<downloadWinInfo>& vec)
+{
+    int y = 1;
+    /* Iterate over the list of downloads we obtained from dlManagerControl */
+    for (auto& dl : vec) {
+        /* TODO - paintStatusWin() */
+        mainWindows.at(dlsStatusWinIdx)->printInMiddle(y, 0, row / 4, dl.progress, COLOR_PAIR(7));
+        mainWindows.at(dlsStatusWinIdx)->printInMiddle(y, row / 4, row / 4, dl.speed, COLOR_PAIR(7));
+        //mainWindow.at(dlsStatusWinIdx)->printInMiddledlsStatusWiny, 2 * width / 4, width / 4, dl.eta, COLOR_PAIR(7));
+        mainWindows.at(dlsStatusWinIdx)->printInMiddle(y, 3 * row / 4,row / 4, dl.status, COLOR_PAIR(7));
+        y++;
+    }
+}
+
 void dlManagerUI::setDownloadsMenu()
 {
     point pMax = mainWindows.at(dlsWinIdx)->getMaxyx();
@@ -486,22 +308,10 @@ void dlManagerUI::setDownloadsMenu()
 
 /* toDO - see how I can save the current menu and only add one item without reposting the entire menu */
 /* display downloads as a menu */
-void dlManagerUI::initDownloadsMenu(std::vector<std::string> itemsData)
+std::unique_ptr<cursesMenu> dlManagerUI::initDownloadsMenu(std::vector<std::string> itemsData)
 {
-    menu = std::make_unique<cursesMenu>(itemsData);
+    return std::make_unique<cursesMenu>(itemsData);
 }
-
-/* init the downloads status window */
-std::unique_ptr<cursesWindow> dlManagerUI::mainWinDownloadsStatusInit()
-{
-    return std::make_unique<cursesWindow>(row - 4, col / 2, 3, col / 2);
-}
-
-void dlManagerUI::paintDlsStatusWin(std::unique_ptr<cursesWindow>& dlsStatusWin)
-{
-    // do something
-}
-
 /* consistantly refresh the speed / progress /status of the current downloads */ 
 /* toDO - y offset corresponding to the active menu page */
 void dlManagerUI::updateDownloadsStatusWindow()
@@ -520,59 +330,233 @@ void dlManagerUI::updateDownloadsStatusWindow()
         /* y represents the y postion of the infos to print on the screen - it matches the location
          * of the corresponding download item on the lefutureUpdateDlsStatus part of the screen */
         std::vector<downloadWinInfo> vec;
-        dlManagerControl->getAllDownloadsInfos(vec); 
+        dlManagerControl->getAllDownloadsInfos(); 
         populateStatusWin(vec);
+
         /* Refresh status window */
         {
             std::lock_guard<std::mutex> guard(dlManagerUI::dlsInfoMutex);
-            mainWindows.at(dlsStatusWinIdx)->touchWin();
+//            mainWindows.at(dlsStatusWinIdx)->touchWin();
             mainWindows.at(dlsStatusWinIdx)->refreshWin();
         }
     }
 }
+/* end main windows */
 
-/* Populate the status window with downloads informations about their status / speed / progress */
-void dlManagerUI::populateStatusWin(std::vector<downloadWinInfo>& vec)
+
+void dlManagerUI::startStatusUpdate()
 {
-    int y = 1;
-    /* Iterate over the list of downloads we obtained from dlManagerControl */
-    for (auto& dl : vec) {
-        /* TODO - paintStatusWin() */
-        mainWindows.at(dlsStatusWinIdx)->printInMiddle(y, 0, row / 4, dl.progress, COLOR_PAIR(7));
-        mainWindows.at(dlsStatusWinIdx)->printInMiddle(y, row / 4, row / 4, dl.speed, COLOR_PAIR(7));
-        //mainWindow.at(dlsStatusWinIdx)->printInMiddledlsStatusWiny, 2 * width / 4, width / 4, dl.eta, COLOR_PAIR(7));
-        mainWindows.at(dlsStatusWinIdx)->printInMiddle(y, 3 * row / 4,row / 4, dl.status, COLOR_PAIR(7));
-        y++;
+    /* If no downloads - erase the window and break out of here */
+    if (!dlManagerControl->isActive()) {
+        std::lock_guard<std::mutex> guard(dlManagerUI::dlsInfoMutex);
+        mainWindows.at(dlsStatusWinIdx)->refreshWin();
+    }
+    else {
+        updateStatus = true;
+        futureUpdateDlsStatus = std::async(std::launch::async, &dlManagerUI::updateDownloadsStatusWindow, this);
     }
 }
 
-/* Init the download progress subwindow */ 
-std::unique_ptr<cursesWindow> dlManagerUI::mainWinKeyActInit()
+/* Signals to the downloads status update thread to stop */
+int dlManagerUI::stopStatusUpdate()
 {
-    return std::make_unique<cursesWindow>(1, col / 2, row - 1, 0);
+    {
+        std::lock_guard<std::mutex> guard(dlManagerUI::dlsInfoMutex);
+        if (!updateStatus) { return 1; }
+        updateStatus = false;
+    }
+
+    /* Wait for the thread to stop before moving on */
+    if (!(futureIsReady(futureUpdateDlsStatus))) {
+        while (!futureIsReady(futureUpdateDlsStatus))
+            //wait unitl execution is done
+            ;
+    } 
+    return 0;
 }
 
-void dlManagerUI::paintKeyActWin(std::unique_ptr<cursesWindow>& keyActWin)
-{
-    /* Display keys and their associated functions at the bottom of the window */
-    keyActWin->printInMiddle(0, 0, col / 2, msgKeyInfoP, COLOR_PAIR(8));
-}
 
-/* init the global download info subwindow in a separated thread - displays number of downloads + speed */ 
-std::unique_ptr<cursesWindow> dlManagerUI::mainWinDlInfosInit()
+/* Navigate the download manager menus */
+void dlManagerUI::Browser()
 {
-    return std::make_unique<cursesWindow>(1, col / 2, row - 1, col / 2);
+    bool EXIT = false;
+    bool PAUSEDALL = false;
+    int ch = 0;
+    while ((ch = getch()) != KEY_F(1)) {
+        switch(ch) {
+            case KEY_RESIZE:
+                {
+                    stopStatusUpdate();
+                    resizeUI();
+                    updateDownloadsMenu(dlManagerControl->getDownloadsList());
+                    startStatusUpdate();
+                    break;
+                }
+
+            case KEY_DOWN:
+                {
+                    /* Make sure that the menu is not be empty */
+                    if (dlManagerControl->isActive()) {
+                        menu->menuDriver(REQ_DOWN_ITEM);
+                    }
+                    break;
+                }
+
+            case KEY_UP:
+                {
+                    /* Make sure that the menu is not be empty */
+                    if (dlManagerControl->isActive()) {
+                        menu->menuDriver(REQ_UP_ITEM);
+                    }
+                    break;
+                }
+
+            case 10:
+                /* Enter - user has selected an item */
+                {
+                    /* Make sure that the menu is not be empty */
+                    if (!dlManagerControl->isActive()) {
+                        break;
+                    }
+                    stopStatusUpdate();
+                    showDetails(menu->getItemName());
+                    updateDownloadsMenu(dlManagerControl->getDownloadsList());
+                    startStatusUpdate(); 
+                    break;
+                }
+                /* Opens a subwindow in which we'll enter the download item info */
+            case 'a':
+                {
+                    /* Stop status thread */
+                    stopStatusUpdate();
+                    /* Open the window containing a form in which the user enters the download infos */
+                    addNewDl();
+                    updateDownloadsMenu(dlManagerControl->getDownloadsList());
+                    startStatusUpdate();
+                    break;
+                }
+
+                /* TODO - Display help window */
+            case 'h':
+                {
+                    break;
+                }
+
+                /* Pause all active downloads */
+            case 'p':
+                {
+                    if (!dlManagerControl->isActive()) {
+                        break;
+                    }
+                    std::string tmp = menu->getItemName();
+                    dlManagerControl->stop(tmp);
+                    break;
+                }
+            case 'P':
+                {
+                    if (!dlManagerControl->isActive()) {
+                        break;
+                    }
+                    /* Break if already paused */
+                    if (PAUSEDALL)
+                        break;
+                    stopStatusUpdate();
+                    dlManagerControl->pauseAll();
+                    PAUSEDALL = true;
+                    /* Update key actions window */
+                    updateKeyActWinMessage(PAUSEDALL);
+                    startStatusUpdate();
+                    break;
+                }
+
+            case 'r':
+                {
+                    if (!dlManagerControl->isActive()) {
+                        break;
+                    }
+                    stopStatusUpdate();
+                    dlManagerControl->resumeAll();
+                    PAUSEDALL = false;
+                    /* Update key actions window */
+                    updateKeyActWinMessage(PAUSEDALL);
+                    startStatusUpdate();
+                    break;
+                }
+
+            case 'c':
+                /* TODO - Clear inactive downloads - see where the bug comes from */
+                /* TODO - update menu */
+                {
+                    stopStatusUpdate();
+                    dlManagerControl->clearInactive();
+                    updateDownloadsMenu(dlManagerControl->getDownloadsList());
+                    startStatusUpdate();
+                    break;
+                }
+
+                /* Kill all downloads */
+            case 'k':
+                {
+                    stopStatusUpdate();
+                    dlManagerControl->killAll();
+                    updateDownloadsMenu(dlManagerControl->getDownloadsList());
+                    PAUSEDALL = false;
+                    /* Erase all windows and start from scratch */
+                    /* TODO - routine here */
+                    mainWindows.at(dlsStatusWinIdx)->resetWin();
+                    mainWindows.at(keyActWinIdx)->eraseWin();
+                    mainWindows.at(keyActWinIdx)->printInMiddle(0, 0, 0, msgKeyInfoP, COLOR_PAIR(8));
+                    mainWindows.at(keyActWinIdx)->refreshWin();
+                    startStatusUpdate();
+                    break;
+                }
+
+                /* Terminates the program */
+            case CTRL('t'):
+                {
+                    stopStatusUpdate();
+                    EXIT = true;
+                    break;
+                }
+
+                /* TODO - catch sigint - exit gracefully */
+            case CTRL('z'):
+                {
+                    //stopStatusUpdate();
+                    break;
+                }
+
+            default:
+                {
+                    break;
+                }
+        }
+
+        /* Consistantly update main windows */
+        {
+            std::lock_guard<std::mutex> guard(dlManagerUI::dlsInfoMutex);
+            refreshMainWins();        
+        }
+
+        if (EXIT) {
+            break;
+        }
+    }
 }
-/* end main windows */
 
 /* Add a new download */
 void dlManagerUI::addNewDl()
 {
     curs_set(1);   
-    addDlWin = addDlInitWin();
+    /* Important: We begin by assigning a new form to addDlForm unique_ptr and then assigning a new window to 
+     * addDlWin unique_ptr -> if we reset the addDlWin pointer first and then try to reset addDlForm, since 
+     * addDlForm has to free some memory corresponding to the old window (now deleted), we end up with a 
+     * segfault */
     addDlForm = initAddDlForm(2);
+    addDlWin = addDlInitWin();
     setAddDlForm();
     paintAddDlWin();
+    addDlWin->touchWin();
     addDlWin->refreshWin();
     addDlNav();
     /* No need to call free() for win and form -> class destructor will take care of it */
@@ -611,9 +595,9 @@ std::unique_ptr<cursesForm> dlManagerUI::initAddDlForm(int numFields)
     return std::make_unique<cursesForm>(numFields);
 }
 
-void dlManagerUI::initDetForm(int numFields)
+std::unique_ptr<cursesForm> dlManagerUI::initDetForm(int numFields)
 {
-    detForm = std::make_unique<cursesForm>(numFields);
+    return std::make_unique<cursesForm>(numFields);
 }
 
 void dlManagerUI::setAddDlForm()
@@ -635,13 +619,15 @@ void dlManagerUI::setAddDlForm()
     /* Initialize addDlForm */
     addDlForm->initForm();
     addDlForm->setFormWin(addDlWin);
-    addDlForm->setFormSubwin(addDlWin, 20, 10, row / 2, 2);
+    addDlForm->setFormSubwin(addDlWin, 20, 10, maxyx.y / 2, 2);
 
     addDlForm->postForm();
 }
 
 void dlManagerUI::resizeAddDlNav(std::string url, std::string filename)
 {
+    url.push_back('\0');
+    filename.push_back('\0');
     url = trimSpaces(url);
     filename = trimSpaces(filename);
     resizeUI();
@@ -670,8 +656,6 @@ void dlManagerUI::addDlNav()
                     }
                     std::string url = addDlForm->getFieldBuffer(0);
                     std::string filename = addDlForm->getFieldBuffer(1);
-                    url.push_back('\0');
-                    filename.push_back('\0');
                     resizeAddDlNav(url, filename);
                 }
                 break;
@@ -719,12 +703,13 @@ void dlManagerUI::addDlNav()
                         ;
                     }
                     else {
-                        /* TODO - create a checUserInput class / function that will call everyone */
+                        /* TODO - create a checkUserInput function that will call everyone */
                         /* Get user input from the fields */
+                        /* 50 char max for the filename TODO */
                         std::string url = addDlForm->getFieldBuffer(0);
                         std::string filename = addDlForm->getFieldBuffer(1);
                         std::string URLcleaned = trimSpaces(url);                        
-                        std::string filenameCleaned =trimSpaces(filename);
+                        std::string filenameCleaned = trimSpaces(filename);
                         /* Must be at least 7 char long -> http:// */
                         if (checkURL(url) == 1) {
                             addDlWin->printInMiddle(maxyx.y - 4, 0, maxyx.x, msgInvalidURL, COLOR_PAIR(1));
@@ -737,8 +722,8 @@ void dlManagerUI::addDlNav()
                         URLcleaned.push_back('\0');
                         filenameCleaned.push_back('\0');
                         /* Start dl if everything ok */
-                        dlManagerControl->createNewDl(dlFolder, filename, url,  0, 0);
-                        dlManagerControl->startDl(filename);
+                        dlManagerControl->createNewDl(dlFolder, filenameCleaned, URLcleaned,  0, 0);
+                        dlManagerControl->startDl(filenameCleaned);
                         /* Update downloads list in the menu */
                         updateDownloadsMenu(dlManagerControl->getDownloadsList());
                         /* Restart status thread */
@@ -763,15 +748,18 @@ void dlManagerUI::addDlNav()
 
 void dlManagerUI::updateDownloadsMenu(std::vector<std::string> vec)
 {
-    initDownloadsMenu(vec);
+    menu = initDownloadsMenu(vec);
     setDownloadsMenu();
 }
 
 /* Init a subwindow containg infos about the selected download */
 void dlManagerUI::showDetails(std::string itemName)
 {
-    initDetWin();
-    initDetForm(2);
+    /* Important: We begin by assigning a new form to detForm unique_ptr and then assigning a new window to 
+     * detWin unique_ptr -> if we reassign the detWin pointer first and then try to reassign detForm, since 
+     * detForm has to free some memory corresponding to the old window (now deleted), we end up with a segfault */
+    detForm = initDetForm(2);
+    detWin = initDetWin();
     setDetForm();
     paintDetWin(itemName);
 
@@ -789,9 +777,9 @@ void dlManagerUI::showDetails(std::string itemName)
     stopProgressBarThread();
 }
 
-void dlManagerUI::initDetWin(/* pass winsize */)
+std::unique_ptr<cursesWindow> dlManagerUI::initDetWin(/* pass winsize */)
 {
-    detWin = std::make_unique<cursesWindow>(row / 2, col - (col / 2), (row / 4), col / 4);
+    return std::make_unique<cursesWindow>(row / 2, col - (col / 2), (row / 4), col / 4);
 }
 
 void dlManagerUI::paintDetWin(std::string& itemName)
@@ -863,13 +851,32 @@ void dlManagerUI::startProgressBarThread(std::string& filename)
     futureProgressBar = std::async(std::launch::async, &dlManagerUI::progressBar, this, std::move(progressWin), filename);
 }
 
+/* Stop progress subwindow */
+int dlManagerUI::stopProgressBarThread()
+{
+    /* Signal to stop progress bar thread once we exit the details window */
+    {
+        std::lock_guard<std::mutex> guard(dlProgMutex);
+        if (!progRef) { return 1; }
+        progRef = false;
+    }
+
+    /* Wait for the thread to stop before moving on */
+    if (!(futureIsReady(futureProgressBar))) {
+        while (!futureIsReady(futureProgressBar))
+            //wait unitl execution is done
+            ;
+    } 
+    return 0;
+}
+
 void dlManagerUI::resetDetWin(std::string filename)
 {
     stopProgressBarThread();
-    resizeUI();
 
-    initDetWin();
-    initDetForm(2);
+    resizeUI();
+    detWin = initDetWin();
+    detForm = initDetForm(2);
     setDetForm();
     paintDetWin(filename);
     detForm->populateField(REQ_FIRST_FIELD, dlManagerControl->getURL(filename));
@@ -920,13 +927,13 @@ void dlManagerUI::detNav(std::string filename)
 }
 
 /* Display a subwindow containing details about the selected download */ 
-void dlManagerUI::progressBar(std::shared_ptr<cursesWindow> progressWin, std::string filename)
+void dlManagerUI::progressBar(std::unique_ptr<cursesWindow>&& progressWin, std::string filename)
 {
     point maxyx = progressWin->getMaxyx();
     /* Pass entire function to thread ! */
     progRef = true;
     /* TODO - remove hardcoded values */
-    int progBarWidth = col - 14;
+    int progBarWidth = maxyx.x - 4;
     int i = 0;
 
     /* TODO - dlManagerController here */
@@ -954,15 +961,15 @@ void dlManagerUI::progressBar(std::shared_ptr<cursesWindow> progressWin, std::st
         while (progCounter != 100.0) {
             /* Write char until value of progress */
             std::string progStr;
-            int curProg = progCounter * progBarWidth / 100;
+            int curProg = progCounter * progBarWidth / 100.0;
             /* floorf */
             std::string percent = stringifyNumber(dlManagerControl->getProgress(filename), 2); 
-            for (i = 0; i < curProg ; ++i)
+            for (i = 0; i < curProg + 1; ++i)
                 progStr.push_back(' ');
             {
                 /* TODO - temporary */
                 std::lock_guard<std::mutex> guard(dlProgMutex);
-                progressWin->printInMiddle(1, 0, maxyx.x, percent, COLOR_PAIR(2));
+                progressWin->printInMiddle(1, 0, maxyx.x, std::to_string(curProg), COLOR_PAIR(2));
                 progressWin->winAttrOn(COLOR_PAIR(16));
                 progressWin->addStr(2, 2, progStr);
                 progressWin->winAttrOff(COLOR_PAIR(16));

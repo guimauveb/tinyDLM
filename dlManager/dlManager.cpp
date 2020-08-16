@@ -1,7 +1,8 @@
 #include "dlManager.hpp"
 
 /* Initialize the dlManager object with all the need infos to processs the download */
-dlManager::dlManager(const int& dlid, const std::string& u, const std::string& f, const std::string& sa, const int& lsl = 0, const int& lst = 0)
+dlManager::dlManager(const int& dlid, const std::string& u, const std::string& f, const std::string& sa, 
+        const int& lsl = 0, const int& lst = 0)
 {
     /* Inetialize our download object- partial initializion but all non set values should be set to 0 or null */
     downloadPtr->id = dlid;
@@ -284,6 +285,4 @@ void dlManager::resume()
 }
 
 const std::string dlManager::USER_AGENT = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/84.0.4147.89 Safari/537.36";
-
-
 

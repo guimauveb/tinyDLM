@@ -13,8 +13,8 @@ dlManagerController::~dlManagerController()
 }
 
 /* Initialize a new dlManager object then place it in a vector */
-void dlManagerController::createNewDl(const std::string& dlFolder, std::string filename, const std::string& url,  
-        const int& lowSpeedLim, const int& lowSpeedTim)
+void dlManagerController::createNewDl(const std::string dlFolder, std::string filename, const std::string url,  
+        const int lowSpeedLim, const int lowSpeedTim)
 {
     std::string saveAs = dlFolder + filename;
     std::unique_ptr<dlManager> dlm = std::make_unique<dlManager>(dlCounter, url, filename, saveAs, lowSpeedLim, lowSpeedTim);
@@ -51,7 +51,7 @@ void dlManagerController::resume(std::string& dlToResume)
 void dlManagerController::resumeAll()
 {
     for (size_t i = 0; i < dlManagerVec.size(); ++i) {
-        if (dlManagerVec.at(i)->getDownloadInfos()->status == downloadStatus::ERROR || dlManagerVec.at(i)->getDownloadInfos()->status == downloadStatus::PAUSED )
+        if (dlManagerVec.at(i)->getDownloadInfos()->status == downloadStatus::PAUSED)
             dlManagerVec.at(i)->resume();
     }
 }
@@ -75,11 +75,13 @@ void dlManagerController::clearInactive()
 {
     /* TODO - get download statuses - remove stopped / failed ones */
     for (size_t i = 0; i < dlManagerVec.size(); ++i) {
-        if (dlManagerVec.at(i)->getDownloadInfos()->status == downloadStatus::ERROR || dlManagerVec.at(i)->getDownloadInfos()->status == downloadStatus::COMPLETED )
+        if (dlManagerVec.at(i)->getDownloadInfos()->status == downloadStatus::ERROR || 
+                dlManagerVec.at(i)->getDownloadInfos()->status == downloadStatus::COMPLETED ) {
+            downloadsMap.erase(dlManagerVec.at(i)->getDownloadInfos()->filename);
             dlManagerVec.erase(dlManagerVec.begin() + i);
+        }
     }
 }
-
 
 /* TODO - not UI related - move to helper func */
 void dlManagerController::stop(std::string& dlToStop)
@@ -132,8 +134,9 @@ downloadStatus dlManagerController::getStatus(const std::string& filename)
 }
 
 /* Get all downloads statuses infos */
-std::vector<downloadWinInfo>& dlManagerController::getAllDownloadsInfos(std::vector<downloadWinInfo>& vec) 
+std::vector<downloadWinInfo> dlManagerController::getAllDownloadsInfos() 
 {
+    std::vector<downloadWinInfo> vec;
     /* Loop over all downloads sorted by id */
     std::map<int, std::string> dlsSorted = sortDownloadsMapByIds();
     for (auto& dl : dlsSorted) {
@@ -165,11 +168,11 @@ std::map<int, std::string> dlManagerController::sortDownloadsMapByIds()
 std::vector<std::string> dlManagerController::getDownloadsList()
 {
     std::vector<std::string> vec;
-     auto m = sortDownloadsMapByIds();
-     for (auto el : m) {
-         vec.push_back(el.second);
-     }
-     return vec;
+    auto m = sortDownloadsMapByIds();
+    for (auto el : m) {
+        vec.push_back(el.second);
+    }
+    return vec;
 }
 
 

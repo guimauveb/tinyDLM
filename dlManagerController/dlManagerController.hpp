@@ -7,8 +7,8 @@ class dlManagerController
         dlManagerController();
         ~dlManagerController();
 
-        void createNewDl(const std::string& dlFolder, std::string filename, const std::string& url,
-                         const int& lowSpeedLim, const int& lowSpeedTim);
+        void createNewDl(const std::string dlFolder, std::string filename, const std::string url,
+                         const int lowSpeedLim, const int lowSpeedTim);
         void removeDl();
 
         void startDl(std::vector<std::string>& dlsToStart);
@@ -31,7 +31,7 @@ class dlManagerController
         double getSpeed(const std::string& filename);
         downloadStatus getStatus(const std::string& filename);
 
-        std::vector<downloadWinInfo>& getAllDownloadsInfos(std::vector<downloadWinInfo>& vec);
+        std::vector<downloadWinInfo> getAllDownloadsInfos();
         /* Returns false if there's 0 download */
         bool isActive();
         std::vector<std::string> getDownloadsList();
@@ -42,8 +42,6 @@ class dlManagerController
         std::vector<std::unique_ptr<dlManager>> dlManagerVec;
         /* Maps a filename to a download id */
         std::map<std::string, int> downloadsMap;
-        std::map<int, std::string> downloadsMapByIds;
         std::map<int, std::string> sortDownloadsMapByIds();
-
 
 };
