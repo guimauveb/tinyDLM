@@ -1,10 +1,10 @@
 #include "dlManagerController.hpp"
+#include "../UIHelpers/cursesWindow.hpp"
 
 dlManagerController::dlManagerController()
     /* TODO - see what can be initialized here */
-    :dlCounter{0}, dlManagerVec{}
 {
-
+    dlCounter = 0;
 }
 
 dlManagerController::~dlManagerController()
@@ -22,7 +22,10 @@ void dlManagerController::createNewDl(const std::string dlFolder, std::string fi
 
     /* Update downloads list */
     std::map<std::string, int>::iterator it = downloadsMap.end();
-    downloadsMap.insert(it, std::pair<std::string, int>(filename, dlCounter++));
+    downloadsMap.insert(it, std::pair<std::string, int>(filename, dlCounter));
+    dlCounter++;
+    /* TODO - why don't dlManagerVec and downloadsMap always have the same size ? */
+    assert(dlManagerVec.size() == downloadsMap.size());
 }
 
 /* Start one dl */
@@ -73,12 +76,25 @@ void dlManagerController::pauseAll()
  * the dictionnary */
 void dlManagerController::clearInactive()
 {
-    /* TODO - get download statuses - remove stopped / failed ones */
+    /* TODO - How can it fail ?? */
+    assert(dlManagerVec.size() == downloadsMap.size());
+
+    std::vector<size_t> todel;
     for (size_t i = 0; i < dlManagerVec.size(); ++i) {
-        if (dlManagerVec.at(i)->getDownloadInfos()->status == downloadStatus::ERROR || 
-                dlManagerVec.at(i)->getDownloadInfos()->status == downloadStatus::COMPLETED ) {
-            downloadsMap.erase(dlManagerVec.at(i)->getDownloadInfos()->filename);
-            dlManagerVec.erase(dlManagerVec.begin() + i);
+        downloadStatus s = dlManagerVec.at(i)->getDownloadInfos()->status;
+        if (s != downloadStatus::DOWNLOADING) {
+            std::map<std::string, int>::iterator it = downloadsMap.find(dlManagerVec.at(i)->
+                    getDownloadInfos()->filename);
+            if (it != downloadsMap.end()) {
+                downloadsMap.erase(it);
+                todel.push_back(i);
+            }
+        }
+    }
+    if (!todel.empty()) {
+        for (size_t i = 0; i < todel.size(); ++i) {
+            dlManagerVec.erase(dlManagerVec.begin() + todel.at(i) - i);
+            dlCounter--;
         }
     }
 }
@@ -169,6 +185,7 @@ std::vector<std::string> dlManagerController::getDownloadsList()
 {
     std::vector<std::string> vec;
     auto m = sortDownloadsMapByIds();
+    endwin();
     for (auto el : m) {
         vec.push_back(el.second);
     }

@@ -78,7 +78,10 @@ void cursesMenu::setMenuMark(const char *m)
 
 std::string cursesMenu::getItemName()
 {
-    return std::string(item_name(current_item(menu)));
+    std::string itemName = item_name(current_item(menu));
+    /* char * returned by item_name doesn't seem to be null terminated */
+    itemName.push_back('\0');
+    return itemName;
 }
 
 void cursesMenu::menuDriver(int c)

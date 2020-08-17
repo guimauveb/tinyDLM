@@ -281,7 +281,7 @@ void dlManagerUI::paintDlsStatusWin(std::unique_ptr<cursesWindow>& dlsStatusWin)
 }
 
 /* Populate the status window with downloads informations such as their status / speed / progress */
-void dlManagerUI::populateStatusWin(std::vector<downloadWinInfo>& vec)
+void dlManagerUI::populateStatusWin(const std::vector<downloadWinInfo> vec)
 {
     int y = 1;
     /* Iterate over the list of downloads we obtained from dlManagerControl */
@@ -298,11 +298,11 @@ void dlManagerUI::populateStatusWin(std::vector<downloadWinInfo>& vec)
 void dlManagerUI::setDownloadsMenu()
 {
     point pMax = mainWindows.at(dlsWinIdx)->getMaxyx();
-    const std::string mark = " * ";
     menu->menuOptsOn(O_SHOWDESC);
     menu->setMenuWin(mainWindows.at(dlsWinIdx));
     menu->setMenuSub(mainWindows.at(dlsWinIdx), pMax.y - 1, pMax.x - 4, 1, 2);
     menu->setMenuFormat(pMax.y - 6, 0);
+    menu->setMenuMark(" * ");
     menu->postMenu();
 }
 
@@ -312,11 +312,11 @@ std::unique_ptr<cursesMenu> dlManagerUI::initDownloadsMenu(std::vector<std::stri
 {
     return std::make_unique<cursesMenu>(itemsData);
 }
+
 /* consistantly refresh the speed / progress /status of the current downloads */ 
 /* toDO - y offset corresponding to the active menu page */
 void dlManagerUI::updateDownloadsStatusWindow()
 {
-    std::map<std::string, int>::iterator it;
     while (true) {
         {
             std::lock_guard<std::mutex> guard(dlManagerUI::dlsInfoMutex);
@@ -329,20 +329,17 @@ void dlManagerUI::updateDownloadsStatusWindow()
         std::this_thread::sleep_for(std::chrono::milliseconds(100));
         /* y represents the y postion of the infos to print on the screen - it matches the location
          * of the corresponding download item on the lefutureUpdateDlsStatus part of the screen */
-        std::vector<downloadWinInfo> vec;
-        dlManagerControl->getAllDownloadsInfos(); 
-        populateStatusWin(vec);
+        populateStatusWin(dlManagerControl->getAllDownloadsInfos());
 
         /* Refresh status window */
         {
             std::lock_guard<std::mutex> guard(dlManagerUI::dlsInfoMutex);
-//            mainWindows.at(dlsStatusWinIdx)->touchWin();
+            mainWindows.at(dlsStatusWinIdx)->touchWin();
             mainWindows.at(dlsStatusWinIdx)->refreshWin();
         }
     }
 }
 /* end main windows */
-
 
 void dlManagerUI::startStatusUpdate()
 {
@@ -368,9 +365,10 @@ int dlManagerUI::stopStatusUpdate()
 
     /* Wait for the thread to stop before moving on */
     if (!(futureIsReady(futureUpdateDlsStatus))) {
-        while (!futureIsReady(futureUpdateDlsStatus))
+        while (!futureIsReady(futureUpdateDlsStatus)) {
             //wait unitl execution is done
             ;
+        }
     } 
     return 0;
 }
@@ -414,7 +412,7 @@ void dlManagerUI::Browser()
             case 10:
                 /* Enter - user has selected an item */
                 {
-                    /* Make sure that the menu is not be empty */
+                    /* Make sure that the menu is not empty */
                     if (!dlManagerControl->isActive()) {
                         break;
                     }
@@ -489,6 +487,7 @@ void dlManagerUI::Browser()
                 {
                     stopStatusUpdate();
                     dlManagerControl->clearInactive();
+                    mainWindows.at(dlsStatusWinIdx)->resetWin();
                     updateDownloadsMenu(dlManagerControl->getDownloadsList());
                     startStatusUpdate();
                     break;
@@ -626,15 +625,17 @@ void dlManagerUI::setAddDlForm()
 
 void dlManagerUI::resizeAddDlNav(std::string url, std::string filename)
 {
+    resizeUI();
+    addDlForm = initAddDlForm(2);
+    addDlWin = addDlInitWin();
+    setAddDlForm();
+    paintAddDlWin();
+
     url.push_back('\0');
     filename.push_back('\0');
     url = trimSpaces(url);
     filename = trimSpaces(filename);
-    resizeUI();
-    addDlWin = addDlInitWin();
-    addDlForm = initAddDlForm(2);
-    setAddDlForm();
-    paintAddDlWin();
+
     addDlForm->populateField(REQ_FIRST_FIELD, url);
     addDlForm->populateField(REQ_LAST_FIELD, filename);
     addDlWin->refreshWin();
@@ -848,7 +849,8 @@ void dlManagerUI::startProgressBarThread(std::string& filename)
     point maxyx = detWin->getMaxyx();
     auto progressWin = initProgressWin(begyx, maxyx);
     progressWin->drawBox(0, 0);
-    futureProgressBar = std::async(std::launch::async, &dlManagerUI::progressBar, this, std::move(progressWin), filename);
+    futureProgressBar = std::async(std::launch::async, &dlManagerUI::progressBar, this, 
+            std::move(progressWin), filename);
 }
 
 /* Stop progress subwindow */
@@ -863,20 +865,21 @@ int dlManagerUI::stopProgressBarThread()
 
     /* Wait for the thread to stop before moving on */
     if (!(futureIsReady(futureProgressBar))) {
-        while (!futureIsReady(futureProgressBar))
+        while (!futureIsReady(futureProgressBar)) {
             //wait unitl execution is done
             ;
+        }
     } 
     return 0;
 }
 
-void dlManagerUI::resetDetWin(std::string filename)
+void dlManagerUI::resizeDetWin(std::string filename)
 {
     stopProgressBarThread();
 
     resizeUI();
-    detWin = initDetWin();
     detForm = initDetForm(2);
+    detWin = initDetWin();
     setDetForm();
     paintDetWin(filename);
     detForm->populateField(REQ_FIRST_FIELD, dlManagerControl->getURL(filename));
@@ -896,7 +899,7 @@ void dlManagerUI::detNav(std::string filename)
         switch (ch) {
             case KEY_RESIZE:
                 {
-                    resetDetWin(filename);    
+                    resizeDetWin(filename);    
                     break;
                 }
             case 'r':
@@ -969,7 +972,7 @@ void dlManagerUI::progressBar(std::unique_ptr<cursesWindow>&& progressWin, std::
             {
                 /* TODO - temporary */
                 std::lock_guard<std::mutex> guard(dlProgMutex);
-                progressWin->printInMiddle(1, 0, maxyx.x, std::to_string(curProg), COLOR_PAIR(2));
+                progressWin->printInMiddle(1, 0, maxyx.x, percent, COLOR_PAIR(2));
                 progressWin->winAttrOn(COLOR_PAIR(16));
                 progressWin->addStr(2, 2, progStr);
                 progressWin->winAttrOff(COLOR_PAIR(16));

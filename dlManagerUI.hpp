@@ -54,7 +54,7 @@ class dlManagerUI
         std::unique_ptr<cursesMenu> initDownloadsMenu(std::vector<std::string> itemsData);
         void setDownloadsMenu();
         void paintDlsStatusWin(std::unique_ptr<cursesWindow>& dlsStatusWin);
-        void populateStatusWin(std::vector<downloadWinInfo>& vec);
+        void populateStatusWin(const std::vector<downloadWinInfo> vec);
         /* Update status window in a designated thread */
         void updateDownloadsStatusWindow();
         void updateDownloadsMenu(std::vector<std::string> vec);
@@ -101,7 +101,7 @@ class dlManagerUI
 
         std::string initDetailsTitle(std::string itemName);
         void detNav(std::string filename);
-        void resetDetWin(std::string filename);
+        void resizeDetWin(std::string filename);
 
         /* Download progress bar updated in a separate thread */
         std::unique_ptr<cursesWindow> initProgressWin(point begyx, point maxyx);

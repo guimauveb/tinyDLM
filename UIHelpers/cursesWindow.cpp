@@ -48,7 +48,7 @@ void cursesWindow::eraseWin()
 /* reset == erase then refresh */
 void cursesWindow::resetWin()
 {
-    //werase(win);
+    werase(win);
     wrefresh(win);
 }
 /* We need to delete the reinit the window to properly resize it - wresize() only changes row and col */
