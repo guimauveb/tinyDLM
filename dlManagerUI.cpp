@@ -850,7 +850,7 @@ void dlManagerUI::startProgressBarThread(std::string& filename)
     auto progressWin = initProgressWin(begyx, maxyx);
     progressWin->drawBox(0, 0);
     futureProgressBar = std::async(std::launch::async, &dlManagerUI::progressBar, this, 
-            std::ref(progressWin), filename);
+            std::move(progressWin), filename);
 }
 
 /* Stop progress subwindow */
@@ -858,7 +858,7 @@ int dlManagerUI::stopProgressBarThread()
 {
     /* Signal to stop progress bar thread once we exit the details window */
     {
-        std::lock_guard<std::mutex> guard(dlProgMutex);
+        std::lock_guard<std::mutex> guard(dlManagerUI::dlProgMutex);
         if (!progRef) { return 1; }
         progRef = false;
     }
@@ -935,7 +935,7 @@ void dlManagerUI::progressBar(std::shared_ptr<cursesWindow> progressWin, std::st
     point maxyx = progressWin->getMaxyx();
     /* Pass entire function to thread ! */
     {
-        std::lock_guard<std::mutex> guard(dlProgMutex);
+        std::lock_guard<std::mutex> guard(dlManagerUI::dlProgMutex);
         progRef = true;
     }
     /* TODO - remove hardcoded values */
@@ -952,7 +952,7 @@ void dlManagerUI::progressBar(std::shared_ptr<cursesWindow> progressWin, std::st
             progStr.push_back(' ');
         {
             /* TODO - temporary */
-            std::lock_guard<std::mutex> guard(dlProgMutex);
+            std::lock_guard<std::mutex> guard(dlManagerUI::dlProgMutex);
             /* TODO - updateProgWin() */
             progressWin->printInMiddle(1, 0, maxyx.x, hundredPer, COLOR_PAIR(2));
             progressWin->winAttrOn(COLOR_PAIR(16));
@@ -973,7 +973,7 @@ void dlManagerUI::progressBar(std::shared_ptr<cursesWindow> progressWin, std::st
             for (i = 0; i < curProg + 1; ++i)
                 progStr.push_back(' ');
             {
-                std::lock_guard<std::mutex> guard(dlProgMutex);
+                std::lock_guard<std::mutex> guard(dlManagerUI::dlProgMutex);
                 /* TODO - temporary */
                 progressWin->printInMiddle(1, 0, maxyx.x, percent, COLOR_PAIR(2));
                 progressWin->winAttrOn(COLOR_PAIR(16));
@@ -982,12 +982,12 @@ void dlManagerUI::progressBar(std::shared_ptr<cursesWindow> progressWin, std::st
                 progressWin->refreshWin();
             }
             {
-                std::lock_guard<std::mutex> guard(dlProgMutex);
+                std::lock_guard<std::mutex> guard(dlManagerUI::dlProgMutex);
                 if (!progRef)
                     break;
             }
             progCounter = dlManagerControl->getProgress(filename);
-            std::this_thread::sleep_for(std::chrono::milliseconds(150));
+            std::this_thread::sleep_for(std::chrono::milliseconds(200));
         }
     }
 }
