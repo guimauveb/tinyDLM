@@ -32,5 +32,5 @@ class cursesForm {
         size_t nFields;
         FORM *form = nullptr;
         std::vector<FIELD*> fields;
-        std::vector<const std::string> fieldBuffers;
+        std::vector<std::string> fieldBuffers;
 };
