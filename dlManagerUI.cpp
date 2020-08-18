@@ -849,8 +849,8 @@ void dlManagerUI::startProgressBarThread(std::string& filename)
     point maxyx = detWin->getMaxyx();
     auto progressWin = initProgressWin(begyx, maxyx);
     progressWin->drawBox(0, 0);
-    futureProgressBar = std::async(std::launch::async, &dlManagerUI::progressBar, this, 
-            std::move(progressWin), filename);
+    futureVec.emplace_back(std::async(std::launch::async, &dlManagerUI::progressBar, this, 
+            std::move(progressWin), filename));
 }
 
 /* Stop progress subwindow */
@@ -889,13 +889,7 @@ void dlManagerUI::resizeDetWin(std::string filename)
     detForm->populateField(REQ_LAST_FIELD, filename);
     detWin->refreshWin();
 
-    /* Initialize progress bar according to its parent win (details win) dimensions */
-    point begyx = detWin->getBegyx();
-    point maxyx = detWin->getMaxyx();
-    auto progressWin = initProgressWin(begyx, maxyx);
-    progressWin->drawBox(0, 0);
-    futureVec.emplace_back(std::async(std::launch::async, &dlManagerUI::progressBar, this, 
-                std::move(progressWin), filename));
+    startProgressBarThread(filename);
 }
 
 /* Navigate through a download details subwindow */
