@@ -771,7 +771,7 @@ void dlManagerUI::showDetails(std::string itemName)
     curs_set(0);
 
     /* detWin is only used to get progressWin dimensions - not used in the actual thread */
-    startProgressBarThread(itemName);
+    startProgressBarThread();
     /* Disable cursor */
     /* Navigate through the details window */
     detNav(itemName);
@@ -842,14 +842,14 @@ std::unique_ptr<cursesWindow> dlManagerUI::initProgressWin(point begyx, point ma
     return std::make_unique<cursesWindow>(4, maxyx.x-10, maxyx.y, begyx.x+4);
 }
 
-void dlManagerUI::startProgressBarThread(std::string& filename)
+void dlManagerUI::startProgressBarThread()
 {
     /* Initialize progress bar according to its parent win (details win) dimensions */
     point begyx = detWin->getBegyx();
     point maxyx = detWin->getMaxyx();
     progressWin = initProgressWin(begyx, maxyx);
     progressWin->drawBox(0, 0);
-    futureProgressBar = std::async(std::launch::async, &dlManagerUI::progressBar, this, filename);
+    futureProgressBar = std::async(std::launch::async, &dlManagerUI::progressBar, this);
 }
 
 /* Stop progress subwindow */
@@ -885,7 +885,7 @@ void dlManagerUI::resizeDetWin(std::string filename)
     detForm->populateField(REQ_LAST_FIELD, filename);
     detWin->refreshWin();
 
-    startProgressBarThread(filename);
+    startProgressBarThread();
 }
 
 /* Navigate through a download details subwindow */
@@ -929,7 +929,7 @@ void dlManagerUI::detNav(std::string filename)
 }
 
 /* Display a subwindow containing details about the selected download */ 
-void dlManagerUI::progressBar(std::string filename)
+void dlManagerUI::progressBar()
 {
     point maxyx = progressWin->getMaxyx();
     /* Pass entire function to thread ! */
@@ -937,11 +937,13 @@ void dlManagerUI::progressBar(std::string filename)
         std::lock_guard<std::mutex> guard(dlManagerUI::dlProgMutex);
         progRef = true;
     }
+    std::string filename = "abcd";
     /* TODO - remove hardcoded values */
     int progBarWidth = maxyx.x - 4;
     int i = 0;
 
     /* TODO - dlManagerController here */
+
     float progCounter = dlManagerControl->getProgress(filename);
 
     if (progCounter == 100.0) {
