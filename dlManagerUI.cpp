@@ -849,8 +849,8 @@ void dlManagerUI::startProgressBarThread(std::string& filename)
     point maxyx = detWin->getMaxyx();
     auto progressWin = initProgressWin(begyx, maxyx);
     progressWin->drawBox(0, 0);
-    futureProgressBar = std::async(std::launch::async, &dlManagerUI::progressBar, this, 
-            std::move(progressWin), filename);
+    futureVec.emplace_back(std::async(std::launch::async, &dlManagerUI::progressBar, this, 
+            std::move(progressWin), filename));
 }
 
 /* Stop progress subwindow */
@@ -864,12 +864,13 @@ int dlManagerUI::stopProgressBarThread()
     }
 
     /* Wait for the thread to stop before moving on */
-    if (!(futureIsReady(futureProgressBar))) {
-        while (!futureIsReady(futureProgressBar)) {
+    if (!(futureIsReady(futureVec.at(0)))) {
+        while (!futureIsReady(futureVec.at(0))) {
             //wait unitl execution is done
             ;
         }
     } 
+    futureVec.clear();
     return 0;
 }
 
@@ -973,6 +974,7 @@ void dlManagerUI::progressBar(std::shared_ptr<cursesWindow> progressWin, std::st
             for (i = 0; i < curProg + 1; ++i)
                 progStr.push_back(' ');
             {
+                std::lock_guard<std::mutex> guard(dlProgMutex);
                 /* TODO - temporary */
                 progressWin->printInMiddle(1, 0, maxyx.x, percent, COLOR_PAIR(2));
                 progressWin->winAttrOn(COLOR_PAIR(16));
