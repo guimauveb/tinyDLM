@@ -934,7 +934,10 @@ void dlManagerUI::progressBar(std::shared_ptr<cursesWindow> progressWin, std::st
 {
     point maxyx = progressWin->getMaxyx();
     /* Pass entire function to thread ! */
-    progRef = true;
+    {
+        std::lock_guard<std::mutex> guard(dlProgMutex);
+        progRef = true;
+    }
     /* TODO - remove hardcoded values */
     int progBarWidth = maxyx.x - 4;
     int i = 0;
@@ -971,15 +974,17 @@ void dlManagerUI::progressBar(std::shared_ptr<cursesWindow> progressWin, std::st
                 progStr.push_back(' ');
             {
                 /* TODO - temporary */
-                std::lock_guard<std::mutex> guard(dlProgMutex);
                 progressWin->printInMiddle(1, 0, maxyx.x, percent, COLOR_PAIR(2));
                 progressWin->winAttrOn(COLOR_PAIR(16));
                 progressWin->addStr(2, 2, progStr);
                 progressWin->winAttrOff(COLOR_PAIR(16));
                 progressWin->refreshWin();
             }
-            if (!progRef)
-                break;
+            {
+                std::lock_guard<std::mutex> guard(dlProgMutex);
+                if (!progRef)
+                    break;
+            }
             progCounter = dlManagerControl->getProgress(filename);
             std::this_thread::sleep_for(std::chrono::milliseconds(150));
         }
