@@ -88,27 +88,27 @@ class dlManagerUI
 
         /* Navigate through the 'Add a download' subwindow */
         void addDlNav();
-        void populateForm(std::string filename);
+        void populateForm(const std::string filename);
         void resizeAddDlNav(std::string url, std::string filename);
 
         /* Details window routine */
-        void showDetails(std::string itemName);
+        void showDetails(const std::string itemName);
         std::unique_ptr<cursesWindow> detWin; 
         std::unique_ptr<cursesWindow> initDetWin();
-        void paintDetWin(std::string itemName);
+        void paintDetWin(const std::string itemName);
         std::unique_ptr<cursesForm> detForm;
         std::unique_ptr<cursesForm> initDetForm(int numFields);
         void setDetForm();
 
-        std::string initDetailsTitle(std::string itemName);
-        void detNav(std::string filename);
-        int resizeDetWin(std::string filename);
+        const std::string initDetailsTitle(const std::string itemName);
+        void detNav(const std::string filename);
+        int resizeDetWin(const std::string filename);
 
         /* Download progress bar updated in a separate thread */
         std::unique_ptr<cursesWindow> initProgressWin(point begyx, point maxyx);
-        void progressBar(std::string filename);
-        void startProgressBarThread(std::string filename);       
-        void displayProgress(point& maxyx, std::string percent, std::string bar);
+        void progressBar(const std::string filename);
+        void startProgressBarThread(const std::string filename);       
+        void displayProgress(point& maxyx, const std::string percent, const std::string bar);
         int stopProgressBarThread();
 
         /* Bool signaling if the status window should be updated -> set to true when naviagating the download

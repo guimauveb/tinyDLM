@@ -28,7 +28,7 @@ void dlManagerController::createNewDl(const std::string dlFolder, std::string fi
 }
 
 /* Start one dl */
-void dlManagerController::startDl(std::string& dlToStart)
+void dlManagerController::startDl(const std::string& dlToStart)
 {
     try {
         dlManagerVec.at(downloadsMap[dlToStart])->runThread();
@@ -39,12 +39,12 @@ void dlManagerController::startDl(std::string& dlToStart)
 }
 
 /* Multiple downloads to start */
-void dlManagerController::startDl(std::vector<std::string>& dlsToStart)
+void dlManagerController::startDl(const std::vector<std::string>& dlsToStart)
 {
     /* TODO */
 }
 
-void dlManagerController::resume(std::string& dlToResume)
+void dlManagerController::resume(const std::string& dlToResume)
 {
     dlManagerVec.at(downloadsMap[dlToResume])->resume();
 }
@@ -58,7 +58,7 @@ void dlManagerController::resumeAll()
     }
 }
 
-void dlManagerController::pause(std::string& dlToPause)
+void dlManagerController::pause(const std::string& dlToPause)
 {
     dlManagerVec.at(downloadsMap[dlToPause])->pause();
 }
@@ -100,7 +100,7 @@ void dlManagerController::clearInactive()
 }
 
 /* TODO - not UI related - move to helper func */
-void dlManagerController::stop(std::string& dlToStop)
+void dlManagerController::stop(const std::string& dlToStop)
 {
     dlManagerVec.at(downloadsMap[dlToStop])->pause();
 }

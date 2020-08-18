@@ -446,7 +446,7 @@ void dlManagerUI::Browser()
                     if (!dlManagerControl->isActive()) {
                         break;
                     }
-                    std::string tmp = menu->getItemName();
+                    const std::string tmp = menu->getItemName();
                     dlManagerControl->stop(tmp);
                     break;
                 }
@@ -655,8 +655,8 @@ void dlManagerUI::addDlNav()
                     if (addDlForm->formDriver(REQ_VALIDATION) != E_OK) {
                         ;
                     }
-                    std::string url = addDlForm->getFieldBuffer(0);
-                    std::string filename = addDlForm->getFieldBuffer(1);
+                    const std::string url = addDlForm->getFieldBuffer(0);
+                    const std::string filename = addDlForm->getFieldBuffer(1);
                     resizeAddDlNav(url, filename);
                 }
                 break;
@@ -754,7 +754,7 @@ void dlManagerUI::updateDownloadsMenu(std::vector<std::string> vec)
 }
 
 /* Init a subwindow containg infos about the selected download */
-void dlManagerUI::showDetails(std::string itemName)
+void dlManagerUI::showDetails(const std::string itemName)
 {
     /* Important: We begin by assigning a new form to detForm unique_ptr and then assigning a new window to 
      * detWin unique_ptr -> if we reassign the detWin pointer first and then try to reassign detForm, since 
@@ -783,7 +783,7 @@ std::unique_ptr<cursesWindow> dlManagerUI::initDetWin(/* pass winsize */)
     return std::make_unique<cursesWindow>(row / 2, col - (col / 2), (row / 4), col / 4);
 }
 
-void dlManagerUI::paintDetWin(std::string itemName)
+void dlManagerUI::paintDetWin(const std::string itemName)
 {
     point maxyx = detWin->getMaxyx();
     detWin->drawBox(0, 0);
@@ -795,20 +795,22 @@ void dlManagerUI::paintDetWin(std::string itemName)
     detWin->printInMiddle(1, 0, maxyx.x, initDetailsTitle(itemName), COLOR_PAIR(8));
 }
 
-std::string dlManagerUI::initDetailsTitle(std::string itemName)
+const std::string dlManagerUI::initDetailsTitle(const std::string itemName)
 {
+    std::string it = itemName;
+    it.erase(it.find('\0'));
     const std::string labelTruncated = " ... - Details ";
     const std::string label = " - Details ";
-    itemName.erase(itemName.find('\0'));
-    itemName.reserve(itemName.length() + 1);
-    itemName.insert(itemName.begin(), ' ');
-    if (itemName.length() > 20) {
-        itemName.resize(20);
-        itemName.append(labelTruncated);
+    it.reserve(it.length() + 1);
+    it.insert(it.begin(), ' ');
+    if (it.length() > 20) {
+        it.resize(20);
+        it.append(labelTruncated);
     }
     else {
-        itemName.append(label);
+        it.append(label);
     }
+    it.push_back('\0');
     return itemName;
 }
 
@@ -843,7 +845,7 @@ std::unique_ptr<cursesWindow> dlManagerUI::initProgressWin(point begyx, point ma
     return std::make_unique<cursesWindow>(4, maxyx.x-10, maxyx.y, begyx.x+4);
 }
 
-void dlManagerUI::startProgressBarThread(std::string filename)
+void dlManagerUI::startProgressBarThread(const std::string filename)
 {
     /* Initialize progress bar according to its parent win (details win) dimensions */
     point begyx = detWin->getBegyx();
@@ -873,7 +875,7 @@ int dlManagerUI::stopProgressBarThread()
     return 0;
 }
 
-int dlManagerUI::resizeDetWin(std::string filename)
+int dlManagerUI::resizeDetWin(const std::string filename)
 {
     stopProgressBarThread();
 
@@ -892,7 +894,7 @@ int dlManagerUI::resizeDetWin(std::string filename)
 }
 
 /* Navigate through a download details subwindow */
-void dlManagerUI::detNav(std::string filename)
+void dlManagerUI::detNav(const std::string filename)
 {
     int ch = 0;
     bool done = false;
@@ -906,7 +908,7 @@ void dlManagerUI::detNav(std::string filename)
                     /* On Linux I can't seem to figure out why the program crashes when we resize the terminal
                      * window more than once in a few seconds interval while it works perfectly fine on
                      * macOS. Sleeping for a few milliseconds seems to avoid the crash... */
-                    std::this_thread::sleep_for(std::chrono::milliseconds(100));
+                    //std::this_thread::sleep_for(std::chrono::milliseconds(100));
                     break;
                 }
 
@@ -940,7 +942,7 @@ void dlManagerUI::detNav(std::string filename)
 }
 
 /* Display a subwindow containing details about the selected download */ 
-void dlManagerUI::progressBar(std::string filename)
+void dlManagerUI::progressBar(const std::string filename)
 {
     point maxyx = progressWin->getMaxyx();
 
@@ -973,7 +975,7 @@ void dlManagerUI::progressBar(std::string filename)
     else {
         while (true) {
             int curProg = progCounter * progBarWidth / 100.0;
-            std::string percent = stringifyNumber(dlManagerControl->getProgress(filename), 2); 
+            const std::string percent = stringifyNumber(dlManagerControl->getProgress(filename), 2); 
             std::string progStr;
             for (i = 0; i < curProg + 1; ++i) {
                 progStr.push_back(' ');

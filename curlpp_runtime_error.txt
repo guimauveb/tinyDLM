@@ -1,1 +1,1 @@
-Could not resolve host: itemName.resize(20);        itemName.append(labelTruncated
+Could not resolve host: set environment MALLOC_CHECK_ 2

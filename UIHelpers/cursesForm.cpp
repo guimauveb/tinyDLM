@@ -5,6 +5,7 @@
 cursesForm::cursesForm(size_t numField)
 {
     /* TODO - init field then init and post form */
+    fields.resize(2, nullptr);
     nFields = numField;
     for (size_t i = 0; i < numField; ++i)   {
         fields.emplace_back();

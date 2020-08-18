@@ -11,13 +11,13 @@ class dlManagerController
                          const int lowSpeedLim, const int lowSpeedTim);
         void removeDl();
 
-        void startDl(std::vector<std::string>& dlsToStart);
-        void startDl(std::string& dlToStart);
-        void resume(std::string& dlToResume);
+        void startDl(const std::vector<std::string>& dlsToStart);
+        void startDl(const std::string& dlToStart);
+        void resume(const std::string& dlToResume);
         void resumeAll();
-        void pause(std::string& dlToPause);
+        void pause(const std::string& dlToPause);
         void pauseAll();
-        void stop(std::string& dlToStop);
+        void stop(const std::string& dlToStop);
         void stopAll();
         void clearInactive();
         void killAll();
