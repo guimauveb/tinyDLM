@@ -1,5 +1,4 @@
 #include "dlManagerController.hpp"
-#include "../UIHelpers/cursesWindow.hpp"
 
 dlManagerController::dlManagerController()
     /* TODO - see what can be initialized here */
@@ -74,6 +73,7 @@ void dlManagerController::pauseAll()
 
 /* TODO - this function should clear the downloads from the dlmanager vector and leave the UI clean 
  * the dictionnary */
+/* TODO - see why a download in progress - close to being completed - is halfway removed */
 void dlManagerController::clearInactive()
 {
     /* TODO - How can it fail ?? */
@@ -185,7 +185,6 @@ std::vector<std::string> dlManagerController::getDownloadsList()
 {
     std::vector<std::string> vec;
     auto m = sortDownloadsMapByIds();
-    endwin();
     for (auto el : m) {
         vec.push_back(el.second);
     }

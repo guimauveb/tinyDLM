@@ -1,7 +1,6 @@
 #include "dlManagerController/dlManagerController.hpp"
 /* cursesMenu.hpp includes cursesWindow and cursesForm */
 /* TODO - use header protections (?) */
-#include <iostream>
 #include "UIHelpers/cursesMenu.hpp"
 
 /* TODO - is there a way to avoid a macro in this case ? */
@@ -46,9 +45,11 @@ class dlManagerUI
         void paintMainWinWin(std::unique_ptr<cursesWindow>& mainWinWin);
         std::unique_ptr<cursesWindow> mainWinKeyActInit();
         void paintKeyActWin(std::unique_ptr<cursesWindow>& keyActWin);
+        
         /* Update message displayed in the key act window */
         void updateKeyActWinMessage(bool& p);
         std::unique_ptr<cursesWindow> mainWinDownloadsStatusInit();
+
         /* Menu holding downloads items */
         std::unique_ptr<cursesMenu> menu;
         std::unique_ptr<cursesMenu> initDownloadsMenu(std::vector<std::string> itemsData);
