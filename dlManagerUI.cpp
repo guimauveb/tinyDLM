@@ -837,7 +837,7 @@ void dlManagerUI::setDetForm()
 }
 
 /* shared_ptr that will be moved to progressWin own thread */
-std::unique_ptr<cursesWindow> dlManagerUI::initProgressWin(point begyx, point maxyx)
+std::shared_ptr<cursesWindow> dlManagerUI::initProgressWin(point begyx, point maxyx)
 {
     return std::make_unique<cursesWindow>(4, maxyx.x-10, maxyx.y, begyx.x+4);
 }
@@ -930,7 +930,7 @@ void dlManagerUI::detNav(std::string filename)
 }
 
 /* Display a subwindow containing details about the selected download */ 
-void dlManagerUI::progressBar(std::unique_ptr<cursesWindow>&& progressWin, std::string filename)
+void dlManagerUI::progressBar(std::shared_ptr<cursesWindow> progressWin, std::string filename)
 {
     point maxyx = progressWin->getMaxyx();
     /* Pass entire function to thread ! */

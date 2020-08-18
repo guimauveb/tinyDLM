@@ -105,8 +105,8 @@ class dlManagerUI
         void resizeDetWin(std::string filename);
 
         /* Download progress bar updated in a separate thread */
-        std::unique_ptr<cursesWindow> initProgressWin(point begyx, point maxyx);
-        void progressBar(std::unique_ptr<cursesWindow>&& progressWin, std::string filename);
+        std::shared_ptr<cursesWindow> initProgressWin(point begyx, point maxyx);
+        void progressBar(std::shared_ptr<cursesWindow> progressWin, std::string filename);
         void startProgressBarThread(std::string& filename);       
         int stopProgressBarThread();
 
