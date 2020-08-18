@@ -864,12 +864,14 @@ int dlManagerUI::stopProgressBarThread()
     }
 
     /* Wait for the thread to stop before moving on */
-    if (!(futureIsReady(futureVec.at(0)))) {
-        while (!futureIsReady(futureVec.at(0))) {
+    for (size_t i = 0; i < futureVec.size(); ++i) {
+    if (!(futureIsReady(futureVec.at(i)))) {
+        while (!futureIsReady(futureVec.at(i))) {
             //wait unitl execution is done
             ;
         }
     } 
+    }
     futureVec.clear();
     return 0;
 }
