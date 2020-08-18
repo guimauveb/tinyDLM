@@ -328,7 +328,7 @@ void dlManagerUI::updateDownloadsStatusWindow()
          * so it doesn't monopolize time / ressources */ 
         std::this_thread::sleep_for(std::chrono::milliseconds(100));
         /* y represents the y postion of the infos to print on the screen - it matches the location
-         * of the corresponding download item on the lefutureUpdateDlsStatus part of the screen */
+         * of the corresponding download item on the futureUpdateDlsStatus part of the screen */
         populateStatusWin(dlManagerControl->getAllDownloadsInfos());
 
         /* Refresh status window */
@@ -863,13 +863,16 @@ int dlManagerUI::stopProgressBarThread()
         progRef = false;
     }
 
-    /* Wait for the thread to stop before moving on */
-    if (!(futureIsReady(futureProgressBar))) {
-        while (!futureIsReady(futureProgressBar)) {
-            //wait unitl execution is done
-            ;
+    for (size_t i = 0; i < futureVec.size(); ++i) {
+        /* Wait for the thread to stop before moving on */
+        if (!(futureIsReady(futureVec.at(i)))) {
+            while (!futureIsReady(futureVec.at(i))) {
+                //wait unitl execution is done
+                ;
+            }
         }
     } 
+    futureVec.clear();
     return 0;
 }
 
@@ -886,7 +889,13 @@ void dlManagerUI::resizeDetWin(std::string filename)
     detForm->populateField(REQ_LAST_FIELD, filename);
     detWin->refreshWin();
 
-    startProgressBarThread(filename);
+    /* Initialize progress bar according to its parent win (details win) dimensions */
+    point begyx = detWin->getBegyx();
+    point maxyx = detWin->getMaxyx();
+    auto progressWin = initProgressWin(begyx, maxyx);
+    progressWin->drawBox(0, 0);
+    futureVec.emplace_back(std::async(std::launch::async, &dlManagerUI::progressBar, this, 
+                std::move(progressWin), filename));
 }
 
 /* Navigate through a download details subwindow */

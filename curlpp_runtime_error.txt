@@ -1,1 +1,1 @@
-Could not resolve host: Stop progress subwindow *
+Could not resolve host: Initialize progress bar according to its parent win (details win) dimensions *
