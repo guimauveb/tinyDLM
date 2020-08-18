@@ -102,7 +102,7 @@ class dlManagerUI
 
         std::string initDetailsTitle(std::string itemName);
         void detNav(std::string filename);
-        void resizeDetWin(std::string filename);
+        int resizeDetWin(std::string filename);
 
         /* Download progress bar updated in a separate thread */
         std::unique_ptr<cursesWindow> initProgressWin(point begyx, point maxyx);

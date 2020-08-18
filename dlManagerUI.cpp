@@ -872,7 +872,7 @@ int dlManagerUI::stopProgressBarThread()
     return 0;
 }
 
-void dlManagerUI::resizeDetWin(std::string filename)
+int dlManagerUI::resizeDetWin(std::string filename)
 {
     stopProgressBarThread();
 
@@ -886,6 +886,8 @@ void dlManagerUI::resizeDetWin(std::string filename)
     detWin->refreshWin();
 
     startProgressBarThread(filename);
+    
+    return 0;
 }
 
 /* Navigate through a download details subwindow */
@@ -900,7 +902,7 @@ void dlManagerUI::detNav(std::string filename)
                 {
                     resizeDetWin(filename);    
                     /* Sleep for a while to avoid uniterrupted calls to resizeDetWin() */
-                    std::this_thread::sleep_for(std::chrono::milliseconds(100));
+                    //std::this_thread::sleep_for(std::chrono::milliseconds(100));
                     break;
                 }
             case 'r':
