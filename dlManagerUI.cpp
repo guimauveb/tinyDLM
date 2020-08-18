@@ -988,6 +988,10 @@ void dlManagerUI::progressBar(const std::string filename)
                 progressWin->winAttrOff(COLOR_PAIR(16));
                 progressWin->refreshWin();
             }
+            progCounter = dlManagerControl->getProgress(filename);
+            if (progCounter == 100) {
+                break;
+            }
 
             {
                 std::lock_guard<std::mutex> guard(dlManagerUI::dlProgMutex);
@@ -995,10 +999,6 @@ void dlManagerUI::progressBar(const std::string filename)
                     break;
             }
 
-            progCounter = dlManagerControl->getProgress(filename);
-            if (progCounter == 100) {
-                break;
-            }
 
             std::this_thread::sleep_for(std::chrono::milliseconds(100));
         }
