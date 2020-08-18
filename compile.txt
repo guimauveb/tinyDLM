@@ -1,0 +1,1 @@
+clang++ main/main.cpp dlManagerUI.cpp UIHelpers/cursesMenu.cpp UIHelpers/cursesForm.cpp UIHelpers/cursesWindow.cpp dlManagerController/dlManagerController.cpp dlManager/dlManager.cpp  helperFunctions/UIhelperFunc.cpp dialogs/dialogs.cpp -o tinyDLM -std=c++17 -lncurses -lpanel -lmenu -lform -lcurl -lcurlpp -Wall -Wextra -Wmissing-field-initializers -Wuninitialized -Wshadow -g
