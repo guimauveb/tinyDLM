@@ -106,8 +106,8 @@ class dlManagerUI
 
         /* Download progress bar updated in a separate thread */
         std::unique_ptr<cursesWindow> initProgressWin(point begyx, point maxyx);
-        void progressBar();
-        void startProgressBarThread();       
+        void progressBar(std::string filename);
+        void startProgressBarThread(std::string filename);       
         int stopProgressBarThread();
 
         /* Bool signaling if the status window should be updated -> set to true when naviagating the download
