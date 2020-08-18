@@ -18,7 +18,7 @@ template<typename A, typename B> std::map<B, A> flipMap(const std::map<A, B>& sr
  * of the program */
 template<typename T> bool futureIsReady(std::future<T>& t)
 {
-    return t.wait_for(std::chrono::seconds(0)) == std::future_status::ready;
+    return t.wait_for(std::chrono::milliseconds(200)) == std::future_status::ready;
 }
 
 
