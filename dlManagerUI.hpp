@@ -119,7 +119,6 @@ class dlManagerUI
         std::future<void> futureUpdateDlsStatus;
         /* future that will execute the progress bar update function */
         std::future<void> futureProgressBar;
-        std::vector<std::future<void>> futureVec;
 
         /* TODO - Create a struct on the stack */
         winSize welWinSz;
