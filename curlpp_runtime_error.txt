@@ -1,0 +1,1 @@
+Could not resolve host: itemName.resize(20);        itemName.append(labelTruncated

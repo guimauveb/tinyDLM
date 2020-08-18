@@ -783,7 +783,7 @@ std::unique_ptr<cursesWindow> dlManagerUI::initDetWin(/* pass winsize */)
     return std::make_unique<cursesWindow>(row / 2, col - (col / 2), (row / 4), col / 4);
 }
 
-void dlManagerUI::paintDetWin(std::string& itemName)
+void dlManagerUI::paintDetWin(std::string itemName)
 {
     point maxyx = detWin->getMaxyx();
     detWin->drawBox(0, 0);
@@ -799,6 +799,7 @@ std::string dlManagerUI::initDetailsTitle(std::string itemName)
 {
     const std::string labelTruncated = " ... - Details ";
     const std::string label = " - Details ";
+    itemName.erase(itemName.find('\0'));
     itemName.reserve(itemName.length() + 1);
     itemName.insert(itemName.begin(), ' ');
     if (itemName.length() > 20) {
@@ -886,7 +887,7 @@ int dlManagerUI::resizeDetWin(std::string filename)
     detWin->refreshWin();
 
     startProgressBarThread(filename);
-    
+
     return 0;
 }
 
@@ -902,9 +903,13 @@ void dlManagerUI::detNav(std::string filename)
                 {
                     resizeDetWin(filename);    
                     /* Sleep for a while to avoid uniterrupted calls to resizeDetWin() */
-                    //std::this_thread::sleep_for(std::chrono::milliseconds(100));
+                    /* On Linux I can't seem to figure out why the program crashes when we resize the terminal
+                     * window more than once in a few seconds interval while it works perfectly fine on
+                     * macOS. Sleeping for a few milliseconds seems to avoid the crash... */
+                    std::this_thread::sleep_for(std::chrono::milliseconds(100));
                     break;
                 }
+
             case 'r':
                 /* Resume transfer - if the transfer is ongoing - does nothing */
                 {
@@ -912,6 +917,7 @@ void dlManagerUI::detNav(std::string filename)
                     dlManagerControl->resume(filename);
                 }
                 break;
+
             case 'p':
                 /* Pause transfer - if the transfer is already paused - does nothing */
                 {
@@ -919,6 +925,7 @@ void dlManagerUI::detNav(std::string filename)
                     dlManagerControl->pause(filename);
                 }
                 break;
+
             case 'x':
                 /* Close subwindow */
                 done = true;
@@ -936,27 +943,25 @@ void dlManagerUI::detNav(std::string filename)
 void dlManagerUI::progressBar(std::string filename)
 {
     point maxyx = progressWin->getMaxyx();
-    /* Pass entire function to thread ! */
+
     {
         std::lock_guard<std::mutex> guard(dlManagerUI::dlProgMutex);
         progRef = true;
     }
+
     /* TODO - remove hardcoded values */
     int progBarWidth = maxyx.x - 4;
     int i = 0;
 
-    /* TODO - dlManagerController here */
     float progCounter = dlManagerControl->getProgress(filename);
 
     if (progCounter == 100.0) {
-        /* TODO - bug here - bar size isn't correct */
         std::string progStr;
-        for (i = 0; i < progBarWidth; ++i)
+        for (i = 0; i < progBarWidth; ++i) {
             progStr.push_back(' ');
+        }
+
         {
-            /* TODO - temporary */
-            std::lock_guard<std::mutex> guard(dlManagerUI::dlProgMutex);
-            /* TODO - updateProgWin() */
             progressWin->printInMiddle(1, 0, maxyx.x, hundredPer, COLOR_PAIR(2));
             progressWin->winAttrOn(COLOR_PAIR(16));
             progressWin->addStr(2, 2, progStr);
@@ -966,34 +971,34 @@ void dlManagerUI::progressBar(std::string filename)
     }
 
     else {
-        /* TODO - bug here - bar size isn't correct */
         while (true) {
-            /* Write char until value of progress */
-            std::string progStr;
             int curProg = progCounter * progBarWidth / 100.0;
-            /* floorf */
             std::string percent = stringifyNumber(dlManagerControl->getProgress(filename), 2); 
-            for (i = 0; i < curProg + 1; ++i)
+            std::string progStr;
+            for (i = 0; i < curProg + 1; ++i) {
                 progStr.push_back(' ');
+            }
+
             {
-                std::lock_guard<std::mutex> guard(dlManagerUI::dlProgMutex);
-                /* TODO - temporary */
                 progressWin->printInMiddle(1, 0, maxyx.x, percent, COLOR_PAIR(2));
                 progressWin->winAttrOn(COLOR_PAIR(16));
                 progressWin->addStr(2, 2, progStr);
                 progressWin->winAttrOff(COLOR_PAIR(16));
                 progressWin->refreshWin();
             }
+
             {
                 std::lock_guard<std::mutex> guard(dlManagerUI::dlProgMutex);
                 if (!progRef)
                     break;
             }
+
             progCounter = dlManagerControl->getProgress(filename);
             if (progCounter == 100) {
                 break;
             }
-            std::this_thread::sleep_for(std::chrono::milliseconds(200));
+
+            std::this_thread::sleep_for(std::chrono::milliseconds(100));
         }
     }
 }

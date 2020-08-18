@@ -95,7 +95,7 @@ class dlManagerUI
         void showDetails(std::string itemName);
         std::unique_ptr<cursesWindow> detWin; 
         std::unique_ptr<cursesWindow> initDetWin();
-        void paintDetWin(std::string& itemName);
+        void paintDetWin(std::string itemName);
         std::unique_ptr<cursesForm> detForm;
         std::unique_ptr<cursesForm> initDetForm(int numFields);
         void setDetForm();
@@ -108,6 +108,7 @@ class dlManagerUI
         std::unique_ptr<cursesWindow> initProgressWin(point begyx, point maxyx);
         void progressBar(std::string filename);
         void startProgressBarThread(std::string filename);       
+        void displayProgress(point& maxyx, std::string percent, std::string bar);
         int stopProgressBarThread();
 
         /* Bool signaling if the status window should be updated -> set to true when naviagating the download
