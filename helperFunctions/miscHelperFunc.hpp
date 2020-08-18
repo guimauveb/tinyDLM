@@ -1,5 +1,6 @@
 #include <map>
 #include <future>
+#include <algorithm>
 
 template<typename A, typename B> std::pair<B, A> flipPair(const std::pair<A, B>& p)
 {
