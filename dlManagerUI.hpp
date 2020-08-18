@@ -105,8 +105,8 @@ class dlManagerUI
         void resizeDetWin(std::string filename);
 
         /* Download progress bar updated in a separate thread */
-        std::shared_ptr<cursesWindow> initProgressWin(point begyx, point maxyx);
-        void progressBar(std::shared_ptr<cursesWindow> progressWin, std::string filename);
+        std::unique_ptr<cursesWindow> initProgressWin(point begyx, point maxyx);
+        void progressBar(std::string filename);
         void startProgressBarThread(std::string& filename);       
         int stopProgressBarThread();
 
@@ -120,6 +120,7 @@ class dlManagerUI
         /* future that will execute the progress bar update function */
         std::future<void> futureProgressBar;
         std::vector<std::future<void>> futureVec;
+        std::unique_ptr<cursesWindow> progressWin;
 
         /* TODO - Create a struct on the stack */
         winSize welWinSz;

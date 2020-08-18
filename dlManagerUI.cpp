@@ -837,7 +837,7 @@ void dlManagerUI::setDetForm()
 }
 
 /* shared_ptr that will be moved to progressWin own thread */
-std::shared_ptr<cursesWindow> dlManagerUI::initProgressWin(point begyx, point maxyx)
+std::unique_ptr<cursesWindow> dlManagerUI::initProgressWin(point begyx, point maxyx)
 {
     return std::make_unique<cursesWindow>(4, maxyx.x-10, maxyx.y, begyx.x+4);
 }
@@ -847,10 +847,9 @@ void dlManagerUI::startProgressBarThread(std::string& filename)
     /* Initialize progress bar according to its parent win (details win) dimensions */
     point begyx = detWin->getBegyx();
     point maxyx = detWin->getMaxyx();
-    auto progressWin = initProgressWin(begyx, maxyx);
+    progressWin = initProgressWin(begyx, maxyx);
     progressWin->drawBox(0, 0);
-    futureVec.emplace_back(std::async(std::launch::async, &dlManagerUI::progressBar, this, 
-            std::move(progressWin), filename));
+    futureProgressBar = std::async(std::launch::async, &dlManagerUI::progressBar, this, filename);
 }
 
 /* Stop progress subwindow */
@@ -863,16 +862,13 @@ int dlManagerUI::stopProgressBarThread()
         progRef = false;
     }
 
-    for (size_t i = 0; i < futureVec.size(); ++i) {
-        /* Wait for the thread to stop before moving on */
-        if (!(futureIsReady(futureVec.at(i)))) {
-            while (!futureIsReady(futureVec.at(i))) {
-                //wait unitl execution is done
-                ;
-            }
+    /* Wait for the thread to stop before moving on */
+    if (!(futureIsReady(futureProgressBar))) {
+        while (!futureIsReady(futureProgressBar)) {
+            //wait unitl execution is done
+            ;
         }
     } 
-    futureVec.clear();
     return 0;
 }
 
@@ -933,7 +929,7 @@ void dlManagerUI::detNav(std::string filename)
 }
 
 /* Display a subwindow containing details about the selected download */ 
-void dlManagerUI::progressBar(std::shared_ptr<cursesWindow> progressWin, std::string filename)
+void dlManagerUI::progressBar(std::string filename)
 {
     point maxyx = progressWin->getMaxyx();
     /* Pass entire function to thread ! */
