@@ -602,12 +602,15 @@ std::unique_ptr<cursesForm> dlManagerUI::initDetForm(int numFields)
 void dlManagerUI::setAddDlForm()
 {
     point maxyx = addDlWin->getMaxyx();
+    point begyx = addDlWin->getBegyx();
+    setWinsSize();
 
     /* Set field size and location */
-    addDlForm->setField(0, 1, maxyx.x - 10, 3, 4, 0, 0);
+    addDlForm->setField(0, 1, maxyx.x - 10, row / 4 + 2, 4, 0, 0);
     endwin();
-    std::cout << maxyx.y << '\n';
-    addDlForm->setField(1, 1, maxyx.x - 10, 6, 4, 0, 0);
+    std::cout << "begyx.y = " << begyx.y << '\n';
+    std::cout << "row / 4 = " << row / 4 << '\n';
+    addDlForm->setField(1, 1, maxyx.x - 10, row / 4 + 5, 4, 0, 0);
 
     /* Set field options */
     addDlForm->setFieldBack(0, A_UNDERLINE);
@@ -842,9 +845,9 @@ void dlManagerUI::setDetForm()
 }
 
 /* shared_ptr that will be moved to progressWin own thread */
-std::unique_ptr<cursesWindow> dlManagerUI::initProgressWin(point begyx, point maxyx)
+std::unique_ptr<cursesWindow> dlManagerUI::initProgressWin(point bx, point mx)
 {
-    return std::make_unique<cursesWindow>(4, maxyx.x-10, maxyx.y, begyx.x+4);
+    return std::make_unique<cursesWindow>(4, mx.x-10, mx.y, bx.x+4);
 }
 
 void dlManagerUI::startProgressBarThread(const std::string filename)
