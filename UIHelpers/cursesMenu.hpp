@@ -2,6 +2,7 @@
 #include <menu.h>
 
 #include <vector>
+#include <map>
 #include <iostream>
 #include <cstring>
 
@@ -23,11 +24,16 @@ class cursesMenu {
         void clearMenu();
 
         void menuDriver(int c);
+
         std::string getItemName();
+        int getItemNo();
+        int getItemNum();
+
         void clearItems();
 
     private:
         std::vector<std::string> itemStrings;
+        std::map<std::string, int> itemsMap;
         std::vector<ITEM *> items;
         MENU *menu = nullptr;
 };

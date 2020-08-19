@@ -17,7 +17,7 @@ struct download {
     double speed;
     double progress;
 
-    downloadStatus status;          /* Download status */
+    downloadStatus status;          
 
     std::string filename;
     std::string saveAs; 
@@ -40,9 +40,8 @@ struct downloadWinInfo {
     const std::string progress;
     const std::string eta;
     
-    downloadWinInfo(int i, const std::string s, const std::string sp, const std::string prog, const std::string\
-    e)
+    downloadWinInfo(int i, const std::string s, const std::string sp, const std::string prog, 
+        const std::string e)
         :id(i), status(s), speed(sp), progress(prog), eta(e)
     {}
-
 };

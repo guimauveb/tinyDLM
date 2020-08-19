@@ -141,6 +141,7 @@ class dlManagerUI
         /* Mutex to keep each thread accessing wrefresh() at the same time and causing trouble */
         static std::mutex dlsInfoMutex;
         static std::mutex dlProgMutex;
+        static std::mutex yOffsetMutex;
 
         /* TODO - move to msg / const / helper */
         const int lowSpeedLim = 56;
@@ -152,5 +153,6 @@ class dlManagerUI
         const int dlsWinIdx = 2;
         const int dlsStatusWinIdx = 3;
         const int keyActWinIdx = 4;
+        int yOffset;
 };
 

@@ -96,7 +96,7 @@ class dlManager
 
         /* Returns a reference to the download object pointed by a shared ptr*/
         /* A const ref for performance reasons since main the ui will call it consistanly */
-        std::shared_ptr<download> getDownloadInfos();
+        const std::shared_ptr<download>& getDownloadInfos();
 
         //void setLowSpeedLimit(int lowSpeedLim);
         //void setLowSpeedTime(int lowSpeedTim);

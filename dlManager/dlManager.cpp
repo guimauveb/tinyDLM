@@ -28,7 +28,7 @@ dlManager::dlManager(const int& dlid, const std::string& u, const std::string& f
     downloadPtr->cookie = "";
 }
 
-std::shared_ptr<download> dlManager::getDownloadInfos()
+const std::shared_ptr<download>& dlManager::getDownloadInfos()
 {
     std::lock_guard<std::mutex> guard(*dlMutPtr);
     return downloadPtr;

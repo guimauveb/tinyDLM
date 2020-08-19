@@ -8,11 +8,30 @@ cursesMenu::cursesMenu(std::vector<std::string> itemsData)
     for (size_t i = 0; i < itemStrings.size(); ++i) {
         /* The filename of each download will be used as the item name */
         items.push_back(new_item(itemStrings.at(i).c_str(), nullptr)); 
+        /* Update map - each item has a corresponding id */
+        itemsMap[itemStrings.at(i)] = i;
     }
 
     /* Push back a null item */
     items.push_back((ITEM *)nullptr);
     menu = new_menu((ITEM **)items.data());
+}
+
+int cursesMenu::getItemNum()
+{
+    return (int)items.size();
+}
+
+/* Returns highlighted item id */
+int cursesMenu::getItemNo()
+{
+    std::string tmp = getItemName();
+    std::map<std::string, int>::iterator it = itemsMap.find(tmp);
+    if (it != itemsMap.end()) {
+        return it->second;
+    }
+    /* Should not happen */
+    return 1; 
 }
 
 /* Creates an empty cursesMenu object to initialize the program */

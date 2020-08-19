@@ -1,4 +1,5 @@
 #include "dlManagerController.hpp"
+#include <curses.h>
 
 dlManagerController::dlManagerController()
     /* TODO - see what can be initialized here */
@@ -53,7 +54,6 @@ void dlManagerController::resume(const std::string& dlToResume)
 void dlManagerController::resumeAll()
 {
     for (size_t i = 0; i < dlManagerVec.size(); ++i) {
-        if (dlManagerVec.at(i)->getDownloadInfos()->status == downloadStatus::PAUSED)
             dlManagerVec.at(i)->resume();
     }
 }
@@ -71,8 +71,6 @@ void dlManagerController::pauseAll()
     }
 }
 
-/* TODO - this function should clear the downloads from the dlmanager vector and leave the UI clean 
- * the dictionnary */
 /* TODO - see why a download in progress - close to being completed - is halfway removed */
 void dlManagerController::clearInactive()
 {
@@ -81,8 +79,7 @@ void dlManagerController::clearInactive()
 
     std::vector<size_t> todel;
     for (size_t i = 0; i < dlManagerVec.size(); ++i) {
-        downloadStatus s = dlManagerVec.at(i)->getDownloadInfos()->status;
-        if (s != downloadStatus::DOWNLOADING) {
+        if(dlManagerVec.at(i)->getDownloadInfos()->status != downloadStatus::DOWNLOADING) {
             std::map<std::string, int>::iterator it = downloadsMap.find(dlManagerVec.at(i)->
                     getDownloadInfos()->filename);
             if (it != downloadsMap.end()) {
@@ -93,7 +90,7 @@ void dlManagerController::clearInactive()
     }
     if (!todel.empty()) {
         for (size_t i = 0; i < todel.size(); ++i) {
-            dlManagerVec.erase(dlManagerVec.begin() + todel.at(i) - i);
+            dlManagerVec.erase(dlManagerVec.begin() + (todel.at(i) - i));
             dlCounter--;
         }
     }
@@ -123,6 +120,7 @@ void dlManagerController::killAll()
 
 std::string dlManagerController::getURL(const std::string& filename)
 {
+    /* TODO - clearInactive bug is here */
     return dlManagerVec.at(downloadsMap[filename])->getDownloadInfos()->url;
 }
 
@@ -155,7 +153,7 @@ std::vector<downloadWinInfo> dlManagerController::getAllDownloadsInfos()
     std::vector<downloadWinInfo> vec;
     /* Loop over all downloads sorted by id */
     std::map<int, std::string> dlsSorted = sortDownloadsMapByIds();
-    for (auto& dl : dlsSorted) {
+    for (auto dl : dlsSorted) {
         const int id = dl.first;
         const std::string f = dl.second;
         const std::string strstatus = stringifyStatus(getStatus(f));
@@ -184,9 +182,9 @@ std::map<int, std::string> dlManagerController::sortDownloadsMapByIds()
 std::vector<std::string> dlManagerController::getDownloadsList()
 {
     std::vector<std::string> vec;
-    auto m = sortDownloadsMapByIds();
+    std::map<int, std::string> m = sortDownloadsMapByIds();
     for (auto el : m) {
-        vec.push_back(el.second);
+        vec.emplace_back(el.second);
     }
     return vec;
 }
