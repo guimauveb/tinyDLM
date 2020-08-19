@@ -601,11 +601,13 @@ std::unique_ptr<cursesForm> dlManagerUI::initDetForm(int numFields)
 
 void dlManagerUI::setAddDlForm()
 {
-    point maxyx = addDlWin->getMaxyx();
+//    point maxyx = addDlWin->getMaxyx();
+    int mx = addDlWin->getMaxx();
+    int my = addDlWin->getMaxy();
 
     /* Set field size and location */
-    addDlForm->setField(0, 1, maxyx.x - 10, 3, 4, 0, 0);
-    addDlForm->setField(1, 1, maxyx.x - 10, 6, 4, 0, 0);
+    addDlForm->setField(0, 1, mx - 10, 3, 4, 0, 0);
+    addDlForm->setField(1, 1, mx - 10, 6, 4, 0, 0);
 
     /* Set field options */
     addDlForm->setFieldBack(0, A_UNDERLINE);
@@ -618,7 +620,7 @@ void dlManagerUI::setAddDlForm()
     /* Initialize addDlForm */
     addDlForm->initForm();
     addDlForm->setFormWin(addDlWin);
-    addDlForm->setFormSubwin(addDlWin, 20, 10, maxyx.y / 2, 2);
+    addDlForm->setFormSubwin(addDlWin, 20, 10, my / 2, 2);
 
     addDlForm->postForm();
 }
@@ -907,7 +909,8 @@ void dlManagerUI::detNav(const std::string filename)
                     /* Sleep for a while to avoid uniterrupted calls to resizeDetWin() */
                     /* On Linux I can't seem to figure out why the program crashes when we resize the terminal
                      * window more than once in a few seconds interval while it works perfectly fine on
-                     * macOS. Sleeping for a few milliseconds seems to avoid the crash... */
+                     * macOS (if we don't resize the window like a maniac ... 
+                     * Sleeping for a few milliseconds seems to avoid the crash on Linux... */
                     //std::this_thread::sleep_for(std::chrono::milliseconds(100));
                     break;
                 }

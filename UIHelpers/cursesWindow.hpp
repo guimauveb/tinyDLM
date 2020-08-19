@@ -21,6 +21,8 @@ class cursesWindow
 
         point getBegyx();
         point getMaxyx();
+        int getMaxy();
+        int getMaxx();
 
         void winAttrOn(chtype ct);
         void winAttrOff(chtype ct);
