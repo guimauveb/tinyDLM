@@ -101,20 +101,6 @@ point cursesWindow::getMaxyx()
     return point {.y = maxy, .x = maxx};
 }
 
-int cursesWindow::getMaxy()
-{
-    int maxy, maxx;
-    getmaxyx(win, maxy, maxx);
-    return maxy;
-}
-
-int cursesWindow::getMaxx()
-{
-    int maxy, maxx;
-    getmaxyx(win, maxy, maxx);
-    return maxx;
-}
-
 void cursesWindow::addStr(int y, int x, std::string str)
 {
     mvwaddstr(win, y, x, str.c_str());

@@ -601,13 +601,13 @@ std::unique_ptr<cursesForm> dlManagerUI::initDetForm(int numFields)
 
 void dlManagerUI::setAddDlForm()
 {
-//    point maxyx = addDlWin->getMaxyx();
-    int mx = addDlWin->getMaxx();
-    int my = addDlWin->getMaxy();
+    point maxyx = addDlWin->getMaxyx();
 
     /* Set field size and location */
-    addDlForm->setField(0, 1, mx - 10, 3, 4, 0, 0);
-    addDlForm->setField(1, 1, mx - 10, 6, 4, 0, 0);
+    addDlForm->setField(0, 1, maxyx.x - 10, 3, 4, 0, 0);
+    endwin();
+    std::cout << maxyx.y << '\n';
+    addDlForm->setField(1, 1, maxyx.x - 10, 6, 4, 0, 0);
 
     /* Set field options */
     addDlForm->setFieldBack(0, A_UNDERLINE);
@@ -620,7 +620,7 @@ void dlManagerUI::setAddDlForm()
     /* Initialize addDlForm */
     addDlForm->initForm();
     addDlForm->setFormWin(addDlWin);
-    addDlForm->setFormSubwin(addDlWin, 20, 10, my / 2, 2);
+    addDlForm->setFormSubwin(addDlWin, 20, 10, maxyx.y / 2, 2);
 
     addDlForm->postForm();
 }

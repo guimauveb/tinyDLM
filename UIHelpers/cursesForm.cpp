@@ -21,7 +21,8 @@ cursesForm::~cursesForm()
     clearForm();
 }
 
-void cursesForm::setField(int fieldIdx, int height, int width, int toprow, int leftcol, int offscreen, int nbuffers)
+void cursesForm::setField(int fieldIdx, int height, int width, int toprow, int leftcol, int offscreen,
+        int nbuffers)
 {
     fields.at(fieldIdx) = new_field(height, width, toprow, leftcol, offscreen, nbuffers);
 }
