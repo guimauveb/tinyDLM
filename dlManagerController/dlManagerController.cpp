@@ -13,19 +13,29 @@ dlManagerController::~dlManagerController()
 }
 
 /* Initialize a new dlManager object then place it in a vector */
-void dlManagerController::createNewDl(const std::string dlFolder, std::string filename, const std::string url,  
+std::string dlManagerController::createNewDl(std::string dlFolder, std::string filename, const std::string url,  
         const int lowSpeedLim, const int lowSpeedTim)
 {
-    std::string saveAs = dlFolder + filename;
-    std::unique_ptr<dlManager> dlm = std::make_unique<dlManager>(dlCounter, url, filename, saveAs, lowSpeedLim, lowSpeedTim);
+    /* TODO - use an index for each name for better readability */
+    std::string f = filename;
+    std::map<std::string, int>::iterator it = downloadsMap.find(filename);
+    if (it != downloadsMap.end()) {
+        f.erase(f.find('\0'));
+        f.append(std::to_string(dlCounter));
+        f.push_back('\0');
+    }
+    it = downloadsMap.end();
+    downloadsMap.insert(it, std::pair<std::string, int>(f, dlCounter));
+
+    std::string saveAs = dlFolder + f;
+    std::unique_ptr<dlManager> dlm = std::make_unique<dlManager>(dlCounter, url, f, saveAs, lowSpeedLim, lowSpeedTim);
     dlManagerVec.emplace_back(std::move(dlm));
 
-    /* Update downloads list */
-    std::map<std::string, int>::iterator it = downloadsMap.end();
-    downloadsMap.insert(it, std::pair<std::string, int>(filename, dlCounter));
     dlCounter++;
-    /* TODO - why don't dlManagerVec and downloadsMap always have the same size ? */
+
     assert(dlManagerVec.size() == downloadsMap.size());
+
+    return f;
 }
 
 /* Start one dl */
@@ -72,6 +82,7 @@ void dlManagerController::pauseAll()
 }
 
 /* TODO - see why a download in progress - close to being completed - is halfway removed */
+/* Bug here */
 void dlManagerController::clearInactive()
 {
     /* TODO - How can it fail ?? */

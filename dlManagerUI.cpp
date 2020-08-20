@@ -14,6 +14,7 @@ dlManagerUI::dlManagerUI()
     mainWinsInit();
     refreshMainWins();        
     /* Display a nice message at first start */
+    /* TODO - move to main so we can exit from here */
     firstStart();
     /* Start downloads status thread */
     startStatusUpdate();
@@ -62,6 +63,7 @@ void dlManagerUI::initColors()
     init_pair(16, COLOR_GREEN, COLOR_GREEN);
 }
 
+/* TODO - pass all this to initWin functions */
 void dlManagerUI::setWinsSize()
 {
     /* Get terminal screen size in columns and rows */
@@ -72,9 +74,9 @@ void dlManagerUI::setWinsSize()
     topBarSz = {1, col, 0, 0};
     labelsSz = {1, col, 2, 0};
     mainWinSz = {row - 4, col / 2, 3, 0};
-    dlStatusSz = {row - 4, col / 2, 3, col / 2};
+    dlStatusSz = {row - 5, col / 2, 3, col / 2};
     keyActSz = {1, col / 2, row - 1, 0};
-    dlInfosSz = {1, col / 2, row - 1, col / 2};
+    dlInfosSz = {1, col / 2, row - 2, col / 2};
 
     dlAddSz = {row / 2, col - (col / 2), (row / 4), col / 4};
     dlDetSz = {row / 2, col - (col / 2), (row / 4), col / 4};
@@ -109,6 +111,7 @@ void dlManagerUI::firstStart()
     int ch = 0;
     while ((ch = getch()) != KEY_F(1)) {
         switch(ch) {
+            /* TODO -do not resize under 108 * 24 */
             case KEY_RESIZE:
                 resizeUI();
                 welWin->resizeWin(welWinSz);
@@ -149,6 +152,8 @@ void dlManagerUI::mainWinsInit()
 
     mainWindows.emplace_back(mainWinKeyActInit());
     paintKeyActWin(mainWindows.at(keyActWinIdx));
+
+    mainWindows.emplace_back(mainWinDlInfosInit());
 }
 
 void dlManagerUI::refreshMainWins()
@@ -180,6 +185,9 @@ void dlManagerUI::resizeUI()
 
     mainWindows.at(keyActWinIdx)->resizeWin(keyActSz);
     paintKeyActWin(mainWindows.at(keyActWinIdx));
+
+    mainWindows.at(dlsInfosWinIdx)->resizeWin(dlInfosSz);
+    paintDlsInfosWin(mainWindows.at(dlsInfosWinIdx));
 
     refreshMainWins();
 }
@@ -237,7 +245,7 @@ std::unique_ptr<cursesWindow> dlManagerUI::mainWinMainInit()
 
 void dlManagerUI::paintMainWinWin(std::unique_ptr<cursesWindow>& mainWinWin)
 {
-//    mainWinWin->drawBox(0, 0);
+    //    mainWinWin->drawBox(0, 0);
 }
 
 /* Init the download progress subwindow */ 
@@ -264,11 +272,12 @@ void dlManagerUI::updateKeyActWinMessage(bool& p)
         mainWindows.at(keyActWinIdx)->printInMiddle(0, 0, col / 2, msgKeyInfoP, COLOR_PAIR(8));
     }
 }
+
 /* init the global download info subwindow in a separated thread - displays number of downloads + speed */ 
-//std::unique_ptr<cursesWindow> dlManagerUI::mainWinDlInfosInit()
-//{
-//    return std::make_unique<cursesWindow>(1, col / 2, row - 1, col / 2);
-//}
+std::unique_ptr<cursesWindow> dlManagerUI::mainWinDlInfosInit()
+{
+    return std::make_unique<cursesWindow>(1, col / 2, row - 2, col / 2);
+}
 
 /* init the downloads status window */
 std::unique_ptr<cursesWindow> dlManagerUI::mainWinDownloadsStatusInit()
@@ -279,6 +288,11 @@ std::unique_ptr<cursesWindow> dlManagerUI::mainWinDownloadsStatusInit()
 void dlManagerUI::paintDlsStatusWin(std::unique_ptr<cursesWindow>& dlsStatusWin)
 {
 
+
+}
+
+void dlManagerUI::paintDlsInfosWin(std::unique_ptr<cursesWindow>& dlsInfosWin)
+{
 }
 
 /* Populate the status window with downloads informations such as their status / speed / progress */
@@ -287,21 +301,30 @@ void dlManagerUI::populateStatusWin(const std::vector<downloadWinInfo> vec)
     /* TODO - mutex here */
     int y = 1;
     size_t offset;
+    int curr;
     /* Iterate over the list of downloads we obtained from dlManagerControl */
     /* Start iterating at the offset determined by the highlighted item in the menu */
     {
         std::lock_guard<std::mutex> guard(dlManagerUI::yOffsetMutex);
         offset = yOffset;
+        curr = currItNo;
     }
 
-    /* If topItem > 0, it won't print until the last item but will stop at the item corresponding to the 
-     * row size of the window. Find a way to stay in the window bound while printing everything */ 
+    point p = mainWindows.at(dlsStatusWinIdx)->getMaxyx();
     for (offset = yOffset; offset < vec.size(); ++offset) {
-        /* TODO - paintStatusWin() */
-        mainWindows.at(dlsStatusWinIdx)->printInMiddle(y, 0, row / 4, vec.at(offset).progress, COLOR_PAIR(7));
-        mainWindows.at(dlsStatusWinIdx)->printInMiddle(y, row / 4, row / 4, vec.at(offset).speed, COLOR_PAIR(7));
-        //mainWindow.at(dlsStatusWinIdx)->printInMiddledlsStatusWiny, 2 * width / 4, width / 4, dl.eta, COLOR_PAIR(7));
-        mainWindows.at(dlsStatusWinIdx)->printInMiddle(y, 3 * row / 4,row / 4, vec.at(offset).status, COLOR_PAIR(7));
+        /* TODO - set color_pair instead of copy and paste */
+        if (curr == offset) {
+            mainWindows.at(dlsStatusWinIdx)->printInMiddle(y, 0, p.x / 4, vec.at(offset).progress, COLOR_PAIR(8));
+            mainWindows.at(dlsStatusWinIdx)->printInMiddle(y, p.x / 4, p.x / 4, vec.at(offset).speed, COLOR_PAIR(8));
+            //mainWindow.at(dlsStatusWinIdx)->printInMiddledlsStatusWiny, 2 * width / 4, width / 4, dl.eta, COLOR_PAIR(8));
+            mainWindows.at(dlsStatusWinIdx)->printInMiddle(y, 3 * p.x / 4, p.x / 4, vec.at(offset).status, COLOR_PAIR(8));
+        }
+        else {
+            mainWindows.at(dlsStatusWinIdx)->printInMiddle(y, 0, p.x / 4, vec.at(offset).progress, COLOR_PAIR(7));
+            mainWindows.at(dlsStatusWinIdx)->printInMiddle(y, p.x / 4, p.x / 4, vec.at(offset).speed, COLOR_PAIR(7));
+            //mainWindow.at(dlsStatusWinIdx)->printInMiddledlsStatusWiny, 2 * width / 4, width / 4, dl.eta, COLOR_PAIR(7));
+            mainWindows.at(dlsStatusWinIdx)->printInMiddle(y, 3 * p.x / 4, p.x / 4, vec.at(offset).status, COLOR_PAIR(7));
+        }
         y++;
     }
 }
@@ -336,9 +359,9 @@ void dlManagerUI::updateDownloadsStatusWindow()
                 break;
             }
         }
-        /* Sleep 200ms before refreshing the window again or the while loop will execute endlessly 
+        /* Sleep 100ms before refreshing the window again or the while loop will execute endlessly 
          * so it doesn't monopolize time / ressources */ 
-        std::this_thread::sleep_for(std::chrono::milliseconds(200));
+        std::this_thread::sleep_for(std::chrono::milliseconds(100));
         /* y represents the y postion of the infos to print on the screen - it matches the location
          * of the corresponding download item on the futureUpdateDlsStatus part of the screen */
 
@@ -385,7 +408,6 @@ int dlManagerUI::stopStatusUpdate()
     return 0;
 }
 
-
 /* Navigate the download manager menus */
 void dlManagerUI::Browser()
 {
@@ -394,20 +416,27 @@ void dlManagerUI::Browser()
     int ch = 0;
 
     point pMax = mainWindows.at(3)->getMaxyx();
-    int currItNo = 0, topItem = 0;
-    int botItem = pMax.y - 1;
+    int topItem = 0;
+    int botItem = pMax.y - 2;
 
     {
         std::lock_guard<std::mutex> guard(dlManagerUI::yOffsetMutex);
+        currItNo = 0;
         yOffset = 0;
     }
 
     while ((ch = getch()) != KEY_F(1)) {
         switch(ch) {
+            /* TODO -do not resize under 108 * 24 */
             case KEY_RESIZE:
                 {
                     stopStatusUpdate();
                     resizeUI();
+                    pMax = mainWindows.at(3)->getMaxyx();
+                    topItem = 0;
+                    botItem = pMax.y - 2;
+                    currItNo = 0;
+                    yOffset = 0;
                     updateDownloadsMenu(dlManagerControl->getDownloadsList());
                     startStatusUpdate();
                     break;
@@ -420,19 +449,16 @@ void dlManagerUI::Browser()
                         menu->menuDriver(REQ_DOWN_ITEM);
                     }
                     pMax = mainWindows.at(3)->getMaxyx();
-                    currItNo = menu->getItemNo() + 1;
-                    /* Signals to scroll status window down if the menu is scrolled down */
-                    /* If curr item id is > max items number displayed in the win -> offset */
-                    if (currItNo > botItem) {
+                    {
                         std::lock_guard<std::mutex> guard(dlManagerUI::yOffsetMutex);
-                        yOffset = (currItNo - (pMax.y - 1)); 
-                        botItem++;
-                        topItem++;
-                        endwin();
-                        std::cout << "curr item number = " << currItNo << '\n';
-                    } 
-                    else {
-                        ;
+                        currItNo = menu->getItemNo();
+                        /* Signals to scroll status window down if the menu is scrolled down */
+                        /* If curr item id is > max items number displayed in the win -> offset */
+                        if (currItNo > botItem) {
+                            yOffset = (currItNo - (pMax.y - 2)); 
+                            botItem++;
+                            topItem++;
+                        } 
                     }
                     break;
                 }
@@ -444,17 +470,16 @@ void dlManagerUI::Browser()
                         menu->menuDriver(REQ_UP_ITEM);
                     }
                     pMax = mainWindows.at(3)->getMaxyx();
-                    currItNo = menu->getItemNo();
-                    /* Signals to scroll status window down if the menu is scrolled down */
-                    if (currItNo < topItem) {
-                        topItem--;
-                        botItem--;
-                        yOffset--;
+                    {
+                        std::lock_guard<std::mutex> guard(dlManagerUI::yOffsetMutex);
+                        currItNo = menu->getItemNo();
+                        /* Signals to scroll status window down if the menu is scrolled down */
+                        if (currItNo < topItem) {
+                            topItem--;
+                            botItem--;
+                            yOffset--;
+                        }
                     }
-                    else {
-                        ;
-                    }
-
                     break;
                 }
 
@@ -468,6 +493,11 @@ void dlManagerUI::Browser()
                     stopStatusUpdate();
                     showDetails(menu->getItemName());
                     updateDownloadsMenu(dlManagerControl->getDownloadsList());
+                    pMax = mainWindows.at(3)->getMaxyx();
+                    topItem = 0;
+                    botItem = pMax.y - 2;
+                    currItNo = 0;
+                    yOffset = 0;
                     startStatusUpdate(); 
                     break;
                 }
@@ -479,7 +509,14 @@ void dlManagerUI::Browser()
                     stopStatusUpdate();
                     /* Open the window containing a form in which the user enters the download infos */
                     addNewDl();
+
+
                     updateDownloadsMenu(dlManagerControl->getDownloadsList());
+                    pMax = mainWindows.at(3)->getMaxyx();
+                    topItem = 0;
+                    botItem = pMax.y - 2;
+                    currItNo = 0;
+                    yOffset = 0;
                     startStatusUpdate();
                     break;
                 }
@@ -714,6 +751,7 @@ void dlManagerUI::addDlNav()
     bool done = false;
     while ((ch = getch())) {
         switch (ch) {
+            /* TODO -do not resize under 108 * 24 */
             case KEY_RESIZE:
                 /* TODO - save all user input then update */
                 {
@@ -788,8 +826,8 @@ void dlManagerUI::addDlNav()
                         URLcleaned.push_back('\0');
                         filenameCleaned.push_back('\0');
                         /* Start dl if everything ok */
-                        dlManagerControl->createNewDl(dlFolder, filenameCleaned, URLcleaned,  0, 0);
-                        dlManagerControl->startDl(filenameCleaned);
+                        std::string f = dlManagerControl->createNewDl(dlFolder, filenameCleaned, URLcleaned,  0, 0);
+                        dlManagerControl->startDl(f);
                         /* Update downloads list in the menu */
                         updateDownloadsMenu(dlManagerControl->getDownloadsList());
                         /* Restart status thread */
@@ -966,6 +1004,7 @@ void dlManagerUI::detNav(const std::string filename)
 
     while ((ch = getch())) {
         switch (ch) {
+            /* TODO -do not resize under 108 * 24 */
             case KEY_RESIZE:
                 {
                     resizeDetWin(filename);    

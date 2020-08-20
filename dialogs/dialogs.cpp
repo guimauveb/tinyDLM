@@ -5,7 +5,7 @@ const std::string workInProg    = "Work in progress";
 
 const std::string tinyDLMWelcome = " tinyDLM - A tiny downloader manager ";
 const std::string tinyDLMVer     = " v1.0 ";
-const std::string tinyHelp       = " Press h if you need help. ";
+const std::string tinyHelp       = " Press 'a' to add a new download. ";
 
 /* Display keys and their associated functions at the bottom of the window */
 const std::string msgKeyInfoP  = " a: add  p: pause all  c: clear inactive  k: kill all " ;

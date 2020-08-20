@@ -45,6 +45,8 @@ class dlManagerUI
         void paintMainWinWin(std::unique_ptr<cursesWindow>& mainWinWin);
         std::unique_ptr<cursesWindow> mainWinKeyActInit();
         void paintKeyActWin(std::unique_ptr<cursesWindow>& keyActWin);
+        std::unique_ptr<cursesWindow> mainWinDlInfosInit();
+        void paintDlsInfosWin(std::unique_ptr<cursesWindow>& dlsInfosWin);
         
         /* Update message displayed in the key act window */
         void updateKeyActWinMessage(bool& p);
@@ -59,7 +61,6 @@ class dlManagerUI
         /* Update status window in a designated thread */
         void updateDownloadsStatusWindow();
         void updateDownloadsMenu(std::vector<std::string> vec);
-        //std::unique_ptr<cursesWindow> mainWinDlInfosInit();
 
         /* Main windows are then moved into a vector */
         std::vector<std::unique_ptr<cursesWindow>> mainWindows;
@@ -153,6 +154,8 @@ class dlManagerUI
         const int dlsWinIdx = 2;
         const int dlsStatusWinIdx = 3;
         const int keyActWinIdx = 4;
+        const int dlsInfosWinIdx = 5;
         int yOffset;
+        int currItNo;
 };
 
