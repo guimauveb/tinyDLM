@@ -1,26 +1,45 @@
-/* TODO - organize files and folders */
 tinyDLM
-├── dlManager 
-│   └── dlManager.hpp
-│   └── dlManager.cpp
-│   └── download.hpp
-├── dlManagerController 
-│   └── dlManagerController.hpp
-│   └── dlManagerController.cpp
-├── helperFunctions
-│   └── UIHelperFunctions.hpp
-│   └── UIHelperFunctions.cpp
-│   └── miscHelperFunc.hpp
+│   
+│   └── includes
+│       └── cursesWindow.hpp
+│       └── cursesMenu.hpp
+│       └── cursesForm.hpp
+│   └── source
+│       └── cursesWindow.cpp
+│       └── cursesMenu.cpp
+│       └── cursesForm.cpp
+│       └── helper
+│           └── fieldSize.cpp
+│           └── point.cpp
+│           └── winSize.cpp
 ├── dialogs
-│   └── dialogs.hpp
-│   └── dialogs.cpp
-├── UIHelpers (coming)
-│   └── cursesWindow.hpp
-│   └── cursesWindow.cpp
-│   └── winSize.cpp
-└── dlManagerUI.hpp
-└── dlManagerUI.cpp
-│   └── winSize.cpp
+│   └── include
+│       └── dialogs.hpp
+│   └── source 
+│       └── dialogs.cpp
+├── dlManager 
+│   └── include
+│       └── dlManager.hpp
+│       └── download.hpp
+│   └── source
+│       └── dlManager.cpp
+├── dlManagerController 
+│   └── include
+│       └── dlManagerController.hpp
+│       └── helper
+│           └── flipMap.hpp
+│   └── source
+│       └── dlManagerController.cpp
+├── UI
+│   └── include
+│       └── dlManagerUI.hpp
+│       └── helper
+│           └── userInputCheck.hpp
+│           └── futureState.hpp
+│  └── source
+│       └── dlManagerUI.cpp
+│       └── helper
+│           └── userInputCheck.cpp
 └── main 
-   └── main.cpp
+│   └── main.cpp
 
