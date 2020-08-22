@@ -18,7 +18,7 @@ class dlManager
         /* Constructor */
         dlManager(const int& dlid, const std::string& u, const std::string& f, const std::string& sa, const int& lsl, const int& lst);
 
-        /* Make sure threads are done executing before killing the object */
+        /* Make sure threads are done executing when calling the destructor */
         ~dlManager(); 
 
         /* This function will take care of the transfer */
@@ -60,7 +60,7 @@ class dlManager
                 unsigned writeRound;
         };
 
-        /* Returns number of bytes downloaded / progress (yes...) / and that's where we signal the curl handle
+        /* Returns number of bytes downloaded / progress / and that's where we signal the curl handle
          * to pause the transfer */
         struct ProgressCallbackFunctor
         {
@@ -77,7 +77,6 @@ class dlManager
                 /* Shared pointer pointing to the mutex protecting the download object */
                 std::shared_ptr<std::mutex> mutPtr;
                 /* Shared pointer pointing to the download struct */
-                /* Does nothing here for now */
                 std::shared_ptr<download> dlPtr;
                 /* Shared pointer pointing to the 'PAUSE' bool */ 
                 std::shared_ptr<bool> pPtr;
@@ -112,7 +111,6 @@ class dlManager
         /* Ban default constructor */
         dlManager();
 
-        /* TODO - 0 = stopped - 1 = downloading - 2 = pause - 3 = error */
         /* Initialise our curlpp handle here so it can be accessed by any function */
         curlpp::Easy cleaner;
         curlpp::Easy request;
@@ -120,9 +118,8 @@ class dlManager
         /* Initialize a download struct that will hold all download informations - initialized by the 
          * constructor */
         std::shared_ptr<download> downloadPtr = std::make_shared<download>();
-        /* Change the URL -> The new URL must link to the same file */
-        /* Some websites require a valid user agent */
 
+        /* Some websites require a valid user agent */
         static const std::string USER_AGENT; 
         const double oneSec = 1000000;
         const double oneMil = 1000000;

@@ -23,10 +23,8 @@ dlManagerUI::~dlManagerUI()
     stopProgressBarThread();
     /* Pause all downloads -> we use pause to stop them since it does the same thing */
     dlManagerControl->pauseAll();
-
     /* Delete main windows */
     mainWindows.clear();
-
     /* TODO - save downloads list */
     /* Empty the downloads list menu */
     endwin();
@@ -58,7 +56,6 @@ void dlManagerUI::initColors()
     init_pair(16, COLOR_GREEN, COLOR_GREEN);
 }
 
-/* TODO - pass all this to initWin functions */
 void dlManagerUI::setWinsSize()
 {
     /* Get terminal screen size in columns and rows */
@@ -291,7 +288,7 @@ void dlManagerUI::paintKeyActWin(std::unique_ptr<cursesWindow>& keyActWin)
     keyActWin->printInMiddle(0, 0, col / 2, msgKeyInfoP, COLOR_PAIR(8));
 }
 
-void dlManagerUI::updateKeyActWinMessage(bool& p)
+void dlManagerUI::updateKeyActWinMessage(const bool& p)
 {
     mainWindows.at(keyActWinIdx)->eraseWin();
     if (p) {
@@ -316,18 +313,11 @@ std::unique_ptr<cursesWindow> dlManagerUI::mainWinDownloadsStatusInit()
     return std::make_unique<cursesWindow>(row - 5, col / 2, 3, col / 2);
 }
 
-void dlManagerUI::paintDlsStatusWin(std::unique_ptr<cursesWindow>& dlsStatusWin)
-{
-
-
-}
-
-void dlManagerUI::paintDlsInfosWin(std::unique_ptr<cursesWindow>& dlsInfosWin)
-{
-}
+void dlManagerUI::paintDlsStatusWin(std::unique_ptr<cursesWindow>& dlsStatusWin){}
+void dlManagerUI::paintDlsInfosWin(std::unique_ptr<cursesWindow>& dlsInfosWin){}
 
 /* Populate the status window with downloads informations such as their status / speed / progress */
-void dlManagerUI::populateStatusWin(const std::vector<downloadWinInfo> vec)
+void dlManagerUI::populateStatusWin(const std::vector<downloadWinInfo>& vec)
 {
     int y = 1;
     size_t offset;
@@ -344,6 +334,7 @@ void dlManagerUI::populateStatusWin(const std::vector<downloadWinInfo> vec)
     }
     for (offset = yOffset; offset < vec.size(); ++offset) {
         if (curr == offset) {
+            /* Highlight selected item */
             color = COLOR_PAIR(8);
         }
         else {
@@ -374,15 +365,13 @@ void dlManagerUI::setDownloadsMenu()
     menu->postMenu();
 }
 
-/* toDO - see how I can save the current menu and only add one item without reposting the entire menu */
-/* display downloads as a menu */
+/* Display downloads as a menu */
 std::unique_ptr<cursesMenu> dlManagerUI::initDownloadsMenu(std::vector<std::string> itemsData)
 {
     return std::make_unique<cursesMenu>(itemsData);
 }
 
-/* consistantly refresh the speed / progress /status of the current downloads */ 
-/* toDO - y offset corresponding to the active menu page */
+/* Consistantly refresh the speed / progress /status of the current downloads */ 
 void dlManagerUI::updateDownloadsStatusWindow()
 {
     while (true) {
@@ -488,12 +477,12 @@ void dlManagerUI::paintAddDlWin()
     addDlWin->drawBox(0, 0);
 }
 
-std::unique_ptr<cursesForm> dlManagerUI::initAddDlForm(int numFields)
+std::unique_ptr<cursesForm> dlManagerUI::initAddDlForm(size_t numFields)
 {
     return std::make_unique<cursesForm>(numFields);
 }
 
-std::unique_ptr<cursesForm> dlManagerUI::initDetForm(int numFields)
+std::unique_ptr<cursesForm> dlManagerUI::initDetForm(size_t numFields)
 {
     return std::make_unique<cursesForm>(numFields);
 }
@@ -556,7 +545,6 @@ void dlManagerUI::addDlNav()
         switch (ch) {
             /* TODO -do not resize under 108 * 24 */
             case KEY_RESIZE:
-                /* TODO - save all user input then update */
                 {
                     if (addDlForm->formDriver(REQ_VALIDATION) != E_OK) {
                         ;
@@ -660,7 +648,7 @@ void dlManagerUI::updateDownloadsMenu()
 }
 
 /* Init a subwindow containg infos about the selected download */
-void dlManagerUI::showDetails(const std::string itemName)
+void dlManagerUI::showDetails(const std::string& itemName)
 {
     /* Important: We begin by assigning a new form to detForm unique_ptr and then assigning a new window to 
      * detWin unique_ptr -> if we reassign the detWin pointer first and then try to reassign detForm, since 
@@ -689,7 +677,7 @@ std::unique_ptr<cursesWindow> dlManagerUI::initDetWin(/* pass winsize */)
     return std::make_unique<cursesWindow>(row / 2, col - (col / 2), (row / 4), col / 4);
 }
 
-void dlManagerUI::paintDetWin(const std::string itemName)
+void dlManagerUI::paintDetWin(const std::string& itemName)
 {
     point maxyx = detWin->getMaxyx();
     detWin->drawBox(0, 0);
@@ -701,7 +689,7 @@ void dlManagerUI::paintDetWin(const std::string itemName)
     detWin->printInMiddle(1, 0, maxyx.x, initDetailsTitle(itemName), COLOR_PAIR(8));
 }
 
-const std::string dlManagerUI::initDetailsTitle(const std::string itemName)
+const std::string dlManagerUI::initDetailsTitle(const std::string& itemName)
 {
     std::string it = itemName;
     it.erase(it.find('\0'));
@@ -746,12 +734,12 @@ void dlManagerUI::setDetForm()
 }
 
 /* shared_ptr that will be moved to progressWin own thread */
-std::unique_ptr<cursesWindow> dlManagerUI::initProgressWin(point bx, point mx)
+std::unique_ptr<cursesWindow> dlManagerUI::initProgressWin(const point& bx, const point& mx)
 {
     return std::make_unique<cursesWindow>(4, mx.x-10, mx.y, bx.x+4);
 }
 
-void dlManagerUI::startProgressBarThread(const std::string filename)
+void dlManagerUI::startProgressBarThread(const std::string& filename)
 {
     /* Initialize progress bar according to its parent win (details win) dimensions */
     point begyx = detWin->getBegyx();
@@ -781,7 +769,7 @@ int dlManagerUI::stopProgressBarThread()
     return 0;
 }
 
-int dlManagerUI::resizeDetWin(const std::string filename)
+int dlManagerUI::resizeDetWin(const std::string& filename)
 {
     stopProgressBarThread();
 
@@ -800,7 +788,7 @@ int dlManagerUI::resizeDetWin(const std::string filename)
 }
 
 /* Navigate through a download details subwindow */
-void dlManagerUI::detNav(const std::string filename)
+void dlManagerUI::detNav(const std::string& filename)
 {
     int ch = 0;
     bool done = false;
@@ -849,7 +837,7 @@ void dlManagerUI::detNav(const std::string filename)
 }
 
 /* Display a subwindow containing details about the selected download */ 
-void dlManagerUI::progressBar(const std::string filename)
+void dlManagerUI::progressBar(const std::string& filename)
 {
     point maxyx = progressWin->getMaxyx();
 

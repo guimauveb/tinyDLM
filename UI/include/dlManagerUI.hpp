@@ -1,5 +1,5 @@
-#include "helper/futureState.hpp"
-#include "helper/userInputCheck.hpp"
+#include "../../helper/include/futureState.hpp"
+#include "../../helper/include/userInputCheck.hpp"
 #include "../../dialogs/include/dialogs.hpp"
 
 #include "../../dlManagerController/include/dlManagerController.hpp"
@@ -47,13 +47,13 @@ class dlManagerUI
         /* 'Add a new download' routine */
         void addNewDl();
         /* Details window routine */
-        void showDetails(const std::string itemName);
+        void showDetails(const std::string& itemName);
 
         /* Menu holding downloads items */
         std::unique_ptr<cursesMenu> menu;
         
         /* Update message displayed in the key act window */
-        void updateKeyActWinMessage(bool& p);
+        void updateKeyActWinMessage(const bool& p);
         void updateDownloadsMenu();
 
         /* TODO - enum class */
@@ -99,7 +99,7 @@ class dlManagerUI
         std::unique_ptr<cursesMenu> initDownloadsMenu(std::vector<std::string> itemsData);
         void setDownloadsMenu();
         void paintDlsStatusWin(std::unique_ptr<cursesWindow>& dlsStatusWin);
-        void populateStatusWin(const std::vector<downloadWinInfo> vec);
+        void populateStatusWin(const std::vector<downloadWinInfo>& vec);
         /* Update status window in a designated thread */
         void updateDownloadsStatusWindow();
 
@@ -113,7 +113,7 @@ class dlManagerUI
         std::unique_ptr<cursesWindow> addDlWin;
         std::unique_ptr<cursesWindow> addDlInitWin();
         std::unique_ptr<cursesForm> addDlForm;
-        std::unique_ptr<cursesForm> initAddDlForm(int numFields);
+        std::unique_ptr<cursesForm> initAddDlForm(size_t numFields);
         void paintAddDlWin();
         void setAddDlForm();
 
@@ -125,20 +125,19 @@ class dlManagerUI
         
         std::unique_ptr<cursesWindow> detWin; 
         std::unique_ptr<cursesWindow> initDetWin();
-        void paintDetWin(const std::string itemName);
+        void paintDetWin(const std::string& itemName);
         std::unique_ptr<cursesForm> detForm;
-        std::unique_ptr<cursesForm> initDetForm(int numFields);
+        std::unique_ptr<cursesForm> initDetForm(size_t numFields);
         void setDetForm();
 
-        const std::string initDetailsTitle(const std::string itemName);
-        void detNav(const std::string filename);
-        int resizeDetWin(const std::string filename);
+        const std::string initDetailsTitle(const std::string& itemName);
+        void detNav(const std::string& filename);
+        int resizeDetWin(const std::string& filename);
 
         /* Download progress bar updated in a separate thread */
-        std::unique_ptr<cursesWindow> initProgressWin(point bx, point mx);
-        void progressBar(const std::string filename);
-        void startProgressBarThread(const std::string filename);       
-        void displayProgress(point& maxyx, const std::string percent, const std::string bar);
+        std::unique_ptr<cursesWindow> initProgressWin(const point& bx, const point& mx);
+        void progressBar(const std::string& filename);
+        void startProgressBarThread(const std::string& filename);       
         int stopProgressBarThread();
 
         /* Bool signaling if the status window should be updated -> set to true when naviagating the download

@@ -2,7 +2,7 @@
 
 /* Form is already declared as a private member variable - the constructor takes the number of fields we want
  * to create in the form */
-cursesForm::cursesForm(size_t numField)
+cursesForm::cursesForm(const size_t& numField)
 {
     /* TODO - init field then init and post form */
     fields.resize(2, nullptr);
@@ -21,7 +21,7 @@ cursesForm::~cursesForm()
     clearForm();
 }
 
-void cursesForm::setField(int fieldIdx, int height, int width, int toprow, int leftcol, int offscreen,
+void cursesForm::setField(size_t fieldIdx, int height, int width, int toprow, int leftcol, int offscreen,
         int nbuffers)
 {
     fields.at(fieldIdx) = new_field(height, width, toprow, leftcol, offscreen, nbuffers);
@@ -33,22 +33,19 @@ void cursesForm::initForm()
     form = new_form(fields.data());
 }
 
-void cursesForm::initField(size_t numFields)
-{
+void cursesForm::initField(const size_t& numFields) {}
 
-}
-
-void cursesForm::setFieldBack(int fieldIdx, chtype attr)
+void cursesForm::setFieldBack(size_t fieldIdx, chtype attr)
 {
     set_field_back(fields.at(fieldIdx), attr);
 }
 
-void cursesForm::fieldOptsOff(int fieldIdx, Field_Options opts)
+void cursesForm::fieldOptsOff(size_t fieldIdx, Field_Options opts)
 {
     field_opts_off(fields.at(fieldIdx), opts);
 }
 
-void cursesForm::fieldOptsOn(int fieldIdx, Field_Options opts)
+void cursesForm::fieldOptsOn(size_t fieldIdx, Field_Options opts)
 {
     field_opts_on(fields.at(fieldIdx), opts);
 }
@@ -95,7 +92,7 @@ void cursesForm::postForm()
     post_form(form);
 }
 
-std::string cursesForm::getFieldBuffer(int fieldIdx)
+std::string cursesForm::getFieldBuffer(size_t fieldIdx)
 {
     /* TODO - catch out of range vector */
     return std::string(field_buffer(fields.at(fieldIdx), 0)); 
@@ -123,26 +120,7 @@ void cursesForm::saveFieldBuffer()
     }
 }
 
-/* TODO - import it from helper functions */
-std::string cursesForm::trimSpaces(std::string str)
-{
-    int i = 0, j = str.length() - 1;
-    {
-        /* Parse until '\0' or a alphanumeric char */
-        while (str[i] && (!isalpha(str[i]) && !isdigit(str[i]))) {
-            i++;
-        }
-        /* Move from the end till first char */
-        while(!isalpha(str[j]) && !isdigit(str[j])) {
-            j--;
-        }
-    } 
-    return str = str.substr(i, j + 1);
-}
-
-
-
-void cursesForm::populateField(int fieldIdx, const std::string str)
+void cursesForm::populateField(size_t fieldIdx, const std::string str)
 {
     form_driver(form, fieldIdx);
     for (size_t i = 0; i < str.length(); ++i) {

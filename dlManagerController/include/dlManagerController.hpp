@@ -1,6 +1,6 @@
 /* Controls all dlManager instances */
-#include "../include/helper/flipMap.hpp"
-#include "../include/helper/stringify.hpp"
+#include "../../helper/include/flipMap.hpp"
+#include "../../helper/include/stringify.hpp"
 
 #include "../../dlManager/include/dlManager.hpp"
 

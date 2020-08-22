@@ -41,7 +41,6 @@ dlManager::~dlManager()
         ThreadVector.at(i).join();
 }
 
-/* Store the duration of the first call into a variable to avoid waiting for 1 sec at every call */
 void dlManager::downloadSpeed()
 {
     /* Make a copy of the vector and work with the copy to avoid blocking the downloading thread for too
@@ -56,7 +55,7 @@ void dlManager::downloadSpeed()
 
     double totalDur = 0, totalBytes = 0;
     double keptVal = 0;
-    /* Iterate from end to (end - 1sec) */
+    /* Iterate from the end to (end - 1sec) */
     for (const auto& el : tmp) {
         totalDur += el.first;
         totalBytes += el.second;
@@ -167,9 +166,7 @@ void dlManager::runThread()
     ThreadVector.emplace_back(&dlManager::dlPerform, this);
 }
 
-/* TODO - use const members to define members that don't modify the object */
 /* Set will be used to modify these values after the object has been created */
-
 /* Perform the download once we have all the info we need */
 int dlManager::dlPerform()
 {
@@ -182,7 +179,7 @@ int dlManager::dlPerform()
         /* Initialise our WriteCallback functor that will write to the disk */
         WriteCallbackFunctor fObject(&outfile);
         /* Pass our pointer to the mutex avoiding trouble with our download struct - pass a const ref to
-         * the 'PAUSE' bool (since this the Progress function can't modified it) - and a pointer to the 
+         * the 'PAUSE' bool (since this the Progress function won't modify it) - and a pointer to the 
          * actual download object */
         ProgressCallbackFunctor pObject(dlMutPtr, downloadPtr, pausePtr, resumePtr);
         /* If the transfer is resumed, append the existing file and resume transfer from the last byte
@@ -275,7 +272,6 @@ void dlManager::pause()
 
 void dlManager::resume()
 {
-    /* No need to use a mutex ? */
     if (downloadPtr->status == downloadStatus::PAUSED) {
         *resumePtr = true;
         *pausePtr = false;

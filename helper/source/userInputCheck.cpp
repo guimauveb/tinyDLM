@@ -1,4 +1,4 @@
-#include "../../include/helper/userInputCheck.hpp"
+#include "../../helper/include/userInputCheck.hpp"
 
 /* TODO - move somewhere else */
 int checkURLlength(std::string& url)
