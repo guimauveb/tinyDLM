@@ -1,8 +1,8 @@
 # tinyDLM - A tiny download manager
-## Small multi-threaded download manager built around curlpp / ncurses 
 
 ![tinyDLM](/imgs/screenshot.jpg)
 
+## Small multi-threaded download manager built around curlpp / ncurses 
 
     - Direct Download Link only 
     - Supports simultaneous transfers  
@@ -10,6 +10,7 @@
     - Displays current download speed and progress for each transfer  
 
 Installation:
+    
     - [ ] makefile
 
 Works pretty well on macOS Mojave (10.14.6), not so well on Linux (tested on Ubuntu and Kali) because of 
