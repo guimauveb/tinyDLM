@@ -3,17 +3,17 @@
 
 ![tinyDLM](/imgs/screenshot.jpg)
 
+
     - Direct Download Link only 
     - Supports simultaneous transfers  
     - Transfers can be paused / resumed / killed.
     - Displays current download speed and progress for each transfer  
 
 Installation:
-```
-    TODO - makefile
-    Works pretty well on macOS Mojave (10.14.6), not so well on Linux (tested on Ubuntu and Kali) because of 
-    a problem I have with threads and curses window sizes representation which seem to differ from macOS. 
-```
+    - [ ] makefile
+
+Works pretty well on macOS Mojave (10.14.6), not so well on Linux (tested on Ubuntu and Kali) because of 
+a problem I have with threads and curses window sizes representation which seem to differ from macOS. 
 
 Disclaimer:
 I made this program to learn more about programming and more specifically about C++, threads, curses, curl etc.
