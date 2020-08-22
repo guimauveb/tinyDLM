@@ -41,9 +41,12 @@ class dlManagerController
         std::vector<std::string> getDownloadsList();
 
     private:
+        /* Keep track of the number of downloads */
         int dlCounter;
+
         /* dlManager instances are stored in a vector of unique_ptrs */
         std::vector<std::unique_ptr<dlManager>> dlManagerVec;
+
         /* Maps a filename to a download id */
         std::map<std::string, int> downloadsMap;
         std::map<int, std::string> sortDownloadsMapByIds();

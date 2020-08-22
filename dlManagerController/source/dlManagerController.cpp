@@ -11,17 +11,17 @@ dlManagerController::~dlManagerController() {}
 std::string dlManagerController::createNewDl(std::string dlFolder, std::string filename, const std::string url,  
         const int lowSpeedLim, const int lowSpeedTim)
 {
-    /* TODO - use an index for each name for better readability */
     std::string f = filename;
-    std::string appendNum = "(" + std::to_string(dlCounter) + ")";
     std::map<std::string, int>::iterator it = downloadsMap.find(filename);
+
     if (it != downloadsMap.end()) {
         createDuplicate(f, dlCounter);
     }
+
     it = downloadsMap.end();
     downloadsMap.insert(it, std::pair<std::string, int>(f, dlCounter));
 
-    std::string saveAs = dlFolder + f;
+    const std::string saveAs = dlFolder + f;
     std::unique_ptr<dlManager> dlm = std::make_unique<dlManager>(dlCounter, url, f, saveAs, lowSpeedLim, lowSpeedTim);
     dlManagerVec.emplace_back(std::move(dlm));
 
@@ -210,5 +210,4 @@ std::vector<std::string> dlManagerController::getDownloadsList()
     }
     return vec;
 }
-
 

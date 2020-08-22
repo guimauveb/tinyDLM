@@ -4,7 +4,6 @@
 #include <form.h>
 
 #include <vector>
-#include <iostream>
 #include <thread>
 
 class cursesForm {

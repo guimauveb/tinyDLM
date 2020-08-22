@@ -3,7 +3,6 @@
 
 #include <vector>
 #include <map>
-#include <iostream>
 #include <cstring>
 
 class cursesMenu {
