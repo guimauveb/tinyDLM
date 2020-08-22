@@ -44,16 +44,16 @@ class dlManagerUI
         /* Corresponds to the current highlighted item */
         int currItNo;
 
+        /* Display help window */
+        void showHelp();
         /* 'Add a new download' routine */
-        void addNewDl();
+        int addNewDl();
         /* Details window routine */
-        void showDetails(const std::string& itemName);
+        int showDetails(const std::string& itemName);
 
         /* Menu holding downloads items */
         std::unique_ptr<cursesMenu> menu;
         
-        /* Update message displayed in the key act window */
-        void updateKeyActWinMessage(const bool& p);
         void updateDownloadsMenu();
 
         /* TODO - enum class */
@@ -76,6 +76,11 @@ class dlManagerUI
         void setWinsSize();
         void initStatusDriver();
 
+        /* Display tinyDLM help */
+        std::unique_ptr<cursesWindow> initHelpWin();
+        void paintHelpWin(std::unique_ptr<cursesWindow>& win);
+        void helpNav(std::unique_ptr<cursesWindow>& win);
+
         /* Window holding the welcome message at first start */
         std::unique_ptr<cursesWindow> welcomeWinInit();
         void paintWelWin(std::unique_ptr<cursesWindow>& welWin);
@@ -93,7 +98,6 @@ class dlManagerUI
         std::unique_ptr<cursesWindow> mainWinDlInfosInit();
         void paintDlsInfosWin(std::unique_ptr<cursesWindow>& dlsInfosWin);
         
-        
         std::unique_ptr<cursesWindow> mainWinDownloadsStatusInit();
 
         std::unique_ptr<cursesMenu> initDownloadsMenu(std::vector<std::string> itemsData);
@@ -109,7 +113,6 @@ class dlManagerUI
         /* Program's subwindows - 'Add a download' window / 'Details' window - 'Progress bar' window  */
 
         /* "Add a new download" routine */
-        /* Function that will call all the needed functions to create a new "Add a new dl" window */
         std::unique_ptr<cursesWindow> addDlWin;
         std::unique_ptr<cursesWindow> addDlInitWin();
         std::unique_ptr<cursesForm> addDlForm;
@@ -118,7 +121,7 @@ class dlManagerUI
         void setAddDlForm();
 
         /* Navigate through the 'Add a download' subwindow */
-        void addDlNav();
+        int addDlNav();
         void populateForm(const std::string filename);
         void resizeAddDlNav(std::string url, std::string filename);
 
@@ -131,7 +134,7 @@ class dlManagerUI
         void setDetForm();
 
         const std::string initDetailsTitle(const std::string& itemName);
-        void detNav(const std::string& filename);
+        int detNav(const std::string& filename);
         int resizeDetWin(const std::string& filename);
 
         /* Download progress bar updated in a separate thread */

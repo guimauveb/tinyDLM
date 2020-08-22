@@ -8,8 +8,25 @@ extern const std::string tinyDLMWelcome;
 extern const std::string tinyDLMVer;
 extern const std::string tinyHelp;
 
-extern const std::string msgKeyInfoP;
-extern const std::string msgKeyInfoR;
+//extern const std::string msgKeyInfoP;
+//extern const std::string msgKeyInfoR;
+extern const std::string msgHelp;
+extern const std::string msgHelpMenu      ;
+extern const std::string msgHelpAdd       ;
+extern const std::string msgHelpArrowKeys ; 
+extern const std::string msgHelpReturn    ; 
+extern const std::string msgHelpPause     ; 
+extern const std::string msgHelpPauseAll  ; 
+extern const std::string msgHelpResume    ; 
+extern const std::string msgHelpResumeAll ; 
+extern const std::string msgHelpClear     ; 
+extern const std::string msgHelpKill      ;
+extern const std::string msgHelpKillAll   ; 
+extern const std::string msgHelpExit      ; 
+extern const std::string msgHelpCloseWin  ;
+
+extern const std::string addURL;
+extern const std::string addSaveAs;
 
 extern const std::string msgClose;
 extern const std::string msgPause;

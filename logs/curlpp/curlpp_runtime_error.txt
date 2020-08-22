@@ -1,1 +1,0 @@
-Protocol "ehttps" not supported or disabled in libcurl

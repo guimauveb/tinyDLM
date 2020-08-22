@@ -12,7 +12,6 @@ int main()
 
     /* Navigate through the tinyDLM UI */
     {
-        bool PAUSEDALL = false;
         int ch = 0;
 
         while ((ch = getch()) != KEY_F(1)) {
@@ -22,8 +21,8 @@ int main()
                     {
                         dlmc->stopStatusUpdate();
                         dlmc->resizeUI();
-                        dlmc->resetStatusDriver();
                         dlmc->updateDownloadsMenu();
+                        dlmc->resetStatusDriver();
                         dlmc->startStatusUpdate();
                         break;
                     }
@@ -33,8 +32,8 @@ int main()
                         /* Make sure that the menu is not empty */
                         if (dlmc->dlManagerControl->isActive()) {
                             dlmc->menu->menuDriver(REQ_DOWN_ITEM);
+                            dlmc->statusDriver(KEY_DOWN);
                         }
-                        dlmc->statusDriver(KEY_DOWN);
                         break;
                     }
 
@@ -43,8 +42,8 @@ int main()
                         /* Make sure that the menu is not empty */
                         if (dlmc->dlManagerControl->isActive()) {
                             dlmc->menu->menuDriver(REQ_UP_ITEM);
+                            dlmc->statusDriver(KEY_UP); 
                         }
-                        dlmc->statusDriver(KEY_UP); 
                         break;
                     }
 
@@ -56,9 +55,15 @@ int main()
                             break;
                         }
                         dlmc->stopStatusUpdate();
-                        dlmc->showDetails(dlmc->menu->getItemName());
-                        dlmc->updateDownloadsMenu();
-                        dlmc->resetStatusDriver();
+
+                        /* showDetails returns true if the download was killed and that we should update the
+                         * menu */
+                        if (dlmc->showDetails(dlmc->menu->getItemName())) {
+                            dlmc->updateDownloadsMenu();
+                            dlmc->resetStatusDriver();
+                            dlmc->mainWindows.at(dlmc->dlsStatusWinIdx)->resetWin();
+                        }
+
                         dlmc->startStatusUpdate(); 
                         break;
                     }
@@ -67,9 +72,10 @@ int main()
                     /* Opens a subwindow in which we'll enter the new download item info */
                     {
                         dlmc->stopStatusUpdate();
-                        dlmc->addNewDl();
-                        dlmc->updateDownloadsMenu();
-                        dlmc->resetStatusDriver();
+                        if (dlmc->addNewDl()) {
+                            dlmc->updateDownloadsMenu();
+                            dlmc->resetStatusDriver();
+                        }
                         dlmc->startStatusUpdate();
                         break;
                     }
@@ -77,6 +83,9 @@ int main()
                 case 'h':
                     /* TODO - Display a help window */
                     {
+                        dlmc->stopStatusUpdate();
+                        dlmc->showHelp();
+                        dlmc->startStatusUpdate();
                         break;
                     }
 
@@ -86,7 +95,7 @@ int main()
                         if (!dlmc->dlManagerControl->isActive()) {
                             break;
                         }
-                        dlmc->dlManagerControl->stop(dlmc->menu->getItemName());
+                        dlmc->dlManagerControl->pause(dlmc->menu->getItemName());
                         break;
                     }
 
@@ -98,8 +107,6 @@ int main()
                         }
                         dlmc->stopStatusUpdate();
                         dlmc->dlManagerControl->pauseAll();
-                        PAUSEDALL = true;
-                        dlmc->updateKeyActWinMessage(PAUSEDALL);
                         dlmc->startStatusUpdate();
                         break;
                     }
@@ -121,8 +128,6 @@ int main()
                         }
                         dlmc->stopStatusUpdate();
                         dlmc->dlManagerControl->resumeAll();
-                        PAUSEDALL = false;
-                        dlmc->updateKeyActWinMessage(PAUSEDALL);
                         dlmc->startStatusUpdate();
                         break;
                     }
@@ -130,21 +135,41 @@ int main()
                 case 'c':
                     /* TODO - clearInactive() doesn't work properly when a download is in progress */
                     {
+                        if (!dlmc->dlManagerControl->isActive()) {
+                            break;
+                        }
                         dlmc->stopStatusUpdate();
                         dlmc->dlManagerControl->clearInactive();
                         dlmc->mainWindows.at(dlmc->dlsStatusWinIdx)->resetWin();
                         dlmc->updateDownloadsMenu();
+                        dlmc->resetStatusDriver();
                         dlmc->startStatusUpdate();
                         break;
                     }
 
                 case 'k':
+                    /* Kill selected download */
+                    {
+                        if (!dlmc->dlManagerControl->isActive()) {
+                            break;
+                        }
+                        dlmc->stopStatusUpdate();
+                        dlmc->dlManagerControl->stop(dlmc->menu->getItemName()); 
+                        dlmc->updateDownloadsMenu();
+                        dlmc->resetStatusDriver();
+                        dlmc->mainWindows.at(dlmc->dlsStatusWinIdx)->resetWin();
+                        dlmc->startStatusUpdate();
+                        break;
+                    }
+
+                case 'K':
                     /* Kill all downloads */
                     {
+                        if (!dlmc->dlManagerControl->isActive()) {
+                            break;
+                        }
                         dlmc->stopStatusUpdate();
                         dlmc->dlManagerControl->killAll();
-                        PAUSEDALL = false;
-                        dlmc->updateKeyActWinMessage(PAUSEDALL); 
                         dlmc->updateDownloadsMenu();
                         dlmc->mainWindows.at(dlmc->dlsStatusWinIdx)->resetWin();
                         dlmc->startStatusUpdate();

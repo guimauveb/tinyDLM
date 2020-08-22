@@ -154,6 +154,10 @@ int dlManagerUI::firstStart()
                 startStatusUpdate();
                 return 0;
             case 'h':
+                showHelp();
+                refreshMainWins();
+                startStatusUpdate();
+                return 0;
                 break;
             default:
                 break;
@@ -285,20 +289,7 @@ std::unique_ptr<cursesWindow> dlManagerUI::mainWinKeyActInit()
 void dlManagerUI::paintKeyActWin(std::unique_ptr<cursesWindow>& keyActWin)
 {
     /* Display keys and their associated functions at the bottom of the window */
-    keyActWin->printInMiddle(0, 0, col / 2, msgKeyInfoP, COLOR_PAIR(8));
-}
-
-void dlManagerUI::updateKeyActWinMessage(const bool& p)
-{
-    mainWindows.at(keyActWinIdx)->eraseWin();
-    if (p) {
-        /* Display 'resume' if paused */
-        mainWindows.at(keyActWinIdx)->printInMiddle(0, 0, col / 2, msgKeyInfoR, COLOR_PAIR(8));
-    }
-    else {
-        /* Display 'pause' if not paused */
-        mainWindows.at(keyActWinIdx)->printInMiddle(0, 0, col / 2, msgKeyInfoP, COLOR_PAIR(8));
-    }
+    keyActWin->printInMiddle(0, 0, col / 4, msgHelp, COLOR_PAIR(7));
 }
 
 /* init the global download info subwindow in a separated thread - displays number of downloads + speed */ 
@@ -431,10 +422,47 @@ int dlManagerUI::stopStatusUpdate()
     return 0;
 }
 
-/* Add a new download */
-void dlManagerUI::addNewDl()
+void dlManagerUI::showHelp()
 {
-    curs_set(1);   
+    std::unique_ptr<cursesWindow> helpWin = initHelpWin();
+    paintHelpWin(helpWin);
+    helpWin->refreshWin();
+    helpNav(helpWin);
+}
+
+void dlManagerUI::helpNav(std::unique_ptr<cursesWindow>& win)
+{
+    getch();
+}
+
+std::unique_ptr<cursesWindow> dlManagerUI::initHelpWin()
+{
+    return std::make_unique<cursesWindow>(row / 2 + 2, col - (col / 2), (row / 4), col / 4);
+}
+
+void dlManagerUI::paintHelpWin(std::unique_ptr<cursesWindow>& win)
+{
+    const int begy = 1;
+    const point maxyx = win->getMaxyx();
+    win->printInMiddle(begy, 0, maxyx.x, msgHelpMenu, COLOR_PAIR(7));
+    win->addStr(begy + 2, 0, msgHelpAdd);
+    win->addStr(begy + 3, 0, msgHelpArrowKeys);
+    win->addStr(begy + 4, 0, msgHelpReturn);
+    win->addStr(begy + 5, 0, msgHelpPause);
+    win->addStr(begy + 6, 0, msgHelpPauseAll);
+    win->addStr(begy + 7, 0, msgHelpResume);
+    win->addStr(begy + 8, 0, msgHelpResumeAll);
+    win->addStr(begy + 9, 0, msgHelpClear);
+    win->addStr(begy + 10, 0, msgHelpKill);
+    win->addStr(begy + 11, 0, msgHelpKillAll);
+    win->addStr(begy + 12, 0, msgHelpExit);
+    win->printInMiddle(begy + 14, 0, maxyx.x, msgHelpCloseWin, COLOR_PAIR(7));
+    win->drawBox(0, 0);
+}
+
+/* Add a new download */
+int dlManagerUI::addNewDl()
+{
     /* Important: We begin by assigning a new form to addDlForm unique_ptr and then assigning a new window to 
      * addDlWin unique_ptr -> if we reset the addDlWin pointer first and then try to reset addDlForm, since 
      * addDlForm has to free some memory corresponding to the old window (now deleted), we end up with a 
@@ -445,9 +473,8 @@ void dlManagerUI::addNewDl()
     paintAddDlWin();
     addDlWin->touchWin();
     addDlWin->refreshWin();
-    addDlNav();
     /* No need to call free() for win and form -> class destructor will take care of it */
-    curs_set(0);   
+    return addDlNav();
 }
 
 /* Init "Add a download" window */
@@ -470,6 +497,8 @@ void dlManagerUI::paintAddDlWin()
     titleAdd[i] = '\0';
 
     point maxyx = addDlWin->getMaxyx();
+    addDlWin->addStr(3, 3, addURL);
+    addDlWin->addStr(7, 3, addSaveAs);
     addDlWin->printInMiddle(1, 0, maxyx.x , titleAdd, COLOR_PAIR(8));
     addDlWin->printInMiddle(maxyx.y - 2, 0, maxyx.x / 3, msgStart, COLOR_PAIR(8));
     addDlWin->printInMiddle(maxyx.y - 2, 0, maxyx.x, msgScheduleCtrl, COLOR_PAIR(8));
@@ -497,9 +526,9 @@ void dlManagerUI::setAddDlForm()
     /* if macOS -> field[0] toprow = 3 and field[1] toprow = 6 */
     /* if Linux -> field[0] toprow = begy.y + 2 and field[1] toprow = begy.y + 5 */
     /* On macOS toprow seems to be an offset starting at the corresponding window first row */
-    /* On Linux it starts at 0 */
-    addDlForm->setField(0, 1, maxyx.x - 10, 3, 4, 0, 0);
-    addDlForm->setField(1, 1, maxyx.x - 10, 6, 4, 0, 0);
+    /* On Linux it starts at terminal window row 0 */
+    addDlForm->setField(0, 1, maxyx.x - 10, 4, 4, 0, 0);
+    addDlForm->setField(1, 1, maxyx.x - 10, 8, 4, 0, 0);
 
     /* Set field options */
     addDlForm->setFieldBack(0, A_UNDERLINE);
@@ -536,11 +565,14 @@ void dlManagerUI::resizeAddDlNav(std::string url, std::string filename)
 }
 
 /* Navigate through the 'Add a download' window */
-void dlManagerUI::addDlNav()
+int dlManagerUI::addDlNav()
 {
+    curs_set(1);   
     point maxyx = addDlWin->getMaxyx();
     int ch = 0;
     bool done = false;
+    bool updateMenu = false;
+
     while ((ch = getch())) {
         switch (ch) {
             /* TODO -do not resize under 108 * 24 */
@@ -552,6 +584,7 @@ void dlManagerUI::addDlNav()
                     const std::string url = addDlForm->getFieldBuffer(0);
                     const std::string filename = addDlForm->getFieldBuffer(1);
                     resizeAddDlNav(url, filename);
+                    updateMenu = true;
                 }
                 break;
 
@@ -599,12 +632,13 @@ void dlManagerUI::addDlNav()
                     }
                     else {
                         /* TODO - create a checkUserInput function that will call everyone */
+
                         /* Get user input from the fields */
-                        /* 50 char max for the filename TODO */
                         std::string url = addDlForm->getFieldBuffer(0);
                         std::string filename = addDlForm->getFieldBuffer(1);
                         std::string URLcleaned = trimSpaces(url);                        
                         std::string filenameCleaned = trimSpaces(filename);
+
                         /* Must be at least 7 char long -> http:// */
                         if (checkURL(url) == 1) {
                             addDlWin->printInMiddle(maxyx.y - 4, 0, maxyx.x, msgInvalidURL, COLOR_PAIR(1));
@@ -614,6 +648,7 @@ void dlManagerUI::addDlNav()
                             addDlWin->printInMiddle(maxyx.y - 4, 0, maxyx.x, msgInvalidFilename, COLOR_PAIR(1));
                             break;
                         }
+
                         URLcleaned.push_back('\0');
                         filenameCleaned.push_back('\0');
                         /* Start dl if everything ok */
@@ -621,24 +656,31 @@ void dlManagerUI::addDlNav()
                         dlManagerControl->startDl(f);
                         /* Update downloads list in the menu */
                         updateDownloadsMenu();
-                        /* Restart status thread */
                         done = true;
+                        /* Signals to reset downloads menu */
+                        updateMenu = true;
                         break;
                     }
                 }
                 break;
+
             default:
+                {
                 addDlForm->formDriver(ch);
                 break;
+                }
         }
+
         if (done) {
-            /* Exit subaddDlWin if done */
             break;
         }
-        /* No mutex needed since all threads have stopped */
         addDlWin->refreshWin();
-        /* TODO - get rid of them */
     }
+    curs_set(0);
+    if (updateMenu) {
+        return 1;
+    }
+    return 0;
 }
 
 void dlManagerUI::updateDownloadsMenu()
@@ -648,7 +690,7 @@ void dlManagerUI::updateDownloadsMenu()
 }
 
 /* Init a subwindow containg infos about the selected download */
-void dlManagerUI::showDetails(const std::string& itemName)
+int dlManagerUI::showDetails(const std::string& itemName)
 {
     /* Important: We begin by assigning a new form to detForm unique_ptr and then assigning a new window to 
      * detWin unique_ptr -> if we reassign the detWin pointer first and then try to reassign detForm, since 
@@ -662,14 +704,10 @@ void dlManagerUI::showDetails(const std::string& itemName)
     detForm->populateField(REQ_LAST_FIELD, itemName);
     detWin->refreshWin();
 
-    curs_set(0);
-
-    /* detWin is only used to get progressWin dimensions - not used in the actual thread */
-    startProgressBarThread(itemName);
     /* Disable cursor */
+    curs_set(0);
     /* Navigate through the details window */
-    detNav(itemName);
-    stopProgressBarThread();
+    return (detNav(itemName));
 }
 
 std::unique_ptr<cursesWindow> dlManagerUI::initDetWin(/* pass winsize */)
@@ -686,7 +724,7 @@ void dlManagerUI::paintDetWin(const std::string& itemName)
     detWin->printInMiddle(maxyx.y - 2, maxyx.x / 4, maxyx.x / 4, msgPause, COLOR_PAIR(8));
     detWin->printInMiddle(maxyx.y - 2, 2 * maxyx.x / 4, maxyx.x / 4, msgResume, COLOR_PAIR(8));
     detWin->printInMiddle(maxyx.y - 2, 3 * maxyx.x / 4, maxyx.x / 4, msgKill, COLOR_PAIR(8));
-    detWin->printInMiddle(1, 0, maxyx.x, initDetailsTitle(itemName), COLOR_PAIR(8));
+    detWin->printInMiddle(1, 0, maxyx.x, initDetailsTitle(itemName), COLOR_PAIR(7));
 }
 
 const std::string dlManagerUI::initDetailsTitle(const std::string& itemName)
@@ -788,10 +826,13 @@ int dlManagerUI::resizeDetWin(const std::string& filename)
 }
 
 /* Navigate through a download details subwindow */
-void dlManagerUI::detNav(const std::string& filename)
+int dlManagerUI::detNav(const std::string& filename)
 {
     int ch = 0;
     bool done = false;
+    bool updateMenu = false;
+
+    startProgressBarThread(filename);
 
     while ((ch = getch())) {
         switch (ch) {
@@ -799,6 +840,7 @@ void dlManagerUI::detNav(const std::string& filename)
             case KEY_RESIZE:
                 {
                     resizeDetWin(filename);    
+                    updateMenu = true;
                     /* Sleeping here fixes an issue where the old progress bar thread wouldn't have time 
                      * to terminate before a new one would start, causing a segfault / double free. 
                      * Ugly fix but I don't have time to investigate further */
@@ -824,16 +866,36 @@ void dlManagerUI::detNav(const std::string& filename)
                 break;
 
             case 'x':
-                /* Close subwindow */
-                done = true;
-                break;
+                {
+                    /* Close subwindow */
+                    done = true;
+                    break;
+                }
+
+            case 'k':
+                {
+                    stopProgressBarThread();
+                    dlManagerControl->stop(filename);
+                    updateMenu = true;
+                    done = true;
+                    break;
+                }
+
             default:
-                break;
+                {
+                    break;
+                }
+
         }
         if (done) {
             break;
         }
     } 
+    stopProgressBarThread();
+    if (updateMenu) {
+        return 1;
+    }
+    return 0;
 }
 
 /* Display a subwindow containing details about the selected download */ 

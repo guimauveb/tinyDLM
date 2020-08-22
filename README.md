@@ -1,0 +1,29 @@
+# tinyDLM - A tiny download manager
+## The second largest heading
+
+Small multi-threaded download manager built around curlpp / ncurses. 
+
+    - Direct Download Link only 
+    - Supports simultaneous transfers  
+    - Transfers can be paused / resumed / killed.
+    - Displays current download speed and progress for each transfer  
+
+Installation:
+    Works pretty well on macOS Mojave (10.14.6), not so well on Linux (tested on Ubuntu and Kali) because of 
+    a problem I have with threads and curses window sizes representation which seem to differ from macOS. 
+
+Disclaimer:
+
+    I made this program to learn more about programming and more specifically about C++, threads, curses, curl.
+
+
+Missing functionalities that I wished to implement (but certainly won't since I want to move on to new projects):
+    - Keep the window from resizing under a certain threshold
+    - Add multiple links at the same time (easy)
+    - Schedule download start (probably easy)
+    - Select download directory (transfers are stored in 'downloads') (trivial)
+    - Compute the ETA (probably easy)
+    - Save downloads on exit and restore them on the next launch (not so trivial)
+
+
+

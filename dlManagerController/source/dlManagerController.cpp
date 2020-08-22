@@ -1,14 +1,11 @@
 #include "../include/dlManagerController.hpp"
-#include <ncurses.h>
 
 dlManagerController::dlManagerController()
 {
     dlCounter = 0;
 }
 
-dlManagerController::~dlManagerController()
-{
-}
+dlManagerController::~dlManagerController() {}
 
 /* Initialize a new dlManager object then place it in a vector */
 std::string dlManagerController::createNewDl(std::string dlFolder, std::string filename, const std::string url,  
@@ -16,11 +13,10 @@ std::string dlManagerController::createNewDl(std::string dlFolder, std::string f
 {
     /* TODO - use an index for each name for better readability */
     std::string f = filename;
+    std::string appendNum = "(" + std::to_string(dlCounter) + ")";
     std::map<std::string, int>::iterator it = downloadsMap.find(filename);
     if (it != downloadsMap.end()) {
-        f.erase(f.find('\0'));
-        f.append(std::to_string(dlCounter));
-        f.push_back('\0');
+        createDuplicate(f, dlCounter);
     }
     it = downloadsMap.end();
     downloadsMap.insert(it, std::pair<std::string, int>(f, dlCounter));
@@ -91,9 +87,13 @@ void dlManagerController::clearInactive()
             if (it != downloadsMap.end()) {
                 downloadsMap.erase(it);
                 todel.push_back(i);
-                /* Decrement downloads id since they are used as indexes to access dlManagerVec */
+                /* Decrement downloads ids above deleted item since they are used as 
+                 * indexes to access dlManagerVec */
+                /* TODO - could we start iterating by ref at some index instead of map::begin ? */
                 for (auto & el : downloadsMap) {
-                    --el.second;
+                    if (el.second > it->second) {
+                        --el.second;
+                    }
                 }
             }
         }
@@ -110,6 +110,21 @@ void dlManagerController::clearInactive()
 void dlManagerController::stop(const std::string& dlToStop)
 {
     dlManagerVec.at(downloadsMap[dlToStop])->pause();
+    dlManagerVec.erase(dlManagerVec.begin() + downloadsMap[dlToStop]);
+    std::map<std::string, int>::iterator it = downloadsMap.find(dlToStop);
+    if (it != downloadsMap.end()) {
+        downloadsMap.erase(it);
+        /* Decrement downloads ids above deleted item since they are used as 
+         * indexes to access dlManagerVec */
+        /* TODO - could we start iterating by ref at some index instead of map::begin ? */
+        for (auto & el : downloadsMap) {
+            if (el.second > it->second) {
+                --el.second;
+            }
+        }   
+    }
+    /* Decrement counter */
+    dlCounter--;
 }
 
 void dlManagerController::stopAll()
