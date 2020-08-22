@@ -16,8 +16,8 @@ Installation:
 Works pretty well on macOS Mojave (10.14.6), not so well on Linux (tested on Ubuntu and Kali) because of 
 a problem I have with threads and curses window sizes representation which seem to differ from macOS. 
 
-Disclaimer:
-I made this program to learn more about programming and more specifically about C++, threads, curses, curl etc.
+### Disclaimer:
+**I made this program to learn more about programming and more specifically about C++, threads, curses, curl etc.**
 
 Missing functionalities that I wished to implement (but certainly won't since I'm moving to new projects):
 
