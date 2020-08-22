@@ -19,7 +19,7 @@ a problem I have with threads and curses window sizes representation which seem 
 ### Disclaimer:
 **I made this program to learn more about programming and more specifically about C++, threads, curses, curl etc.**
 
-Missing functionalities that I wished to implement (but certainly won't since I'm moving to new projects):
+Missing functionalities that I wish to implement (but certainly won't since I'm moving to new projects):
 
     - [ ] Keep the window from resizing under a certain size (probably easy)
     - [ ] Add multiple links at the same time (easy)
