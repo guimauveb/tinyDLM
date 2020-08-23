@@ -3,7 +3,9 @@
 ![tinyDLM](/imgs/screenshot.jpg)
 
 ## Small multi-threaded download manager built around curlpp / ncurses 
+**I made this program to learn more about programming and more specifically about C++, threads, curses, curl etc.**
 
+###Features:
     - Direct Download Link only 
     - Supports simultaneous transfers  
     - Transfers can be paused / resumed / killed.
@@ -16,8 +18,7 @@ Installation:
 Works pretty well on macOS Mojave (10.14.6), not so well on Linux (tested on Ubuntu and Kali) because of 
 a problem I have with threads and curses window sizes representation which seem to differ from macOS. 
 
-### Disclaimer:
-**I made this program to learn more about programming and more specifically about C++, threads, curses, curl etc.**
+
 
 Missing functionalities that I wish to implement (but certainly won't since I'm moving to new projects):
 
