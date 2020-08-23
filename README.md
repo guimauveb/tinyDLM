@@ -1,4 +1,6 @@
+<p align="center">
 # tinyDLM - A tiny download manager
+</p>
 
 ![tinyDLM](/imgs/screenshot.jpg)
 
