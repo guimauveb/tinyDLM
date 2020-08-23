@@ -5,8 +5,8 @@
 ## Small multi-threaded download manager built around curlpp / ncurses 
 **I made this program to learn more about programming and more specifically about C++, threads, curses, curl etc.**
 
-###Features:
-    - Direct Download Link only 
+### Features:
+    - Supports Direct Download Link only 
     - Supports simultaneous transfers  
     - Transfers can be paused / resumed / killed.
     - Displays current download speed and progress for each transfer  
