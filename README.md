@@ -3,7 +3,6 @@
 ![tinyDLM](/imgs/screenshot.jpg)
 
 ## Small multi-threaded download manager built around cURLpp / ncurses 
-**I made this program to learn more about programming and more specifically about C++, threads, curses, curl etc.**
 
 ### Features:
     - Supports Direct Download Link only 
