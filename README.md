@@ -23,13 +23,15 @@ a problem I have with threads and curses window sizes representation which seem 
 Full support for Linux is coming.
 
 **Missing functionalities that I wish to implement (but certainly won't since I'm moving to new projects):**
-
-    - [ ] Keep the window from resizing under a certain size (probably easy)
-    - [ ] Add multiple links at the same time (easy)
-    - [ ] Schedule download start (probably easy)
-    - [ ] Select download directory (transfers are stored in 'downloads') (trivial)
-    - [ ] Compute the ETA (probably easy)
-    - [ ] Save downloads on exit and restore them on the next launch (not so trivial)
+    
+    - [ ] Limit download speed  
+    - [ ] Chose number of max simultaneous downloads  
+    - [ ] Keep the window from resizing under a certain size  
+    - [ ] Add multiple links at the same time  
+    - [ ] Schedule download start  
+    - [ ] Select download directory (transfers are stored in 'downloads')  
+    - [ ] Compute the ETA  
+    - [ ] Save downloads on exit and restore them on the next launch  
 
 
 
