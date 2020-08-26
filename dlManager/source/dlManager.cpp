@@ -41,6 +41,8 @@ dlManager::~dlManager()
         ThreadVector.at(i).join();
 }
 
+/* Compute the current download speed which corresponds to the average speed during the second preceding the call
+ * to this function. */
 void dlManager::downloadSpeed()
 {
     /* Make a copy of the vector and work with the copy to avoid blocking the downloading thread for too
@@ -64,8 +66,8 @@ void dlManager::downloadSpeed()
         if (totalDur >= oneSec)
             break;
     }
-    /* totalBytes is equal to what has been downloaded in one sec 
-     * we divide by 1M to get the result in MO/s */
+    /* totalBytes is equal to what has been downloaded in one sec */
+    /* We divide by 1M to get the result in MO/s */
     const double currSpeed = totalBytes / oneMil;
     {
         std::lock_guard<std::mutex> guard(*dlMutPtr);
@@ -111,8 +113,8 @@ int dlManager::ProgressCallbackFunctor::Progress(curlpp::Easy *handle, double dl
         timeNow = std::chrono::system_clock::now();
         auto duration = std::chrono::duration_cast<std::chrono::microseconds>(timeNow - timeOld).count();
         /* duration == 40 000 nanoseconds on average */
-        /* Save duration and bytes downloaded in a map then compute the average of the last
-         * 500 ms every 500ms */
+        /* Save duration and bytes downloaded in a map then compute the average speed during the last
+         * second */
         double downloadedAtThisCall = dlnow - dlold;
         {
             std::lock_guard<std::mutex> guard(*mutPtr);
