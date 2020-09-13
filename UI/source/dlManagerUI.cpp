@@ -583,7 +583,7 @@ int dlManagerUI::addDlNav()
                     }
                     const std::string url = addDlForm->getFieldBuffer(0);
                     const std::string filename = addDlForm->getFieldBuffer(1);
-                    //resizeAddDlNav(url, filename);
+                    resizeAddDlNav(url, filename);
                     updateMenu = true;
                 }
                 break;
@@ -666,8 +666,8 @@ int dlManagerUI::addDlNav()
 
             default:
                 {
-                addDlForm->formDriver(ch);
-                break;
+                    addDlForm->formDriver(ch);
+                    break;
                 }
         }
 
@@ -780,10 +780,7 @@ std::unique_ptr<cursesWindow> dlManagerUI::initProgressWin(const point& bx, cons
 void dlManagerUI::startProgressBarThread(const std::string& filename)
 {
     /* Initialize progress bar according to its parent win (details win) dimensions */
-    point begyx = detWin->getBegyx();
-    point maxyx = detWin->getMaxyx();
-    progressWin = initProgressWin(begyx, maxyx);
-    progressWin->drawBox(0, 0);
+
     futureProgressBar = std::async(std::launch::async, &dlManagerUI::progressBar, this, filename);
 }
 
@@ -807,24 +804,6 @@ int dlManagerUI::stopProgressBarThread()
     return 0;
 }
 
-int dlManagerUI::resizeDetWin(const std::string& filename)
-{
-    stopProgressBarThread();
-
-    resizeUI();
-    detForm = initDetForm(2);
-    detWin = initDetWin();
-    setDetForm();
-    paintDetWin(filename);
-    detForm->populateField(REQ_FIRST_FIELD, dlManagerControl->getURL(filename));
-    detForm->populateField(REQ_LAST_FIELD, filename);
-    detWin->refreshWin();
-
-    startProgressBarThread(filename);
-
-    return 0;
-}
-
 /* Navigate through a download details subwindow */
 int dlManagerUI::detNav(const std::string& filename)
 {
@@ -839,7 +818,10 @@ int dlManagerUI::detNav(const std::string& filename)
             /* TODO -do not resize under 108 * 24 */
             case KEY_RESIZE:
                 {
-//                    resizeDetWin(filename);    
+                    /* Block progress thread */
+                    std::lock_guard<std::mutex> guard(dlManagerUI::dlProgMutex);
+                    resizeUI();
+                    resize = true;
                     updateMenu = true;
                     /* Sleeping here fixes an issue where the old progress bar thread wouldn't have time 
                      * to terminate before a new one would start, causing a segfault / double free. 
@@ -890,6 +872,7 @@ int dlManagerUI::detNav(const std::string& filename)
         if (done) {
             break;
         }
+        resize = false;
     } 
     stopProgressBarThread();
     if (updateMenu) {
@@ -901,13 +884,17 @@ int dlManagerUI::detNav(const std::string& filename)
 /* Display a subwindow containing details about the selected download */ 
 void dlManagerUI::progressBar(const std::string& filename)
 {
-    point maxyx = progressWin->getMaxyx();
-
+    std::unique_ptr<cursesWindow> pWin;
     {
         std::lock_guard<std::mutex> guard(dlManagerUI::dlProgMutex);
+        point begyx = detWin->getBegyx();
+        point maxyx = detWin->getMaxyx();
+        pWin = initProgressWin(begyx, maxyx);
+        pWin->drawBox(0, 0);
         progRef = true;
     }
 
+    point maxyx = pWin->getMaxyx();
     /* TODO - remove hardcoded values */
     int progBarWidth = maxyx.x - 4;
     int i = 0;
@@ -921,11 +908,11 @@ void dlManagerUI::progressBar(const std::string& filename)
         }
 
         {
-            progressWin->printInMiddle(1, 0, maxyx.x, hundredPer, COLOR_PAIR(2));
-            progressWin->winAttrOn(COLOR_PAIR(16));
-            progressWin->addStr(2, 2, progStr);
-            progressWin->winAttrOff(COLOR_PAIR(16));
-            progressWin->refreshWin();
+            pWin->printInMiddle(1, 0, maxyx.x, hundredPer, COLOR_PAIR(2));
+            pWin->winAttrOn(COLOR_PAIR(16));
+            pWin->addStr(2, 2, progStr);
+            pWin->winAttrOff(COLOR_PAIR(16));
+            pWin->refreshWin();
         }
     }
 
@@ -939,11 +926,11 @@ void dlManagerUI::progressBar(const std::string& filename)
             }
 
             {
-                progressWin->printInMiddle(1, 0, maxyx.x, percent, COLOR_PAIR(2));
-                progressWin->winAttrOn(COLOR_PAIR(16));
-                progressWin->addStr(2, 2, progStr);
-                progressWin->winAttrOff(COLOR_PAIR(16));
-                progressWin->refreshWin();
+                pWin->printInMiddle(1, 0, maxyx.x, percent, COLOR_PAIR(2));
+                pWin->winAttrOn(COLOR_PAIR(16));
+                pWin->addStr(2, 2, progStr);
+                pWin->winAttrOff(COLOR_PAIR(16));
+                pWin->refreshWin();
             }
             progCounter = dlManagerControl->getProgress(filename);
             if (progCounter == 100) {
@@ -952,6 +939,14 @@ void dlManagerUI::progressBar(const std::string& filename)
 
             {
                 std::lock_guard<std::mutex> guard(dlManagerUI::dlProgMutex);
+                if (resize) {
+                    detWin = initDetWin();
+                    point begyx = {10, 10}; 
+                    point maxyx = {25, 25};
+                    pWin = initProgressWin(begyx, maxyx);
+                    pWin->drawBox(0, 0);
+                    pWin->refreshWin();
+                }
                 if (!progRef)
                     break;
             }

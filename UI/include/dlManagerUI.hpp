@@ -169,6 +169,7 @@ class dlManagerUI
 
         /* Signals to stop refreshing progress subwindow */
         bool progRef = false;
+        bool resize = false;
 
         /* TODO - make it selectionable by the user */
         const int lowSpeedLim = 56;
