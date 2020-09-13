@@ -583,7 +583,7 @@ int dlManagerUI::addDlNav()
                     }
                     const std::string url = addDlForm->getFieldBuffer(0);
                     const std::string filename = addDlForm->getFieldBuffer(1);
-                    resizeAddDlNav(url, filename);
+                    //resizeAddDlNav(url, filename);
                     updateMenu = true;
                 }
                 break;
@@ -839,7 +839,7 @@ int dlManagerUI::detNav(const std::string& filename)
             /* TODO -do not resize under 108 * 24 */
             case KEY_RESIZE:
                 {
-                    resizeDetWin(filename);    
+//                    resizeDetWin(filename);    
                     updateMenu = true;
                     /* Sleeping here fixes an issue where the old progress bar thread wouldn't have time 
                      * to terminate before a new one would start, causing a segfault / double free. 
