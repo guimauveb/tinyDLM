@@ -522,11 +522,6 @@ void dlManagerUI::setAddDlForm()
     setWinsSize();
 
     /* Set field size and location */
-    /* toprow doesn't start from the same location on macOS and Linux ... */
-    /* if macOS -> field[0] toprow = 3 and field[1] toprow = 6 */
-    /* if Linux -> field[0] toprow = begy.y + 2 and field[1] toprow = begy.y + 5 */
-    /* On macOS toprow seems to be an offset starting at the corresponding window first row */
-    /* On Linux it starts at terminal window row 0 */
     addDlForm->setField(0, 1, maxyx.x - 10, 4, 4, 0, 0);
     addDlForm->setField(1, 1, maxyx.x - 10, 8, 4, 0, 0);
 
@@ -540,8 +535,7 @@ void dlManagerUI::setAddDlForm()
 
     /* Initialize addDlForm */
     addDlForm->initForm();
-    //addDlForm->setFormWin(addDlWin);
-    addDlForm->setFormSubwin(addDlWin, 20, 10, maxyx.y / 2, 2);
+    addDlForm->setFormSubwin(addDlWin);
 
     addDlForm->postForm();
 }
@@ -766,7 +760,7 @@ void dlManagerUI::setDetForm()
     /* Initialize detForm */
     detForm->initForm();
     detForm->setFormWin(detWin);
-    detForm->setFormSubwin(detWin, 20, 10, row / 2, 2);
+    detForm->setFormSubwin(detWin);
 
     detForm->postForm();
 }

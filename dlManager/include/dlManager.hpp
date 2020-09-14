@@ -9,8 +9,10 @@
 #include <thread>
 #include <sstream>
 #include <fstream>
+#include <mutex>
 
 #include <cmath>
+#include <cstring>
 
 class dlManager 
 {

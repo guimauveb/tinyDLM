@@ -18,7 +18,7 @@ class cursesForm {
         void fieldOptsOff(size_t fieldIdx, Field_Options opts);
         void fieldOptsOn(size_t fieldIdx, Field_Options opts);
         void setFormWin(std::unique_ptr<cursesWindow>& win);
-        void setFormSubwin(std::unique_ptr<cursesWindow>& win, int nlines, int ncols, int begy, int begx);        
+        void setFormSubwin(std::unique_ptr<cursesWindow>& win);        
         void postForm();
 
         int formDriver(int c);

@@ -50,12 +50,13 @@ void cursesForm::fieldOptsOn(size_t fieldIdx, Field_Options opts)
     field_opts_on(fields.at(fieldIdx), opts);
 }
 
+/* Doesn't work - use set_form_sub instead */
 void cursesForm::setFormWin(std::unique_ptr<cursesWindow>& win)
 {
     set_form_win(form, win->getRawPtr());
 }
 
-void cursesForm::setFormSubwin(std::unique_ptr<cursesWindow>& win, int nlines, int ncols, int begy, int begx)        
+void cursesForm::setFormSubwin(std::unique_ptr<cursesWindow>& win)        
 {
     set_form_sub(form, win->getRawPtr());
 }
