@@ -1,10 +1,13 @@
 #include "../include/cursesWindow.hpp"
+#include <fstream>
 
-cursesWindow::cursesWindow(int r, int c, int by, int bx)
+cursesWindow::cursesWindow(int r, int c, int by, int bx, std::string name)
     :row{r}, col{c}, begy{by}, begx{bx}
 {
     if ((win = newwin(row, col, begy, begx)) == nullptr) {
+
     }
+    winName = name;
     wrefresh(win);
 }
 
@@ -49,11 +52,28 @@ void cursesWindow::resetWin()
     werase(win);
     wrefresh(win);
 }
+
 /* We need to delete the reinit the window to properly resize it - wresize() only changes row and col */
-void cursesWindow::resizeWin(winSize& newSz)
+void cursesWindow::resizeWin(winSize newSz)
 {
-    delwin(win);
+    int r = delwin(win);
+    if (r == ERR) {
+        std::ofstream ofstr;
+        std::string e = "Error while freeing memory of window: " + winName;
+        ofstr.open("del_win_logs.txt", std::ios::out);
+        ofstr << e;
+        ofstr.close();
+        /* Callback aborted means that the transfer was paused from the progress functor */
+    }
+
     win = newwin(newSz.row, newSz.col, newSz.begy, newSz.begx);
+    if (win == NULL) {
+        std::ofstream ofstr;
+        std::string e = "Error while allocating memory for window: " + winName;
+        ofstr.open("new_win_logs.txt", std::ios::out);
+        ofstr << e;
+        ofstr.close();
+    }
 }
 
 void cursesWindow::printInMiddle(int starty, int startx, int width, std::string str, chtype color)

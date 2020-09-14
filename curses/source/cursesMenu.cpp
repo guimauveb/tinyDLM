@@ -45,17 +45,24 @@ cursesMenu::~cursesMenu()
 
 void cursesMenu::clearMenu()
 {
-    unpost_menu(menu);
-    free_menu(menu);
+    /* If menu already cleared manually and not by the destructor, set to yes so we don't try to free it twice */
+    if (!menuFreed) {
+        unpost_menu(menu);
+        free_menu(menu);
+    }
+    menuFreed = true;
 }
 
 void cursesMenu::clearItems()
 {
-    const int n = items.size();
-    for(int i = 0; i < n; ++i)
-        free_item(items[i]);
-    items.clear();
-    itemStrings.clear();
+    if (!itemsFreed) {
+        const int n = items.size();
+        for(int i = 0; i < n; ++i)
+            free_item(items[i]);
+        items.clear();
+        itemStrings.clear();
+    }
+    itemsFreed = true;
 }
 
 void cursesMenu::menuOptsOff(Menu_Options)
@@ -69,14 +76,9 @@ void cursesMenu::menuOptsOn(Menu_Options)
 }
 
 /* Set the window to be associated with the menu */
-void cursesMenu::setMenuWin(std::unique_ptr<cursesWindow>& win)
+void cursesMenu::setMenuSub(std::unique_ptr<cursesWindow>& win)
 {
-    set_menu_win(menu, win->getRawPtr());   
-}
-
-void cursesMenu::setMenuSub(std::unique_ptr<cursesWindow>& win, int nl, int nc, int begy, int begx)
-{
-    set_menu_sub(menu, derwin(win->getRawPtr(), nl, nc, begy, begx));
+    set_menu_sub(menu, win->getRawPtr());
 }
 
 /* Set the number of elements to fit the screen size */

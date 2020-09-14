@@ -26,6 +26,7 @@ class dlManagerUI
 
         /* Main windows are stored into a vector */
         std::vector<std::unique_ptr<cursesWindow>> mainWindows;
+        bool resize = false;
         void resizeUI();
         void refreshMainWins();
 
@@ -65,9 +66,9 @@ class dlManagerUI
         const int dlsInfosWinIdx = 5;
     
         /* Mutexes to keep each thread accessing wrefresh() at the same time and causing trouble */
-        static std::mutex dlsInfoMutex;
-        static std::mutex dlProgMutex;
-        static std::mutex yOffsetMutex;
+        std::mutex dlsInfoMutex;
+        std::mutex dlProgMutex;
+        std::mutex yOffsetMutex;
         
     private:
         /* Set the ground for curses */

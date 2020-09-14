@@ -4,11 +4,13 @@
 #include <ncurses.h>
 
 #include <string>
+#include <iostream>
+#include <thread>
 
 class cursesWindow 
 {
     public:
-        cursesWindow(int r, int c, int by, int bx);
+        cursesWindow(int r, int c, int by, int bx, std::string name);
         ~cursesWindow();
 
         WINDOW *getRawPtr();
@@ -34,7 +36,7 @@ class cursesWindow
         void printAtTop(int starty, int startx, int width, std::string str, chtype color);
 
         /* Important ! Will basically call destroyWin() then initWin() */
-        void resizeWin(winSize& newSz);
+        void resizeWin(winSize newSz);
         void keyPad(bool b);
 
     private:
@@ -42,5 +44,6 @@ class cursesWindow
         WINDOW *win = nullptr;
         /* Save all parameters we got from the initialisation so we can resize it */
         int row, col, begy, begx;
+        std::string winName;
 };
 

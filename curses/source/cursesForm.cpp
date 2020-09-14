@@ -50,7 +50,7 @@ void cursesForm::fieldOptsOn(size_t fieldIdx, Field_Options opts)
     field_opts_on(fields.at(fieldIdx), opts);
 }
 
-/* Doesn't work - use set_form_sub instead */
+/* Doesn't work properly on Linux - use set_form_sub instead */
 void cursesForm::setFormWin(std::unique_ptr<cursesWindow>& win)
 {
     set_form_win(form, win->getRawPtr());

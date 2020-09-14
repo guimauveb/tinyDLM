@@ -1,10 +1,6 @@
 #include "../include/dlManagerUI.hpp"
 
 /* Mutexes used to avoid concurrent uses of wrefresh() */
-std::mutex dlManagerUI::dlsInfoMutex;
-std::mutex dlManagerUI::dlProgMutex;
-std::mutex dlManagerUI::yOffsetMutex;
-
 dlManagerUI::dlManagerUI()
     :dlManagerControl{std::make_unique<dlManagerController>()}
 {
@@ -88,7 +84,7 @@ void dlManagerUI::statusDriver(int c)
     currItNo = menu->getItemNo();
 
     if (c == KEY_DOWN) {
-        std::lock_guard<std::mutex> guard(dlManagerUI::yOffsetMutex);
+        std::lock_guard<std::mutex> guard(yOffsetMutex);
         /* Signals to scroll status window down if the menu is scrolled down */
         /* If curr item id is > the maxixmum number of items displayed in the win -> offset */
         if (currItNo > botItem) {
@@ -118,7 +114,7 @@ void dlManagerUI::initStatusDriver()
 /* Window displaying a welcome message*/
 std::unique_ptr<cursesWindow> dlManagerUI::welcomeWinInit()
 {
-    return std::make_unique<cursesWindow>(row - 8, col, 4, 0);
+    return std::make_unique<cursesWindow>(row - 8, col, 4, 0, "welcome");
 }
 
 void dlManagerUI::paintWelWin(std::unique_ptr<cursesWindow>& welWin)
@@ -190,11 +186,27 @@ void dlManagerUI::mainWinsInit()
 
 void dlManagerUI::refreshMainWins()
 {
-    for (size_t i = 0; i < mainWindows.size(); ++i) {
-        mainWindows.at(i)->touchWin();
-        mainWindows.at(i)->refreshWin();
-    }
+    mainWindows.at(topWinIdx)->touchWin();
+    mainWindows.at(topWinIdx)->refreshWin();
+
+    mainWindows.at(labelsWinIdx)->touchWin();
+    mainWindows.at(labelsWinIdx)->refreshWin();
+
+    /* Refresh the downloads list */
+    mainWindows.at(dlsWinIdx)->touchWin();
+    mainWindows.at(dlsWinIdx)->refreshWin();
+
+    //mainWindows.at(dlsStatusWinIdx)->touchWin(dlStatusSz);
+    //paintDlsStatusWin(mainWindows.at(dlsStatusWinIdx));
+
+    mainWindows.at(keyActWinIdx)->touchWin();
+    mainWindows.at(keyActWinIdx)->refreshWin();
+
+    mainWindows.at(dlsInfosWinIdx)->touchWin();
+    mainWindows.at(dlsInfosWinIdx)->refreshWin();
+
 }
+
 
 /* Resize program when terminal window size is detected */
 void dlManagerUI::resizeUI()
@@ -212,8 +224,8 @@ void dlManagerUI::resizeUI()
     mainWindows.at(dlsWinIdx)->resizeWin(mainWinSz);
     paintMainWinWin(mainWindows.at(dlsWinIdx));
 
-    mainWindows.at(dlsStatusWinIdx)->resizeWin(dlStatusSz);
-    paintDlsStatusWin(mainWindows.at(dlsStatusWinIdx));
+    //mainWindows.at(dlsStatusWinIdx)->resizeWin(dlStatusSz);
+    //paintDlsStatusWin(mainWindows.at(dlsStatusWinIdx));
 
     mainWindows.at(keyActWinIdx)->resizeWin(keyActSz);
     paintKeyActWin(mainWindows.at(keyActWinIdx));
@@ -227,7 +239,7 @@ void dlManagerUI::resizeUI()
 /* Window containing top bar title */
 std::unique_ptr<cursesWindow> dlManagerUI::mainWinTopBarInit()
 {
-    return std::make_unique<cursesWindow>(1, col, 0, 0);
+    return std::make_unique<cursesWindow>(1, col, 0, 0, "top");
 }
 
 void dlManagerUI::paintTopWin(std::unique_ptr<cursesWindow>& topWin)
@@ -256,7 +268,7 @@ void dlManagerUI::paintTopWin(std::unique_ptr<cursesWindow>& topWin)
 /* Top window containing labels such as "name", "url","speed" etc  */
 std::unique_ptr<cursesWindow> dlManagerUI::mainWinLabelsInit()
 {   
-    return std::make_unique<cursesWindow>(1, col, 2, 0);
+    return std::make_unique<cursesWindow>(1, col, 2, 0, "labels");
 }
 
 void dlManagerUI::paintLabelsWin(std::unique_ptr<cursesWindow>& labelsWin)
@@ -272,7 +284,7 @@ void dlManagerUI::paintLabelsWin(std::unique_ptr<cursesWindow>& labelsWin)
 /* downloads list window */
 std::unique_ptr<cursesWindow> dlManagerUI::mainWinMainInit()
 {
-    return std::make_unique<cursesWindow>(row - 4, col / 2, 3, 0);
+    return std::make_unique<cursesWindow>(row - 4, col / 2, 3, 0, "menu");
 }
 
 void dlManagerUI::paintMainWinWin(std::unique_ptr<cursesWindow>& mainWinWin)
@@ -283,7 +295,7 @@ void dlManagerUI::paintMainWinWin(std::unique_ptr<cursesWindow>& mainWinWin)
 /* Init the download progress subwindow */ 
 std::unique_ptr<cursesWindow> dlManagerUI::mainWinKeyActInit()
 {
-    return std::make_unique<cursesWindow>(1, col / 2, row - 1, 0);
+    return std::make_unique<cursesWindow>(1, col / 2, row - 1, 0, "key");
 }
 
 void dlManagerUI::paintKeyActWin(std::unique_ptr<cursesWindow>& keyActWin)
@@ -295,13 +307,13 @@ void dlManagerUI::paintKeyActWin(std::unique_ptr<cursesWindow>& keyActWin)
 /* init the global download info subwindow in a separated thread - displays number of downloads + speed */ 
 std::unique_ptr<cursesWindow> dlManagerUI::mainWinDlInfosInit()
 {
-    return std::make_unique<cursesWindow>(1, col / 2, row - 2, col / 2);
+    return std::make_unique<cursesWindow>(1, col / 2, row - 2, col / 2, "dlsinfos");
 }
 
 /* init the downloads status window */
 std::unique_ptr<cursesWindow> dlManagerUI::mainWinDownloadsStatusInit()
 {
-    return std::make_unique<cursesWindow>(row - 5, col / 2, 3, col / 2);
+    return std::make_unique<cursesWindow>(row - 5, col / 2, 3, col / 2, "status");
 }
 
 void dlManagerUI::paintDlsStatusWin(std::unique_ptr<cursesWindow>& dlsStatusWin){}
@@ -319,7 +331,7 @@ void dlManagerUI::populateStatusWin(const std::vector<downloadWinInfo>& vec)
     /* Iterate over the list of downloads we obtained from dlManagerControl */
     /* Start iterating at the offset determined by the highlighted item in the menu */
     {
-        std::lock_guard<std::mutex> guard(dlManagerUI::yOffsetMutex);
+        std::lock_guard<std::mutex> guard(yOffsetMutex);
         offset = yOffset;
         curr = currItNo;
     }
@@ -347,8 +359,7 @@ void dlManagerUI::setDownloadsMenu()
 {
     point pMax = mainWindows.at(dlsWinIdx)->getMaxyx();
     menu->menuOptsOn(O_SHOWDESC);
-    menu->setMenuWin(mainWindows.at(dlsWinIdx));
-    menu->setMenuSub(mainWindows.at(dlsWinIdx), pMax.y - 1, pMax.x - 4, 1, 2);
+    menu->setMenuSub(mainWindows.at(dlsWinIdx));
 
     /* Fill the entire window with items. (-2) corresponds to top and bottom borders that we ignore */
     menu->setMenuFormat(pMax.y - 2, 0);
@@ -367,7 +378,7 @@ void dlManagerUI::updateDownloadsStatusWindow()
 {
     while (true) {
         {
-            std::lock_guard<std::mutex> guard(dlManagerUI::dlsInfoMutex);
+            std::lock_guard<std::mutex> guard(dlsInfoMutex);
             if (!updateStatus) {
                 break;
             }
@@ -380,10 +391,14 @@ void dlManagerUI::updateDownloadsStatusWindow()
 
         /* Refresh status window */
         {
-            std::lock_guard<std::mutex> guard(dlManagerUI::dlsInfoMutex);
+            std::lock_guard<std::mutex> guard(dlsInfoMutex);
+            if (resize) {
+                mainWindows.at(dlsStatusWinIdx)->resizeWin(dlStatusSz);
+                mainWindows.at(dlsStatusWinIdx)->refreshWin();
+                resize = false;
+            }
             mainWindows.at(dlsStatusWinIdx)->eraseWin();
             populateStatusWin(dlManagerControl->getAllDownloadsInfos());
-            mainWindows.at(dlsStatusWinIdx)->touchWin();
             mainWindows.at(dlsStatusWinIdx)->refreshWin();
         }
     }
@@ -394,7 +409,7 @@ void dlManagerUI::startStatusUpdate()
 {
     /* If no downloads - erase the window and break out of here */
     if (!dlManagerControl->isActive()) {
-        std::lock_guard<std::mutex> guard(dlManagerUI::dlsInfoMutex);
+        std::lock_guard<std::mutex> guard(dlsInfoMutex);
         mainWindows.at(dlsStatusWinIdx)->refreshWin();
     }
     else {
@@ -407,7 +422,7 @@ void dlManagerUI::startStatusUpdate()
 int dlManagerUI::stopStatusUpdate()
 {
     {
-        std::lock_guard<std::mutex> guard(dlManagerUI::dlsInfoMutex);
+        std::lock_guard<std::mutex> guard(dlsInfoMutex);
         if (!updateStatus) { return 1; }
         updateStatus = false;
     }
@@ -437,7 +452,7 @@ void dlManagerUI::helpNav(std::unique_ptr<cursesWindow>& win)
 
 std::unique_ptr<cursesWindow> dlManagerUI::initHelpWin()
 {
-    return std::make_unique<cursesWindow>(row / 2 + 2, col - (col / 2), (row / 4), col / 4);
+    return std::make_unique<cursesWindow>(row / 2 + 2, col - (col / 2), (row / 4), col / 4, "help");
 }
 
 void dlManagerUI::paintHelpWin(std::unique_ptr<cursesWindow>& win)
@@ -480,7 +495,7 @@ int dlManagerUI::addNewDl()
 /* Init "Add a download" window */
 std::unique_ptr<cursesWindow> dlManagerUI::addDlInitWin()
 {
-    return std::make_unique<cursesWindow>(row / 2, col - (col / 2), (row / 4), col / 4);
+    return std::make_unique<cursesWindow>(row / 2, col - (col / 2), (row / 4), col / 4, "addDl");
 }
 
 void dlManagerUI::paintAddDlWin()
@@ -706,7 +721,7 @@ int dlManagerUI::showDetails(const std::string& itemName)
 
 std::unique_ptr<cursesWindow> dlManagerUI::initDetWin(/* pass winsize */)
 {
-    return std::make_unique<cursesWindow>(row / 2, col - (col / 2), (row / 4), col / 4);
+    return std::make_unique<cursesWindow>(row / 2, col - (col / 2), (row / 4), col / 4, "detwin");
 }
 
 void dlManagerUI::paintDetWin(const std::string& itemName)
@@ -768,7 +783,7 @@ void dlManagerUI::setDetForm()
 /* shared_ptr that will be moved to progressWin own thread */
 std::unique_ptr<cursesWindow> dlManagerUI::initProgressWin(const point& bx, const point& mx)
 {
-    return std::make_unique<cursesWindow>(4, mx.x-10, mx.y, bx.x+4);
+    return std::make_unique<cursesWindow>(4, mx.x-10, mx.y, bx.x+4, "prog");
 }
 
 void dlManagerUI::startProgressBarThread(const std::string& filename)
@@ -786,7 +801,7 @@ int dlManagerUI::stopProgressBarThread()
 {
     /* Signal to stop progress bar thread once we exit the details window */
     {
-        std::lock_guard<std::mutex> guard(dlManagerUI::dlProgMutex);
+        std::lock_guard<std::mutex> guard(dlProgMutex);
         if (!progRef) { return 1; }
         progRef = false;
     }
@@ -894,7 +909,7 @@ void dlManagerUI::progressBar(const std::string& filename)
     point maxyx = progressWin->getMaxyx();
 
     {
-        std::lock_guard<std::mutex> guard(dlManagerUI::dlProgMutex);
+        std::lock_guard<std::mutex> guard(dlProgMutex);
         progRef = true;
     }
 
@@ -941,7 +956,7 @@ void dlManagerUI::progressBar(const std::string& filename)
             }
 
             {
-                std::lock_guard<std::mutex> guard(dlManagerUI::dlProgMutex);
+                std::lock_guard<std::mutex> guard(dlProgMutex);
                 if (!progRef)
                     break;
             }

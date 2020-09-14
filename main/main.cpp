@@ -19,11 +19,16 @@ int main()
                 /* TODO - do not resize under 108 * 24 */
                 case KEY_RESIZE:
                     {
-                        dlmc->stopStatusUpdate();
-                        dlmc->resizeUI();
-                        dlmc->updateDownloadsMenu();
-                        dlmc->resetStatusDriver();
-                        dlmc->startStatusUpdate();
+                        //dlmc->stopStatusUpdate();
+                        {
+                            std::lock_guard<std::mutex> guard(dlmc->dlsInfoMutex);
+                            dlmc->menu->clearMenu();
+                            dlmc->menu->clearItems();
+                            dlmc->resizeUI();
+                            dlmc->resize = true;
+                            dlmc->updateDownloadsMenu();
+                            dlmc->resetStatusDriver();
+                        }
                         break;
                     }
 
@@ -190,7 +195,7 @@ int main()
 
             /* Consistantly update main windows */
             {
-                std::lock_guard<std::mutex> guard(dlManagerUI::dlsInfoMutex);
+                std::lock_guard<std::mutex> guard(dlmc->dlsInfoMutex);
                 dlmc->refreshMainWins();        
             }
 
