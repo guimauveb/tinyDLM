@@ -540,7 +540,7 @@ void dlManagerUI::setAddDlForm()
 
     /* Initialize addDlForm */
     addDlForm->initForm();
-    addDlForm->setFormWin(addDlWin);
+    //addDlForm->setFormWin(addDlWin);
     addDlForm->setFormSubwin(addDlWin, 20, 10, maxyx.y / 2, 2);
 
     addDlForm->postForm();

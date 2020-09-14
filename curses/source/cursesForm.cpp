@@ -57,7 +57,7 @@ void cursesForm::setFormWin(std::unique_ptr<cursesWindow>& win)
 
 void cursesForm::setFormSubwin(std::unique_ptr<cursesWindow>& win, int nlines, int ncols, int begy, int begx)        
 {
-    set_form_sub(form, derwin(win->getRawPtr(), nlines, ncols, begy, begx));
+    set_form_sub(form, win->getRawPtr());
 }
 
 /* TODO - check errors */
