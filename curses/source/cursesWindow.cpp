@@ -4,10 +4,14 @@
 cursesWindow::cursesWindow(int r, int c, int by, int bx, std::string name)
     :row{r}, col{c}, begy{by}, begx{bx}
 {
-    if ((win = newwin(row, col, begy, begx)) == nullptr) {
-
-    }
     winName = name;
+    if ((win = newwin(row, col, begy, begx)) == NULL) {
+        std::ofstream ofstr;
+        std::string e = "Error while allocating memory for window: " + winName;
+        ofstr.open("new_win_log.txt", std::ios::out);
+        ofstr << e;
+        ofstr.close();
+    }
     wrefresh(win);
 }
 
@@ -58,27 +62,9 @@ void cursesWindow::resetWin()
 /* We need to delete the reinit the window to properly resize it - wresize() only changes row and col */
 void cursesWindow::resizeWin(winSize newSz)
 {
-    int d = 0;
-    if (win != NULL) {
-        d = delwin(win);
-    }
-    if (d == ERR) {
-        std::ofstream ofstr;
-        std::string e = "Error while freeing memory of window: " + winName;
-        ofstr.open("del_win_logs.txt", std::ios::out);
-        ofstr << e;
-        ofstr.close();
-        /* Callback aborted means that the transfer was paused from the progress functor */
-    }
-
-    win = newwin(newSz.row, newSz.col, newSz.begy, newSz.begx);
-    if (win == NULL) {
-        std::ofstream ofstr;
-        std::string e = "Error while allocating memory for window: " + winName;
-        ofstr.open("new_win_logs.txt", std::ios::out);
-        ofstr << e;
-        ofstr.close();
-    }
+    werase(win);
+    wresize(win, newSz.row, newSz.col);
+    //win = newwin(newSz.row, newSz.col, newSz.begy, newSz.begx);
 }
 
 void cursesWindow::printInMiddle(int starty, int startx, int width, std::string str, chtype color)

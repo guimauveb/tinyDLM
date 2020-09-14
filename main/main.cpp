@@ -19,16 +19,19 @@ int main()
                 /* TODO - do not resize under 108 * 24 */
                 case KEY_RESIZE:
                     {
-                        //dlmc->stopStatusUpdate();
+                        dlmc->stopStatusUpdate();
                         {
+                            endwin();
+                            refresh();
                             std::lock_guard<std::mutex> guard(dlmc->dlsInfoMutex);
-                            //dlmc->menu->clearMenu();
-                            //dlmc->menu->clearItems();
+                            dlmc->menu->clearMenu();
+                            dlmc->menu->clearItems();
                             dlmc->resizeUI();
-                            //dlmc->resize = true;
-                            //dlmc->updateDownloadsMenu();
-                            //dlmc->resetStatusDriver();
+                            dlmc->resize = true;
+                            dlmc->updateDownloadsMenu();
+                            dlmc->resetStatusDriver();
                         }
+                        dlmc->startStatusUpdate();
                         break;
                     }
 
