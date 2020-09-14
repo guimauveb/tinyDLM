@@ -61,7 +61,7 @@ void dlManagerUI::setWinsSize()
 
     topBarSz = {1, col, 0, 0};
     labelsSz = {1, col, 2, 0};
-    mainWinSz = {row - 4, col / 2, 3, 0};
+    mainWinSz = {row - 4, col / 2, 4, 0};
     dlStatusSz = {row - 5, col / 2, 3, col / 2};
     keyActSz = {1, col / 2, row - 1, 0};
     dlInfosSz = {1, col / 2, row - 2, col / 2};
@@ -284,7 +284,7 @@ void dlManagerUI::paintLabelsWin(std::unique_ptr<cursesWindow>& labelsWin)
 /* downloads list window */
 std::unique_ptr<cursesWindow> dlManagerUI::mainWinMainInit()
 {
-    return std::make_unique<cursesWindow>(row - 4, col / 2, 3, 0, "menu");
+    return std::make_unique<cursesWindow>(row - 4, col / 2, 4, 0, "menu");
 }
 
 void dlManagerUI::paintMainWinWin(std::unique_ptr<cursesWindow>& mainWinWin)
