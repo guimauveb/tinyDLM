@@ -196,8 +196,8 @@ void dlManagerUI::refreshMainWins()
     mainWindows.at(dlsWinIdx)->touchWin();
     mainWindows.at(dlsWinIdx)->refreshWin();
 
-    //mainWindows.at(dlsStatusWinIdx)->touchWin(dlStatusSz);
-    //paintDlsStatusWin(mainWindows.at(dlsStatusWinIdx));
+    mainWindows.at(dlsStatusWinIdx)->touchWin();
+    paintDlsStatusWin(mainWindows.at(dlsStatusWinIdx));
 
     mainWindows.at(keyActWinIdx)->touchWin();
     mainWindows.at(keyActWinIdx)->refreshWin();
@@ -224,8 +224,8 @@ void dlManagerUI::resizeUI()
     mainWindows.at(dlsWinIdx)->resizeWin(mainWinSz);
     paintMainWinWin(mainWindows.at(dlsWinIdx));
 
-    //mainWindows.at(dlsStatusWinIdx)->resizeWin(dlStatusSz);
-    //paintDlsStatusWin(mainWindows.at(dlsStatusWinIdx));
+    mainWindows.at(dlsStatusWinIdx)->resizeWin(dlStatusSz);
+    paintDlsStatusWin(mainWindows.at(dlsStatusWinIdx));
 
     mainWindows.at(keyActWinIdx)->resizeWin(keyActSz);
     paintKeyActWin(mainWindows.at(keyActWinIdx));
