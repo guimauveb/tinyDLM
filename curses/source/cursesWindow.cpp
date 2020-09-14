@@ -13,7 +13,9 @@ cursesWindow::cursesWindow(int r, int c, int by, int bx, std::string name)
 
 cursesWindow::~cursesWindow()
 {
-    delwin(win);
+    if (win != nullptr) {
+        delwin(win);
+    }
 }
 
 WINDOW *cursesWindow::getRawPtr()
@@ -56,8 +58,11 @@ void cursesWindow::resetWin()
 /* We need to delete the reinit the window to properly resize it - wresize() only changes row and col */
 void cursesWindow::resizeWin(winSize newSz)
 {
-    int r = delwin(win);
-    if (r == ERR) {
+    int d = 0;
+    if (win != NULL) {
+        d = delwin(win);
+    }
+    if (d == ERR) {
         std::ofstream ofstr;
         std::string e = "Error while freeing memory of window: " + winName;
         ofstr.open("del_win_logs.txt", std::ios::out);

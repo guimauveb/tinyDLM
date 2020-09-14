@@ -15,6 +15,8 @@ cursesMenu::cursesMenu(std::vector<std::string> itemsData)
     /* Push back a null item */
     items.push_back((ITEM *)nullptr);
     menu = new_menu((ITEM **)items.data());
+
+    itemsFreed = menuFreed = true;
 }
 
 int cursesMenu::getItemNum()

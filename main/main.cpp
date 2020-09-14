@@ -22,12 +22,12 @@ int main()
                         //dlmc->stopStatusUpdate();
                         {
                             std::lock_guard<std::mutex> guard(dlmc->dlsInfoMutex);
-                            dlmc->menu->clearMenu();
-                            dlmc->menu->clearItems();
+                            //dlmc->menu->clearMenu();
+                            //dlmc->menu->clearItems();
                             dlmc->resizeUI();
-                            dlmc->resize = true;
-                            dlmc->updateDownloadsMenu();
-                            dlmc->resetStatusDriver();
+                            //dlmc->resize = true;
+                            //dlmc->updateDownloadsMenu();
+                            //dlmc->resetStatusDriver();
                         }
                         break;
                     }
