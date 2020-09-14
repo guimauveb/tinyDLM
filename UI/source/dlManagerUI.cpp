@@ -822,7 +822,7 @@ int dlManagerUI::detNav(const std::string& filename)
     bool done = false;
     bool updateMenu = false;
 
-    startProgressBarThread(filename);
+    //startProgressBarThread(filename);
 
     while ((ch = getch())) {
         switch (ch) {
