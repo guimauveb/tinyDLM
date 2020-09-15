@@ -47,15 +47,18 @@ int main()
                 case 10:
                     /* Enter - user has selected an item */
                     {
+
                         /* Make sure that the menu is not empty */
                         if (!dlmc->dlManagerControl->isActive()) {
                             break;
                         }
                         dlmc->stopStatusUpdate();
-
+                        
                         /* showDetails returns true if the download was killed and that we should update the
                          * menu */
                         if (dlmc->showDetails(dlmc->menu->getItemName())) {
+                            dlmc->menu->clearMenu();
+                            dlmc->menu->clearItems();    
                             dlmc->updateDownloadsMenu();
                             dlmc->resetStatusDriver();
                             dlmc->mainWindows.at(dlmc->dlsStatusWinIdx)->resetWin();

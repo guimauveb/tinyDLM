@@ -7,13 +7,13 @@ cursesWindow::cursesWindow(int r, int c, int by, int bx, std::string name)
     winName = name;
     std::ofstream ofstr;
     std::string e = "Allocating memory for window " + winName;
-    ofstr.open("del_win_log.txt", std::ios::app);
+    ofstr.open("newwin.txt", std::ios::app);
     ofstr << e << '\n';
     ofstr.close();
     if ((win = newwin(row, col, begy, begx)) == NULL) {
         std::ofstream ofstr;
         std::string e = "Error while allocating memory for window: " + winName;
-        ofstr.open("new_win_log.txt", std::ios::out);
+        ofstr.open("newwin_log.txt", std::ios::out);
         ofstr << e;
         ofstr.close();
     }
@@ -24,7 +24,7 @@ cursesWindow::~cursesWindow()
 {
     std::ofstream ofstr;
     std::string e = "Freeing memory of window " + winName;
-    ofstr.open("del_win_log.txt", std::ios::app);
+    ofstr.open("del_win_log.txt", std::ios::out);
     ofstr << e << '\n';
     ofstr.close();
     if (win != nullptr) {
@@ -74,8 +74,18 @@ void cursesWindow::resizeWin(winSize newSz)
 {
     //werase(win);
     //wresize(win, newSz.row, newSz.col);
-    /* check if window == NULL */
-    delwin(win);
+
+    if (win != NULL) {
+        int d = delwin(win);
+        if (d == ERR) {
+            std::ofstream ofstr;
+            std::string e = "Error while freeing memory of window " + winName;
+            ofstr.open("del_win_log.txt", std::ios::out);
+            ofstr << e << '\n';
+            ofstr.close();
+        }
+    }
+
     win = newwin(newSz.row, newSz.col, newSz.begy, newSz.begx);
 }
 

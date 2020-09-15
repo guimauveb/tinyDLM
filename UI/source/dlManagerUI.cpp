@@ -677,8 +677,8 @@ int dlManagerUI::addDlNav()
 
             default:
                 {
-                addDlForm->formDriver(ch);
-                break;
+                    addDlForm->formDriver(ch);
+                    break;
                 }
         }
 
@@ -706,13 +706,13 @@ int dlManagerUI::showDetails(const std::string& itemName)
     /* Important: We begin by assigning a new form to detForm unique_ptr and then assigning a new window to 
      * detWin unique_ptr -> if we reassign the detWin pointer first and then try to reassign detForm, since 
      * detForm has to free some memory corresponding to the old window (now deleted), we end up with a segfault */
-    detForm = initDetForm(2);
+    //detForm = initDetForm(2);
     detWin = initDetWin();
-    setDetForm();
+    //setDetForm();
     paintDetWin(itemName);
 
-    detForm->populateField(REQ_FIRST_FIELD, dlManagerControl->getURL(itemName));
-    detForm->populateField(REQ_LAST_FIELD, itemName);
+    //detForm->populateField(REQ_FIRST_FIELD, dlManagerControl->getURL(itemName));
+    //detForm->populateField(REQ_LAST_FIELD, itemName);
     detWin->refreshWin();
 
     /* Disable cursor */
@@ -776,7 +776,7 @@ void dlManagerUI::setDetForm()
 
     /* Initialize detForm */
     detForm->initForm();
-    detForm->setFormWin(detWin);
+    //detForm->setFormWin(detWin);
     detForm->setFormSubwin(detWin);
 
     detForm->postForm();
@@ -791,10 +791,11 @@ std::unique_ptr<cursesWindow> dlManagerUI::initProgressWin(const point& bx, cons
 void dlManagerUI::startProgressBarThread(const std::string& filename)
 {
     /* Initialize progress bar according to its parent win (details win) dimensions */
-    point begyx = detWin->getBegyx();
-    point maxyx = detWin->getMaxyx();
-    progressWin = initProgressWin(begyx, maxyx);
-    progressWin->drawBox(0, 0);
+    //    point begyx = detWin->getBegyx();
+    //point maxyx = detWin->getMaxyx();
+    //progressWin = initProgressWin(begyx, maxyx);
+    //progressWin->drawBox(0, 0);
+    progRef = true;
     futureProgressBar = std::async(std::launch::async, &dlManagerUI::progressBar, this, filename);
 }
 
@@ -821,14 +822,11 @@ int dlManagerUI::stopProgressBarThread()
 int dlManagerUI::resizeDetWin(const std::string& filename)
 {
     stopProgressBarThread();
-    resizeUI();
-    detForm = initDetForm(2);
-    detWin = initDetWin();
-    setDetForm();
-    paintDetWin(filename);
-    detForm->populateField(REQ_FIRST_FIELD, dlManagerControl->getURL(filename));
-    detForm->populateField(REQ_LAST_FIELD, filename);
-    detWin->refreshWin();
+
+    //endwin();
+    //refresh();
+    //resizeUI();
+    resizeDet = true;
 
     startProgressBarThread(filename);
     return 0;
@@ -848,8 +846,8 @@ int dlManagerUI::detNav(const std::string& filename)
             /* TODO -do not resize under 108 * 24 */
             case KEY_RESIZE:
                 {
-                    resizeDetWin(filename);    
                     updateMenu = true;
+                    resizeDet = true;
                     /* Sleeping here fixes an issue where the old progress bar thread wouldn't have time 
                      * to terminate before a new one would start, causing a segfault / double free. 
                      * Ugly fix but I don't have time to investigate further */
@@ -899,6 +897,10 @@ int dlManagerUI::detNav(const std::string& filename)
         if (done) {
             break;
         }
+        if (resizeDet) {
+            resizeDetWin(filename);    
+            resizeDet = false;
+        }
     } 
     stopProgressBarThread();
     if (updateMenu) {
@@ -910,68 +912,82 @@ int dlManagerUI::detNav(const std::string& filename)
 /* Display a subwindow containing details about the selected download */ 
 void dlManagerUI::progressBar(const std::string& filename)
 {
-    point maxyx = progressWin->getMaxyx();
+    //    point maxyx = progressWin->getMaxyx();
 
-    {
-        std::lock_guard<std::mutex> guard(dlProgMutex);
-        progRef = true;
-    }
+//    {
+        //std::lock_guard<std::mutex> guard(dlProgMutex);
+        //progRef = true;
+ //   }
 
     /* TODO - remove hardcoded values */
-    int progBarWidth = maxyx.x - 4;
-    int i = 0;
+    //int progBarWidth = maxyx.x - 4;
+    //    int i = 0;
 
-    float progCounter = dlManagerControl->getProgress(filename);
+  //  float progCounter = dlManagerControl->getProgress(filename);
+//
+//    if (progCounter == 100.0) {
+//        std::string progStr;
+//        //    for (i = 0; i < progBarWidth; ++i) {
+//        //       progStr.push_back(' ');
+//        // }
+//
+//        //{
+//        std::lock_guard<std::mutex> guard(dlProgMutex);
+//        //      progressWin->printInMiddle(1, 0, maxyx.x, hundredPer, COLOR_PAIR(2));
+//        //      progressWin->winAttrOn(COLOR_PAIR(16));
+//        //      progressWin->addStr(2, 2, progStr);
+//        //      progressWin->winAttrOff(COLOR_PAIR(16));
+//        //      progressWin->refreshWin();
+//        //  }
+//    }
 
-    if (progCounter == 100.0) {
-        std::string progStr;
-        for (i = 0; i < progBarWidth; ++i) {
-            progStr.push_back(' ');
-        }
-
-        {
-            progressWin->printInMiddle(1, 0, maxyx.x, hundredPer, COLOR_PAIR(2));
-            progressWin->winAttrOn(COLOR_PAIR(16));
-            progressWin->addStr(2, 2, progStr);
-            progressWin->winAttrOff(COLOR_PAIR(16));
-            progressWin->refreshWin();
-        }
-    }
-
-    else {
+//    else {
         while (true) {
-            int curProg = progCounter * progBarWidth / 100.0;
-            const std::string percent = stringifyNumber(dlManagerControl->getProgress(filename), 2); 
-            std::string progStr;
-            for (i = 0; i < curProg + 1; ++i) {
-                progStr.push_back(' ');
-            }
+            //int curProg = progCounter * progBarWidth / 100.0;
+            //            const std::string percent = stringifyNumber(dlManagerControl->getProgress(filename), 2); 
+            //           std::string progStr;
+            //for (i = 0; i < curProg + 1; ++i) {
+            //   progStr.push_back(' ');
+            //}
 
-            {
-                progressWin->printInMiddle(1, 0, maxyx.x, percent, COLOR_PAIR(2));
-                progressWin->winAttrOn(COLOR_PAIR(16));
-                progressWin->addStr(2, 2, progStr);
-                progressWin->winAttrOff(COLOR_PAIR(16));
-                progressWin->refreshWin();
-            }
-            progCounter = dlManagerControl->getProgress(filename);
-            if (progCounter == 100) {
-                break;
-            }
-            if (resizeDet) {
-                progressWin->resizeWin(dlProgSz);
-                progressWin->touchWin();
-                progressWin->refreshWin();
-                resizeDet = false;
-            }
+            //         {
+            //               std::lock_guard<std::mutex> guard(dlProgMutex);
+            //progressWin->printInMiddle(1, 0, maxyx.x, percent, COLOR_PAIR(2));
+            //progressWin->winAttrOn(COLOR_PAIR(16));
+            // progressWin->addStr(2, 2, progStr);
+            // progressWin->winAttrOff(COLOR_PAIR(16));
+            // progressWin->refreshWin();
+            //          }
+            //         progCounter = dlManagerControl->getProgress(filename);
+            //       if (progCounter == 100) {
+            //          break;
+            //        }
             {
                 std::lock_guard<std::mutex> guard(dlProgMutex);
+                if (resizeDet) {
+                    //  progressWin->resizeWin(dlProgSz);
+                    //  progressWin->touchWin();
+                    //  progressWin->drawBox(0, 0);
+                    //  progressWin->refreshWin();
+
+                    //detForm->clearForm();
+                    //detForm = initDetForm(2);
+                    detWin->resizeWin(dlDetSz);
+                    //setDetForm();
+                    paintDetWin(filename);
+                    detWin->touchWin();
+
+                    // detForm->populateField(REQ_FIRST_FIELD, dlManagerControl->getURL(filename));
+                    //detForm->populateField(REQ_LAST_FIELD, filename);
+                    detWin->refreshWin();
+                    //resizeDet = false;
+                }
                 if (!progRef)
                     break;
             }
             /* Sleep here to avoid uninterupted loop */
             std::this_thread::sleep_for(std::chrono::milliseconds(200));
-        }
+        //}
     }
 }
 
