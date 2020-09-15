@@ -1,1 +1,1 @@
-Freeing memory of window welcome
+Freeing memory of window prog
