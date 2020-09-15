@@ -912,7 +912,7 @@ int dlManagerUI::detNav(const std::string& filename)
 /* Display a subwindow containing details about the selected download */ 
 void dlManagerUI::progressBar(const std::string& filename)
 {
-        point maxyx = progressWin->getMaxyx();
+    point maxyx = progressWin->getMaxyx();
 
     {
         std::lock_guard<std::mutex> guard(dlProgMutex);
@@ -921,54 +921,51 @@ void dlManagerUI::progressBar(const std::string& filename)
 
     /* TODO - remove hardcoded values */
     int progBarWidth = maxyx.x - 4;
-        int i = 0;
+    int i = 0;
 
     float progCounter = dlManagerControl->getProgress(filename);
 
     if (progCounter == 100.0) {
         std::string progStr;
-            for (i = 0; i < progBarWidth; ++i) {
-               progStr.push_back(' ');
-         }
+        for (i = 0; i < progBarWidth; ++i) {
+            progStr.push_back(' ');
+        }
 
         {
-        std::lock_guard<std::mutex> guard(dlProgMutex);
-              progressWin->printInMiddle(1, 0, maxyx.x, hundredPer, COLOR_PAIR(2));
-              progressWin->winAttrOn(COLOR_PAIR(16));
-              progressWin->addStr(2, 2, progStr);
-              progressWin->winAttrOff(COLOR_PAIR(16));
-              progressWin->refreshWin();
-          }
+            std::lock_guard<std::mutex> guard(dlProgMutex);
+            progressWin->printInMiddle(1, 0, maxyx.x, hundredPer, COLOR_PAIR(2));
+            progressWin->winAttrOn(COLOR_PAIR(16));
+            progressWin->addStr(2, 2, progStr);
+            progressWin->winAttrOff(COLOR_PAIR(16));
+            progressWin->refreshWin();
+        }
     }
 
     else {
         while (true) {
             int curProg = progCounter * progBarWidth / 100.0;
-                        const std::string percent = stringifyNumber(dlManagerControl->getProgress(filename), 2); 
-                       std::string progStr;
+            const std::string percent = stringifyNumber(dlManagerControl->getProgress(filename), 2); 
+            std::string progStr;
             for (i = 0; i < curProg + 1; ++i) {
-               progStr.push_back(' ');
+                progStr.push_back(' ');
             }
 
-                     {
-                           std::lock_guard<std::mutex> guard(dlProgMutex);
-            progressWin->printInMiddle(1, 0, maxyx.x, percent, COLOR_PAIR(2));
-            progressWin->winAttrOn(COLOR_PAIR(16));
-             progressWin->addStr(2, 2, progStr);
-             progressWin->winAttrOff(COLOR_PAIR(16));
-             progressWin->refreshWin();
-                      }
-                     progCounter = dlManagerControl->getProgress(filename);
-                   if (progCounter == 100) {
-                      break;
-                    }
+            {
+                std::lock_guard<std::mutex> guard(dlProgMutex);
+                progressWin->printInMiddle(1, 0, maxyx.x, percent, COLOR_PAIR(2));
+                progressWin->winAttrOn(COLOR_PAIR(16));
+                progressWin->addStr(2, 2, progStr);
+                progressWin->winAttrOff(COLOR_PAIR(16));
+                progressWin->refreshWin();
+            }
+            progCounter = dlManagerControl->getProgress(filename);
+            if (progCounter == 100) {
+                break;
+            }
             {
                 std::lock_guard<std::mutex> guard(dlProgMutex);
                 if (resizeDet) {
-                      progressWin->resizeWin(dlProgSz);
-                      progressWin->drawBox(0, 0);
-                      progressWin->touchWin();
-                      progressWin->refreshWin();
+
 
                     //detForm->clearForm();
                     //detForm = initDetForm(2);
@@ -980,6 +977,10 @@ void dlManagerUI::progressBar(const std::string& filename)
                     // detForm->populateField(REQ_FIRST_FIELD, dlManagerControl->getURL(filename));
                     //detForm->populateField(REQ_LAST_FIELD, filename);
                     detWin->refreshWin();
+                    progressWin->resizeWin(dlProgSz);
+                    progressWin->drawBox(0, 0);
+                    progressWin->touchWin();
+                    progressWin->refreshWin();
                     //resizeDet = false;
                 }
                 if (!progRef)
