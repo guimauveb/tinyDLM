@@ -13,25 +13,14 @@ int main()
     /* Navigate through the tinyDLM UI */
     {
         int ch = 0;
+        bool resizeUI = false;
 
         while ((ch = getch()) != KEY_F(1)) {
             switch(ch) {
                 /* TODO - do not resize under 108 * 24 */
                 case KEY_RESIZE:
                     {
-                        dlmc->stopStatusUpdate();
-                        {
-                            endwin();
-                            refresh();
-                            std::lock_guard<std::mutex> guard(dlmc->dlsInfoMutex);
-                            dlmc->menu->clearMenu();
-                            dlmc->menu->clearItems();
-                            dlmc->resizeUI();
-                            dlmc->resize = true;
-                            dlmc->updateDownloadsMenu();
-                            dlmc->resetStatusDriver();
-                        }
-                        dlmc->startStatusUpdate();
+                        resizeUI = true;
                         break;
                     }
 
@@ -195,13 +184,28 @@ int main()
                         break;
                     }
             }
+            if (resizeUI) {
+                dlmc->stopStatusUpdate();
+                {
+                    //std::lock_guard<std::mutex> guard(dlmc->dlsInfoMutex);
+                    endwin();
+                    refresh();
+                    dlmc->menu->clearMenu();
+                    dlmc->menu->clearItems();
+                    dlmc->resizeUI();
+                    dlmc->resize = true;
+                    dlmc->updateDownloadsMenu();
+                    dlmc->resetStatusDriver();
+                }
+                dlmc->startStatusUpdate();
+                resizeUI = false;
+            }
 
             /* Consistantly update main windows */
             {
                 std::lock_guard<std::mutex> guard(dlmc->dlsInfoMutex);
                 dlmc->refreshMainWins();        
             }
-
         }
     }
     return 0;

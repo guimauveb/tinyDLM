@@ -16,9 +16,11 @@ dlManagerUI::dlManagerUI()
 dlManagerUI::~dlManagerUI()
 {
     stopStatusUpdate();
-    stopProgressBarThread();
+    //stopProgressBarThread();
+    menu->clearMenu();
+    menu->clearItems();
     /* Pause all downloads -> we use pause to stop them since it does the same thing */
-    dlManagerControl->pauseAll();
+    dlManagerControl->killAll();
     /* Delete main windows */
     mainWindows.clear();
     /* TODO - save downloads list */
@@ -197,7 +199,7 @@ void dlManagerUI::refreshMainWins()
     mainWindows.at(dlsWinIdx)->refreshWin();
 
     mainWindows.at(dlsStatusWinIdx)->touchWin();
-    paintDlsStatusWin(mainWindows.at(dlsStatusWinIdx));
+    mainWindows.at(dlsStatusWinIdx)->refreshWin();
 
     mainWindows.at(keyActWinIdx)->touchWin();
     mainWindows.at(keyActWinIdx)->refreshWin();
@@ -394,6 +396,7 @@ void dlManagerUI::updateDownloadsStatusWindow()
             std::lock_guard<std::mutex> guard(dlsInfoMutex);
             if (resize) {
                 mainWindows.at(dlsStatusWinIdx)->resizeWin(dlStatusSz);
+                mainWindows.at(dlsStatusWinIdx)->touchWin();
                 mainWindows.at(dlsStatusWinIdx)->refreshWin();
                 resize = false;
             }
@@ -403,7 +406,6 @@ void dlManagerUI::updateDownloadsStatusWindow()
         }
     }
 }
-/* end main windows */
 
 void dlManagerUI::startStatusUpdate()
 {
@@ -818,6 +820,7 @@ int dlManagerUI::stopProgressBarThread()
 
 int dlManagerUI::resizeDetWin(const std::string& filename)
 {
+    stopProgressBarThread();
     resizeUI();
     detForm = initDetForm(2);
     detWin = initDetWin();
@@ -827,6 +830,7 @@ int dlManagerUI::resizeDetWin(const std::string& filename)
     detForm->populateField(REQ_LAST_FIELD, filename);
     detWin->refreshWin();
 
+    startProgressBarThread(filename);
     return 0;
 }
 
@@ -837,7 +841,7 @@ int dlManagerUI::detNav(const std::string& filename)
     bool done = false;
     bool updateMenu = false;
 
-    //startProgressBarThread(filename);
+    startProgressBarThread(filename);
 
     while ((ch = getch())) {
         switch (ch) {
@@ -954,7 +958,12 @@ void dlManagerUI::progressBar(const std::string& filename)
             if (progCounter == 100) {
                 break;
             }
-
+            if (resizeDet) {
+                progressWin->resizeWin(dlProgSz);
+                progressWin->touchWin();
+                progressWin->refreshWin();
+                resizeDet = false;
+            }
             {
                 std::lock_guard<std::mutex> guard(dlProgMutex);
                 if (!progRef)

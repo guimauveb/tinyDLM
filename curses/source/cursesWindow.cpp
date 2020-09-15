@@ -5,6 +5,11 @@ cursesWindow::cursesWindow(int r, int c, int by, int bx, std::string name)
     :row{r}, col{c}, begy{by}, begx{bx}
 {
     winName = name;
+    std::ofstream ofstr;
+    std::string e = "Allocating memory for window " + winName;
+    ofstr.open("del_win_log.txt", std::ios::app);
+    ofstr << e << '\n';
+    ofstr.close();
     if ((win = newwin(row, col, begy, begx)) == NULL) {
         std::ofstream ofstr;
         std::string e = "Error while allocating memory for window: " + winName;
@@ -17,6 +22,11 @@ cursesWindow::cursesWindow(int r, int c, int by, int bx, std::string name)
 
 cursesWindow::~cursesWindow()
 {
+    std::ofstream ofstr;
+    std::string e = "Freeing memory of window " + winName;
+    ofstr.open("del_win_log.txt", std::ios::app);
+    ofstr << e << '\n';
+    ofstr.close();
     if (win != nullptr) {
         delwin(win);
     }
@@ -59,12 +69,14 @@ void cursesWindow::resetWin()
     wrefresh(win);
 }
 
-/* We need to delete the reinit the window to properly resize it - wresize() only changes row and col */
+/* Couldn't get wresize() to work properly. Calling delwin() then newwin() instead */
 void cursesWindow::resizeWin(winSize newSz)
 {
-    werase(win);
-    wresize(win, newSz.row, newSz.col);
-    //win = newwin(newSz.row, newSz.col, newSz.begy, newSz.begx);
+    //werase(win);
+    //wresize(win, newSz.row, newSz.col);
+    /* check if window == NULL */
+    delwin(win);
+    win = newwin(newSz.row, newSz.col, newSz.begy, newSz.begx);
 }
 
 void cursesWindow::printInMiddle(int starty, int startx, int width, std::string str, chtype color)

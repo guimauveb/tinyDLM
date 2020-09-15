@@ -101,13 +101,17 @@ std::string cursesForm::getFieldBuffer(size_t fieldIdx)
 }
 void cursesForm::clearForm()
 {
-    unpost_form(form);
-    free_form(form);
-
-    for (size_t i = 0; i < fields.size(); i++) {
-        free_field(fields.at(i));
+    if (form != nullptr) {
+        unpost_form(form);
+        free_form(form);
     }
+
+    if (fields.size() != 0) {
+        for (size_t i = 0; i < fields.size(); i++) {
+            free_field(fields.at(i));
+        }
     fields.clear();
+    }
 }
 
 /* Save buffer content - useful when resizing the window */
