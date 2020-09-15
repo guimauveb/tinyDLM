@@ -966,7 +966,6 @@ void dlManagerUI::progressBar(const std::string& filename)
                 std::lock_guard<std::mutex> guard(dlProgMutex);
                 if (resizeDet) {
 
-
                     //detForm->clearForm();
                     //detForm = initDetForm(2);
                     detWin->resizeWin(dlDetSz);
@@ -977,10 +976,10 @@ void dlManagerUI::progressBar(const std::string& filename)
                     // detForm->populateField(REQ_FIRST_FIELD, dlManagerControl->getURL(filename));
                     //detForm->populateField(REQ_LAST_FIELD, filename);
                     detWin->refreshWin();
-                    progressWin->resizeWin(dlProgSz);
-                    progressWin->drawBox(0, 0);
-                    progressWin->touchWin();
-                    progressWin->refreshWin();
+                    //progressWin->resizeWin(dlProgSz);
+                    //progressWin->drawBox(0, 0);
+                    //progressWin->touchWin();
+                    //progressWin->refreshWin();
                     //resizeDet = false;
                 }
                 if (!progRef)
