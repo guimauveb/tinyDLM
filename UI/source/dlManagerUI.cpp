@@ -825,7 +825,7 @@ int dlManagerUI::resizeDetWin(const std::string& filename)
 
     //endwin();
     //refresh();
-    //resizeUI();
+    resizeUI();
     resizeDet = true;
 
     startProgressBarThread(filename);
