@@ -1,13 +1,12 @@
 #include "../include/dlManagerUI.hpp"
 
-/* Mutexes used to avoid concurrent uses of wrefresh() */
 dlManagerUI::dlManagerUI()
     :dlManagerControl{std::make_unique<dlManagerController>()}
 {
     initCurses();
     initColors();
     setWinsSize();
-    mainWinsInit();
+    initMainWins();
     updateDownloadsMenu();
     initStatusDriver();
     refreshMainWins();        
@@ -44,15 +43,6 @@ void dlManagerUI::initColors()
 {
     start_color();
     use_default_colors();
-    if (can_change_color() && COLORS >= 16) {
-        init_color(BRIGHT_WHITE, 1000, 1000, 1000);
-    }
-    if (COLORS >= 16) {
-        init_pair(PAIR_BW, COLOR_BLACK, BRIGHT_WHITE);
-    } 
-    else {
-        init_pair(PAIR_BW, COLOR_BLACK, COLOR_WHITE);
-    }
 
     init_pair(1, COLOR_RED, COLOR_WHITE);
     init_pair(2, COLOR_GREEN, -1);
@@ -66,7 +56,7 @@ void dlManagerUI::initColors()
 
 void dlManagerUI::setWinsSize()
 {
-    /* Get terminal screen size in columns and rows */
+    /* Get terminal screen size in rows and columns */
     int nrow = 0, ncol = 0;
 
     getmaxyx(stdscr, nrow, ncol);
@@ -84,21 +74,18 @@ void dlManagerUI::setWinsSize()
         col = 112;
     }
 
-    welWinSz = {row - 8, col, 4, 0};
-    dlHelpSz = {18, col - (col / 2), (row / 4), col / 4};
+    winSizeMap["welSz"]      = {row - 8, col, 4, 0};
+    winSizeMap["helpSz"]     = {18, col - (col / 2), (row / 4), col / 4};
+    winSizeMap["topBarSz"]   = {1, col, 0, 0};
+    winSizeMap["labelsSz"]   = {1, col, 2, 0};
+    winSizeMap["mainWinSz"]  = {row - 4, col / 2, 4, 0};
+    winSizeMap["statusSz"]   = {row - 5, col / 2, 3, col / 2};
+    winSizeMap["pHelpSz"]     = {1, col / 2, row - 1, 0};
+    winSizeMap["infosSz"]    = {1, col / 2, row - 2, col / 2};
+    winSizeMap["addSz"]      = {row / 2, col - (col / 2), (row / 4), col / 4};
+    winSizeMap["detSz"]      = {row / 2, col - (col / 2), (row / 4), col / 4};
+    winSizeMap["progSz"]     = {4, (col - (col / 2)) -10, row / 2, col / 4 + 4};
 
-    topBarSz = {1, col, 0, 0};
-    labelsSz = {1, col, 2, 0};
-    mainWinSz = {row - 4, col / 2, 4, 0};
-    dlStatusSz = {row - 5, col / 2, 3, col / 2};
-    keyActSz = {1, col / 2, row - 1, 0};
-    dlInfosSz = {1, col / 2, row - 2, col / 2};
-
-    dlAddSz = {row / 2, col - (col / 2), (row / 4), col / 4};
-    dlDetSz = {row / 2, col - (col / 2), (row / 4), col / 4};
-    dlProgSz = {4, (col - (col / 2)) -10, row / 2, col / 4 + 4};
-
-    //return struct of winSizes
 }
 
 void dlManagerUI::resetStatusDriver()
@@ -139,10 +126,9 @@ void dlManagerUI::initStatusDriver()
     yOffset = 0;
 }
 
-/* Window displaying a welcome message*/
-std::unique_ptr<cursesWindow> dlManagerUI::welcomeWinInit()
+std::unique_ptr<cursesWindow> dlManagerUI::initWin(winSize& sz, const std::string& name)
 {
-    return std::make_unique<cursesWindow>(row - 8, col, 4, 0, "welcome");
+    return std::make_unique<cursesWindow>(sz.row, sz.col, sz.begy, sz.begx, name);
 }
 
 void dlManagerUI::paintWelWin(std::unique_ptr<cursesWindow>& welWin)
@@ -154,7 +140,7 @@ void dlManagerUI::paintWelWin(std::unique_ptr<cursesWindow>& welWin)
 
 int dlManagerUI::firstStart()
 {
-    std::unique_ptr<cursesWindow> welWin = welcomeWinInit();
+    std::unique_ptr<cursesWindow> welWin = initWin(winSizeMap["welSz"], "welcome");
     paintWelWin(welWin);
     welWin->refreshWin();
     /* Move to current active subwins so we know we have to resize them */
@@ -192,7 +178,7 @@ int dlManagerUI::firstStart()
         }
         if (resize) {
             resizeUI();
-            welWin->resizeWin(welWinSz);
+            welWin->resizeWin(winSizeMap["welSz"]);
             paintWelWin(welWin);
             welWin->refreshWin();
             resize = false;
@@ -207,47 +193,26 @@ int dlManagerUI::firstStart()
     return done;
 }
 
-/* Init the main windows */
-void dlManagerUI::mainWinsInit()
-{
-    mainWindows.emplace_back(mainWinTopBarInit());
-    paintTopWin(mainWindows.at(topWinIdx));
-
-    mainWindows.emplace_back(mainWinLabelsInit());
-    paintLabelsWin(mainWindows.at(labelsWinIdx));
-
-    mainWindows.emplace_back(mainWinMainInit());
-    paintMainWinWin(mainWindows.at(dlsWinIdx));
-
-    mainWindows.emplace_back(mainWinDownloadsStatusInit());
-    paintDlsStatusWin(mainWindows.at(dlsStatusWinIdx));
-
-    mainWindows.emplace_back(mainWinKeyActInit());
-    paintKeyActWin(mainWindows.at(keyActWinIdx));
-
-    mainWindows.emplace_back(mainWinDlInfosInit());
-}
-
 void dlManagerUI::refreshMainWins()
 {
-    mainWindows.at(topWinIdx)->touchWin();
-    mainWindows.at(topWinIdx)->refreshWin();
+    mainWindows.at(topBarIdx)->touchWin();
+    mainWindows.at(topBarIdx)->refreshWin();
 
-    mainWindows.at(labelsWinIdx)->touchWin();
-    mainWindows.at(labelsWinIdx)->refreshWin();
+    mainWindows.at(labelsIdx)->touchWin();
+    mainWindows.at(labelsIdx)->refreshWin();
 
     /* Refresh the downloads list */
-    mainWindows.at(dlsWinIdx)->touchWin();
-    mainWindows.at(dlsWinIdx)->refreshWin();
+    mainWindows.at(mainIdx)->touchWin();
+    mainWindows.at(mainIdx)->refreshWin();
 
-    mainWindows.at(dlsStatusWinIdx)->touchWin();
-    mainWindows.at(dlsStatusWinIdx)->refreshWin();
+    mainWindows.at(statusIdx)->touchWin();
+    mainWindows.at(statusIdx)->refreshWin();
 
-    mainWindows.at(keyActWinIdx)->touchWin();
-    mainWindows.at(keyActWinIdx)->refreshWin();
+    mainWindows.at(pHelpIdx)->touchWin();
+    mainWindows.at(pHelpIdx)->refreshWin();
 
-    mainWindows.at(dlsInfosWinIdx)->touchWin();
-    mainWindows.at(dlsInfosWinIdx)->refreshWin();
+    mainWindows.at(infosIdx)->touchWin();
+    mainWindows.at(infosIdx)->refreshWin();
 
 }
 
@@ -258,44 +223,37 @@ void dlManagerUI::resizeUI()
     // TODO - will return a struct of winSizes objects */
     setWinsSize();
 
-    mainWindows.at(topWinIdx)->resizeWin(topBarSz);
-    paintTopWin(mainWindows.at(topWinIdx));
+    mainWindows.at(topBarIdx)->resizeWin(winSizeMap["topBarSz"]);
+    paintTopWin(mainWindows.at(topBarIdx));
 
-    mainWindows.at(labelsWinIdx)->resizeWin(labelsSz);
-    paintLabelsWin(mainWindows.at(labelsWinIdx));
+    mainWindows.at(labelsIdx)->resizeWin(winSizeMap["labelsSz"]);
+    paintLabelsWin(mainWindows.at(labelsIdx));
 
     /* Refresh the downloads list */
     /* TODO - clearMenu(); */
     menu->clearMenu();
     menu->clearItems();
-    mainWindows.at(dlsWinIdx)->resizeWin(mainWinSz);
-    paintMainWinWin(mainWindows.at(dlsWinIdx));
+    mainWindows.at(mainIdx)->resizeWin(winSizeMap["mainWinSz"]);
+    paintMainWinWin(mainWindows.at(mainIdx));
 
-    mainWindows.at(dlsStatusWinIdx)->resizeWin(dlStatusSz);
-    paintDlsStatusWin(mainWindows.at(dlsStatusWinIdx));
+    mainWindows.at(statusIdx)->resizeWin(winSizeMap["statusSz"]);
+    paintDlsStatusWin(mainWindows.at(statusIdx));
 
-    mainWindows.at(keyActWinIdx)->resizeWin(keyActSz);
-    paintKeyActWin(mainWindows.at(keyActWinIdx));
+    mainWindows.at(pHelpIdx)->resizeWin(winSizeMap["pHelpSz"]);
+    paintKeyActWin(mainWindows.at(pHelpIdx));
 
-    mainWindows.at(dlsInfosWinIdx)->resizeWin(dlInfosSz);
-    paintDlsInfosWin(mainWindows.at(dlsInfosWinIdx));
+    mainWindows.at(infosIdx)->resizeWin(winSizeMap["infosSz"]);
+    paintDlsInfosWin(mainWindows.at(infosIdx));
 
     refreshMainWins();
-}
-
-/* Window containing top bar title */
-std::unique_ptr<cursesWindow> dlManagerUI::mainWinTopBarInit()
-{
-    return std::make_unique<cursesWindow>(1, col, 0, 0, "top");
 }
 
 void dlManagerUI::paintTopWin(std::unique_ptr<cursesWindow>& topWin)
 {
     /* Print a whole black on white row at the top of the main window that will be the size of the terminal
      * window width*/
-    /* TODO - use malloc instead */
-    char titleMain[col];
-    size_t i;
+    char *titleMain = (char*)malloc(col*sizeof(char));
+    size_t i = 0;
 
     /* TODO - create a function for each */
     for (i = 0; i < liteDL_label.length(); ++i)
@@ -308,14 +266,37 @@ void dlManagerUI::paintTopWin(std::unique_ptr<cursesWindow>& topWin)
         titleMain[i] = ' ';
     titleMain[i] = '\0';
 
-    /* TODO - check if conversion to string doesn't break titleMain */
     topWin->printInMiddle(0, 0, col, titleMain, COLOR_PAIR(8));
+
+    free(titleMain);
 }
 
-/* Top window containing labels such as "name", "url","speed" etc  */
-std::unique_ptr<cursesWindow> dlManagerUI::mainWinLabelsInit()
-{   
-    return std::make_unique<cursesWindow>(1, col, 2, 0, "labels");
+/* Init main windows */
+void dlManagerUI::initMainWins()
+{
+
+    /* Window containing top bar title */
+    mainWindows.emplace_back(initWin(winSizeMap["topBarSz"], "topBar"));
+    paintTopWin(mainWindows.at(topBarIdx));
+
+    /* Top window containing labels such as "name", "url","speed" etc  */
+    mainWindows.emplace_back(initWin(winSizeMap["labelsSz"], "labels"));
+    paintLabelsWin(mainWindows.at(labelsIdx));
+
+    /* Window containing downloads list as a menu */
+    mainWindows.emplace_back(initWin(winSizeMap["mainWinSz"], "main"));
+    paintMainWinWin(mainWindows.at(mainIdx));
+
+    /* Window containing ownloads statuses - updated in a separate thread and connected to mainWin */
+    mainWindows.emplace_back(initWin(winSizeMap["statusSz"], "status"));
+    paintDlsStatusWin(mainWindows.at(statusIdx));
+
+    /* Winodow displaying help message */ 
+    mainWindows.emplace_back(initWin(winSizeMap["pHelpSz"], "help"));
+    paintKeyActWin(mainWindows.at(pHelpIdx));
+
+    /* Not used for now */
+    mainWindows.emplace_back(initWin(winSizeMap["infosSz"], "infos"));
 }
 
 void dlManagerUI::paintLabelsWin(std::unique_ptr<cursesWindow>& labelsWin)
@@ -328,39 +309,15 @@ void dlManagerUI::paintLabelsWin(std::unique_ptr<cursesWindow>& labelsWin)
     labelsWin->printInMiddle(0, 7 * col / 8, col / 8, labelStatus, COLOR_PAIR(7));
 }
 
-/* downloads list window */
-std::unique_ptr<cursesWindow> dlManagerUI::mainWinMainInit()
-{
-    return std::make_unique<cursesWindow>(row - 4, col / 2, 4, 0, "menu");
-}
-
 void dlManagerUI::paintMainWinWin(std::unique_ptr<cursesWindow>& mainWinWin)
 {
     //    mainWinWin->drawBox(0, 0);
-}
-
-/* Init the download progress subwindow */ 
-std::unique_ptr<cursesWindow> dlManagerUI::mainWinKeyActInit()
-{
-    return std::make_unique<cursesWindow>(1, col / 2, row - 1, 0, "key");
 }
 
 void dlManagerUI::paintKeyActWin(std::unique_ptr<cursesWindow>& keyActWin)
 {
     /* Display keys and their associated functions at the bottom of the window */
     keyActWin->printInMiddle(0, 0, col / 4, msgHelp, COLOR_PAIR(7));
-}
-
-/* init the global download info subwindow in a separated thread - displays number of downloads + speed */ 
-std::unique_ptr<cursesWindow> dlManagerUI::mainWinDlInfosInit()
-{
-    return std::make_unique<cursesWindow>(1, col / 2, row - 2, col / 2, "dlsinfos");
-}
-
-/* init the downloads status window */
-std::unique_ptr<cursesWindow> dlManagerUI::mainWinDownloadsStatusInit()
-{
-    return std::make_unique<cursesWindow>(row - 5, col / 2, 3, col / 2, "status");
 }
 
 void dlManagerUI::paintDlsStatusWin(std::unique_ptr<cursesWindow>& dlsStatusWin){}
@@ -372,7 +329,7 @@ void dlManagerUI::populateStatusWin(const std::vector<downloadWinInfo>& vec)
     int y = 1;
     size_t offset;
     size_t curr;
-    point p = mainWindows.at(dlsStatusWinIdx)->getMaxyx();
+    point p = mainWindows.at(statusIdx)->getMaxyx();
     chtype color; 
 
     /* Iterate over the list of downloads we obtained from dlManagerControl */
@@ -385,28 +342,28 @@ void dlManagerUI::populateStatusWin(const std::vector<downloadWinInfo>& vec)
     for (offset = yOffset; offset < vec.size(); ++offset) {
         if (curr == offset) {
             /* Highlight selected item */
-            color = COLOR_PAIR(PAIR_BW);
+            color = COLOR_PAIR(8);
         }
         else {
             color = COLOR_PAIR(7);
         }
-        mainWindows.at(dlsStatusWinIdx)->printInMiddle(y, 0, p.x / 4, vec.at(offset).progress, color);
-        mainWindows.at(dlsStatusWinIdx)->printInMiddle(y, 0, p.x / 4 + vec.at(offset).progress.length() + 1,
+        mainWindows.at(statusIdx)->printInMiddle(y, 0, p.x / 4, vec.at(offset).progress, color);
+        mainWindows.at(statusIdx)->printInMiddle(y, 0, p.x / 4 + vec.at(offset).progress.length() + 1,
                 " %", color);
-        mainWindows.at(dlsStatusWinIdx)->printInMiddle(y, p.x / 4, p.x / 4, vec.at(offset).speed, color);
-        mainWindows.at(dlsStatusWinIdx)->printInMiddle(y, p.x / 4, p.x / 4 + vec.at(offset).speed.length() + 2,
+        mainWindows.at(statusIdx)->printInMiddle(y, p.x / 4, p.x / 4, vec.at(offset).speed, color);
+        mainWindows.at(statusIdx)->printInMiddle(y, p.x / 4, p.x / 4 + vec.at(offset).speed.length() + 2,
                 " MBs", color);
-        //mainWindow.at(dlsStatusWinIdx)->printInMiddledlsStatusWiny, 2 * width / 4, width / 4, dl.eta, color);
-        mainWindows.at(dlsStatusWinIdx)->printInMiddle(y, 3 * p.x / 4, p.x / 4, vec.at(offset).status, color);
+        //mainWindow.at(statusIdx)->printInMiddledlsStatusWiny, 2 * width / 4, width / 4, dl.eta, color);
+        mainWindows.at(statusIdx)->printInMiddle(y, 3 * p.x / 4, p.x / 4, vec.at(offset).status, color);
         y++;
     }
 }
 
 void dlManagerUI::setDownloadsMenu()
 {
-    point pMax = mainWindows.at(dlsWinIdx)->getMaxyx();
+    point pMax = mainWindows.at(mainIdx)->getMaxyx();
     menu->menuOptsOn(O_SHOWDESC);
-    menu->setMenuSub(mainWindows.at(dlsWinIdx));
+    menu->setMenuSub(mainWindows.at(mainIdx));
 
     /* Fill the entire window with items. (-2) corresponds to top and bottom borders that we ignore */
     menu->setMenuFormat(pMax.y - 2, 0);
@@ -439,9 +396,9 @@ void dlManagerUI::updateDownloadsStatusWindow()
         /* Refresh status window */
         {
             std::lock_guard<std::mutex> guard(dlsInfoMutex);
-            mainWindows.at(dlsStatusWinIdx)->eraseWin();
+            mainWindows.at(statusIdx)->eraseWin();
             populateStatusWin(dlManagerControl->getAllDownloadsInfos());
-            mainWindows.at(dlsStatusWinIdx)->refreshWin();
+            mainWindows.at(statusIdx)->refreshWin();
         }
     }
 }
@@ -451,7 +408,7 @@ void dlManagerUI::startStatusUpdate()
     /* If no downloads - erase the window and break out of here */
     if (!dlManagerControl->isActive()) {
         std::lock_guard<std::mutex> guard(dlsInfoMutex);
-        mainWindows.at(dlsStatusWinIdx)->refreshWin();
+        mainWindows.at(statusIdx)->refreshWin();
     }
     else {
         updateStatus = true;
@@ -515,7 +472,7 @@ int dlManagerUI::helpNav()
         }
         if (resize) {
             resizeUI();
-            helpWin->resizeWin(dlHelpSz);
+            helpWin->resizeWin(winSizeMap["helpSz"]);
             paintHelpWin(helpWin);
             helpWin->refreshWin();
             resize = false;
@@ -558,8 +515,9 @@ int dlManagerUI::showDetails(const std::string& itemName)
     /* Important: We begin by assigning a new form to detForm unique_ptr and then assigning a new window to 
      * detWin unique_ptr -> if we reassign the detWin pointer first and then try to reassign detForm, since 
      * detForm has to free some memory corresponding to the old window (now deleted), we end up with a segfault */
-    detForm = initDetForm(2);
-    detWin = initDetWin();
+    detForm = initForm(2);
+
+    detWin = initWin(winSizeMap["detSz"], "det");
     setDetForm();
     paintDetWin(itemName);
 
@@ -580,8 +538,10 @@ int dlManagerUI::addNewDl()
      * addDlWin unique_ptr -> if we reset the addDlWin pointer first and then try to reset addDlForm, since 
      * addDlForm has to free some memory corresponding to the old window (now deleted), we end up with a 
      * segfault */
-    addDlForm = initAddDlForm(2);
-    addDlWin = addDlInitWin();
+
+
+    addDlForm = initForm(2);
+    addDlWin = initWin(winSizeMap["addSz"], "add");
     setAddDlForm();
     paintAddDlWin();
     //addDlWin->drawBox(0, 0);
@@ -589,12 +549,6 @@ int dlManagerUI::addNewDl()
     addDlWin->refreshWin();
     /* No need to call free() for win and form -> class destructor will take care of it */
     return addDlNav();
-}
-
-/* Init "Add a download" window */
-std::unique_ptr<cursesWindow> dlManagerUI::addDlInitWin()
-{
-    return std::make_unique<cursesWindow>(row / 2, col - (col / 2), (row / 4), col / 4, "addDl");
 }
 
 void dlManagerUI::paintAddDlWin()
@@ -634,13 +588,7 @@ void dlManagerUI::paintAddDlWin()
     free(titleAdd);
 }
 
-
-std::unique_ptr<cursesForm> dlManagerUI::initAddDlForm(size_t numFields)
-{
-    return std::make_unique<cursesForm>(numFields);
-}
-
-std::unique_ptr<cursesForm> dlManagerUI::initDetForm(size_t numFields)
+std::unique_ptr<cursesForm> dlManagerUI::initForm(size_t numFields)
 {
     return std::make_unique<cursesForm>(numFields);
 }
@@ -700,8 +648,8 @@ int dlManagerUI::resizeDetWin(const std::string& filename)
     refresh();
     resizeUI();
 
-    detForm = initDetForm(2);
-    detWin->resizeWin(dlDetSz);
+    detForm = initForm(2);
+    detWin->resizeWin(winSizeMap["detSz"]);
     setDetForm();
     paintDetWin(filename);
     detForm->populateField(REQ_FIRST_FIELD, dlManagerControl->getURL(filename));
@@ -718,8 +666,8 @@ void dlManagerUI::resizeAddDlNav(std::string url, std::string filename)
     refresh();
     resizeUI();
 
-    addDlForm = initAddDlForm(2);
-    addDlWin->resizeWin(dlAddSz);
+    addDlForm = initForm(2);
+    addDlWin->resizeWin(winSizeMap["addSz"]);
     setAddDlForm();
     paintAddDlWin();
 
@@ -740,11 +688,13 @@ int dlManagerUI::addDlNav()
     curs_set(1);   
     point maxyx = addDlWin->getMaxyx();
     int ch = 0;
+
     bool done = false;
     bool updateMenu = false;
     bool resizeAdd = false;
-    std::string url;
-    std::string filename;
+
+    std::string urlField;
+    std::string filenameField;
 
     while ((ch = getch())) {
         switch (ch) {
@@ -842,9 +792,9 @@ int dlManagerUI::addDlNav()
                 }
         }
         if (resizeAdd) {
-            url = addDlForm->getFieldBuffer(0);
-            filename = addDlForm->getFieldBuffer(1);
-            resizeAddDlNav(url, filename);
+            urlField = addDlForm->getFieldBuffer(0);
+            filenameField = addDlForm->getFieldBuffer(1);
+            resizeAddDlNav(urlField, filenameField);
             resizeAdd = false;
         }
 
@@ -866,11 +816,6 @@ void dlManagerUI::updateDownloadsMenu()
     setDownloadsMenu();
 }
 
-
-std::unique_ptr<cursesWindow> dlManagerUI::initDetWin(/* pass winsize */)
-{
-    return std::make_unique<cursesWindow>(row / 2, col - (col / 2), (row / 4), col / 4, "detwin");
-}
 
 void dlManagerUI::paintDetWin(const std::string& itemName)
 {
@@ -903,18 +848,11 @@ const std::string dlManagerUI::initDetailsTitle(const std::string& itemName)
     return itemName;
 }
 
-/* shared_ptr that will be moved to progressWin own thread */
-std::unique_ptr<cursesWindow> dlManagerUI::initProgressWin(const point& bx, const point& mx)
-{
-    return std::make_unique<cursesWindow>(4, mx.x-10, mx.y, bx.x+4, "prog");
-}
-
 void dlManagerUI::startProgressBarThread(const std::string& filename)
 {
+
     /* Initialize progress bar according to its parent win (details win) dimensions */
-    point begyx = detWin->getBegyx();
-    point maxyx = detWin->getMaxyx();
-    progressWin = initProgressWin(begyx, maxyx);
+    progressWin = initWin(winSizeMap["progSz"], "prog");
     progressWin->drawBox(0, 0);
     progressWin->touchWin();
     progressWin->refreshWin();
@@ -1046,7 +984,6 @@ void dlManagerUI::progressBar(const std::string& filename)
         }
     }
     else {
-
         while (true) {
             {
                 std::lock_guard<std::mutex> guard(dlProgMutex);

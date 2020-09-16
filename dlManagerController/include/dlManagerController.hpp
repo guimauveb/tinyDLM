@@ -11,7 +11,7 @@ class dlManagerController
         dlManagerController();
         ~dlManagerController();
 
-        std::string createNewDl(std::string dlFolder, std::string filename, const std::string url,
+        std::string createNewDl(std::string folder, std::string filename, const std::string url,
                          const int lowSpeedLim, const int lowSpeedTim);
         void removeDl();
 

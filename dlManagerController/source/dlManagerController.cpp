@@ -8,12 +8,13 @@ dlManagerController::dlManagerController()
 dlManagerController::~dlManagerController() {}
 
 /* Initialize a new dlManager object then place it in a vector */
-std::string dlManagerController::createNewDl(std::string dlFolder, std::string filename, const std::string url,  
+std::string dlManagerController::createNewDl(std::string folder, std::string filename, const std::string url,  
         const int lowSpeedLim, const int lowSpeedTim)
 {
     std::string f = filename;
     std::map<std::string, int>::iterator it = downloadsMap.find(filename);
 
+    /* TODO - create a table in which we store the number of duplicate / filename */
     if (it != downloadsMap.end()) {
         createDuplicate(f, dlCounter);
     }
@@ -82,7 +83,7 @@ void dlManagerController::clearInactive()
     std::vector<size_t> todel;
     for (size_t i = 0; i < dlManagerVec.size(); ++i) {
         if((dlManagerVec.at(i)->getDownloadInfos()->status == downloadStatus::ERROR) || 
-           (dlManagerVec.at(i)->getDownloadInfos()->status == downloadStatus::COMPLETED)) {
+                (dlManagerVec.at(i)->getDownloadInfos()->status == downloadStatus::COMPLETED)) {
             it = downloadsMap.find(dlManagerVec.at(i)->
                     getDownloadInfos()->filename);
             if (it != downloadsMap.end()) {

@@ -140,7 +140,7 @@ int main()
                         }
                         dlmc->stopStatusUpdate();
                         dlmc->dlManagerControl->clearInactive();
-                        dlmc->mainWindows.at(dlmc->dlsStatusWinIdx)->resetWin();
+                        dlmc->mainWindows.at(dlmc->statusIdx)->resetWin();
                         dlmc->updateDownloadsMenu();
                         dlmc->resetStatusDriver();
                         dlmc->startStatusUpdate();
@@ -157,7 +157,7 @@ int main()
                         dlmc->dlManagerControl->stop(dlmc->menu->getItemName()); 
                         dlmc->updateDownloadsMenu();
                         dlmc->resetStatusDriver();
-                        dlmc->mainWindows.at(dlmc->dlsStatusWinIdx)->resetWin();
+                        dlmc->mainWindows.at(dlmc->statusIdx)->resetWin();
                         dlmc->startStatusUpdate();
                         break;
                     }
@@ -171,7 +171,7 @@ int main()
                         dlmc->stopStatusUpdate();
                         dlmc->dlManagerControl->killAll();
                         dlmc->updateDownloadsMenu();
-                        dlmc->mainWindows.at(dlmc->dlsStatusWinIdx)->resetWin();
+                        dlmc->mainWindows.at(dlmc->statusIdx)->resetWin();
                         dlmc->startStatusUpdate();
                         break;
                     }
@@ -189,16 +189,13 @@ int main()
             }
             if (resizeUI) {
                 dlmc->stopStatusUpdate();
-                {
-                    //std::lock_guard<std::mutex> guard(dlmc->dlsInfoMutex);
-                    endwin();
-                    refresh();
-                    dlmc->menu->clearMenu();
-                    dlmc->menu->clearItems();
-                    dlmc->resizeUI();
-                    dlmc->updateDownloadsMenu();
-                    dlmc->resetStatusDriver();
-                }
+                endwin();
+                refresh();
+                dlmc->menu->clearMenu();
+                dlmc->menu->clearItems();
+                dlmc->resizeUI();
+                dlmc->updateDownloadsMenu();
+                dlmc->resetStatusDriver();
                 dlmc->startStatusUpdate();
                 resizeUI = false;
             }

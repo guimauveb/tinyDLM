@@ -95,7 +95,6 @@ void cursesForm::postForm()
 
 std::string cursesForm::getFieldBuffer(size_t fieldIdx)
 {
-    /* TODO - catch out of range vector */
     return std::string(field_buffer(fields.at(fieldIdx), 0)); 
 
 }

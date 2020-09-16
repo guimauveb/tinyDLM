@@ -14,11 +14,9 @@
 class dlManagerUI 
 {
     public:
-        /* TODO - define what to initialize with the constructor */
         /* Generate main windows + subwindows */
         dlManagerUI();
 
-        /* TODO - define what to free when the destructor is called */
         ~dlManagerUI();
 
         /* Initialized by the constructor */
@@ -39,11 +37,14 @@ class dlManagerUI
         void statusDriver(int c);
         void resetStatusDriver();
 
-        /* yOffset corresponds to the download item at which the status window should begin when the menu is 
+        /* yOffset refers to the download item at which the status window should begin when the menu is 
          * split into pages */
         int yOffset;
-        /* Corresponds to the current highlighted item */
+        /* Refers to the current highlighted item in the downloads status window */
         int currItNo;
+
+        int topItem;
+        int botItem;
 
         /* Display help window */
         int showHelp();
@@ -54,22 +55,22 @@ class dlManagerUI
 
         /* Menu holding downloads items */
         std::unique_ptr<cursesMenu> menu;
-        
+
         void updateDownloadsMenu();
 
         /* TODO - enum class */
-        const int topWinIdx = 0;
-        const int labelsWinIdx = 1;
-        const int dlsWinIdx = 2;
-        const int dlsStatusWinIdx = 3;
-        const int keyActWinIdx = 4;
-        const int dlsInfosWinIdx = 5;
-    
-        /* Mutexes to keep each thread accessing wrefresh() at the same time and causing trouble */
+        const int topBarIdx = 0;
+        const int labelsIdx = 1;
+        const int mainIdx = 2;
+        const int statusIdx = 3;
+        const int pHelpIdx = 4;
+        const int infosIdx = 5;
+
+        /* Mutexes to keep each thread from accessing wrefresh() at the same time and causing trouble */
         std::mutex dlsInfoMutex;
         std::mutex dlProgMutex;
         std::mutex yOffsetMutex;
-        
+
     private:
         /* Set the ground for curses */
         void initCurses();
@@ -83,23 +84,19 @@ class dlManagerUI
 
         /* Window holding the welcome message at first start */
         std::unique_ptr<cursesWindow> helpWin;
-        std::unique_ptr<cursesWindow> welcomeWinInit();
         void paintWelWin(std::unique_ptr<cursesWindow>& welWin);
 
         /* Initialize program's main windows */
-        void mainWinsInit();
-        std::unique_ptr<cursesWindow> mainWinTopBarInit();
+        void initMainWins();
+
+        /* All windows are initialized by initWin() */
+        std::unique_ptr<cursesWindow> initWin(winSize& sz, const std::string& name);
+
         void paintTopWin(std::unique_ptr<cursesWindow>& topWin);
-        std::unique_ptr<cursesWindow> mainWinLabelsInit();
         void paintLabelsWin(std::unique_ptr<cursesWindow>& labelsWin);
-        std::unique_ptr<cursesWindow> mainWinMainInit();
         void paintMainWinWin(std::unique_ptr<cursesWindow>& mainWinWin);
-        std::unique_ptr<cursesWindow> mainWinKeyActInit();
         void paintKeyActWin(std::unique_ptr<cursesWindow>& keyActWin);
-        std::unique_ptr<cursesWindow> mainWinDlInfosInit();
         void paintDlsInfosWin(std::unique_ptr<cursesWindow>& dlsInfosWin);
-        
-        std::unique_ptr<cursesWindow> mainWinDownloadsStatusInit();
 
         std::unique_ptr<cursesMenu> initDownloadsMenu(std::vector<std::string> itemsData);
         void setDownloadsMenu();
@@ -113,11 +110,11 @@ class dlManagerUI
 
         /* Program's subwindows - 'Add a download' window / 'Details' window - 'Progress bar' window  */
 
+        std::unique_ptr<cursesForm> initForm(size_t numFields);
+
         /* "Add a new download" routine */
         std::unique_ptr<cursesWindow> addDlWin;
-        std::unique_ptr<cursesWindow> addDlInitWin();
         std::unique_ptr<cursesForm> addDlForm;
-        std::unique_ptr<cursesForm> initAddDlForm(size_t numFields);
         void paintAddDlWin();
         void setAddDlForm();
 
@@ -126,12 +123,11 @@ class dlManagerUI
         void populateForm(const std::string filename);
         void resizeAddDlNav(std::string url, std::string filename);
 
-        
+
+        /* Details window routine */
         std::unique_ptr<cursesWindow> detWin; 
-        std::unique_ptr<cursesWindow> initDetWin();
         void paintDetWin(const std::string& itemName);
         std::unique_ptr<cursesForm> detForm;
-        std::unique_ptr<cursesForm> initDetForm(size_t numFields);
         void setDetForm();
 
         const std::string initDetailsTitle(const std::string& itemName);
@@ -139,7 +135,7 @@ class dlManagerUI
         int resizeDetWin(const std::string& filename);
 
         /* Download progress bar updated in a separate thread */
-        std::unique_ptr<cursesWindow> initProgressWin(const point& bx, const point& mx);
+        std::unique_ptr<cursesWindow> progressWin;
         void progressBar(const std::string& filename);
         void startProgressBarThread(const std::string& filename);       
         int stopProgressBarThread();
@@ -153,21 +149,9 @@ class dlManagerUI
         std::future<void> futureUpdateDlsStatus;
         /* future that will execute the progress bar update function */
         std::future<void> futureProgressBar;
-        std::vector<std::future<void>> futureVec;
-        std::unique_ptr<cursesWindow> progressWin;
 
-        /* TODO - Create a struct on the stack */
-        winSize welWinSz;
-        winSize topBarSz;
-        winSize labelsSz;
-        winSize mainWinSz;
-        winSize dlStatusSz;
-        winSize keyActSz;
-        winSize dlInfosSz;
-        winSize dlAddSz;
-        winSize dlDetSz;
-        winSize dlProgSz;
-        winSize dlHelpSz;
+        /* Map holding window sizes */
+        std::map<const std::string, winSize> winSizeMap;
 
         /* Signals to stop refreshing progress subwindow */
         bool progRef = false;
@@ -175,11 +159,5 @@ class dlManagerUI
         /* TODO - make it selectionable by the user */
         const int lowSpeedLim = 56;
         const int lowSpeedTim = 60;
-
-        const int BRIGHT_WHITE  = 15;
-        const int PAIR_BW       = 8; 
-
-        int topItem, botItem;
-
 };
 
