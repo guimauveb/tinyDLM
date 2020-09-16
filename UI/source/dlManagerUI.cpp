@@ -714,7 +714,11 @@ int dlManagerUI::showDetails(const std::string& itemName)
     //detForm->populateField(REQ_FIRST_FIELD, dlManagerControl->getURL(itemName));
     //detForm->populateField(REQ_LAST_FIELD, itemName);
     detWin->refreshWin();
-
+    point begyx = detWin->getBegyx();
+    point maxyx = detWin->getMaxyx();
+    progressWin = initProgressWin(begyx, maxyx);
+    progressWin->drawBox(0, 0);
+    progRef = true;
     /* Disable cursor */
     curs_set(0);
     /* Navigate through the details window */
@@ -791,11 +795,7 @@ std::unique_ptr<cursesWindow> dlManagerUI::initProgressWin(const point& bx, cons
 void dlManagerUI::startProgressBarThread(const std::string& filename)
 {
     /* Initialize progress bar according to its parent win (details win) dimensions */
-    point begyx = detWin->getBegyx();
-    point maxyx = detWin->getMaxyx();
-    progressWin = initProgressWin(begyx, maxyx);
-    progressWin->drawBox(0, 0);
-    progRef = true;
+    
     futureProgressBar = std::async(std::launch::async, &dlManagerUI::progressBar, this, filename);
 }
 
@@ -952,11 +952,11 @@ void dlManagerUI::progressBar(const std::string& filename)
 
             {
                 std::lock_guard<std::mutex> guard(dlProgMutex);
-                progressWin->printInMiddle(1, 0, maxyx.x, percent, COLOR_PAIR(2));
-                progressWin->winAttrOn(COLOR_PAIR(16));
-                progressWin->addStr(2, 2, progStr);
-                progressWin->winAttrOff(COLOR_PAIR(16));
-                progressWin->refreshWin();
+                //progressWin->printInMiddle(1, 0, maxyx.x, percent, COLOR_PAIR(2));
+                //progressWin->winAttrOn(COLOR_PAIR(16));
+                //progressWin->addStr(2, 2, progStr);
+                //progressWin->winAttrOff(COLOR_PAIR(16));
+                //progressWin->refreshWin();
             }
             progCounter = dlManagerControl->getProgress(filename);
             if (progCounter == 100) {
@@ -976,11 +976,11 @@ void dlManagerUI::progressBar(const std::string& filename)
                     // detForm->populateField(REQ_FIRST_FIELD, dlManagerControl->getURL(filename));
                     //detForm->populateField(REQ_LAST_FIELD, filename);
                     detWin->refreshWin();
-                    //progressWin->resizeWin(dlProgSz);
-                    //progressWin->drawBox(0, 0);
-                    //progressWin->touchWin();
-                    //progressWin->refreshWin();
-                    //resizeDet = false;
+                    progressWin->resizeWin(dlProgSz);
+                    progressWin->drawBox(0, 0);
+                    progressWin->touchWin();
+                    progressWin->refreshWin();
+                    resizeDet = false;
                 }
                 if (!progRef)
                     break;
