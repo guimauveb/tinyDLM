@@ -5,28 +5,28 @@ cursesWindow::cursesWindow(int r, int c, int by, int bx, std::string name)
     :row{r}, col{c}, begy{by}, begx{bx}
 {
     winName = name;
-    std::ofstream ofstr;
-    std::string e = "Allocating memory for window " + winName;
-    ofstr.open("newwin.txt", std::ios::app);
-    ofstr << e << '\n';
-    ofstr.close();
+//    std::ofstream ofstr;
+//    std::string e = "Allocating memory for window " + winName;
+//    ofstr.open("newwin.txt", std::ios::app);
+//    ofstr << e << '\n';
+//    ofstr.close();
     if ((win = newwin(row, col, begy, begx)) == NULL) {
-        std::ofstream ofstr;
-        std::string e = "Error while allocating memory for window: " + winName;
-        ofstr.open("newwin_log.txt", std::ios::out);
-        ofstr << e;
-        ofstr.close();
+//        std::ofstream ofstr;
+//        std::string e = "Error while allocating memory for window: " + winName;
+//        ofstr.open("newwin_log.txt", std::ios::out);
+//        ofstr << e;
+//        ofstr.close();
     }
     wrefresh(win);
 }
 
 cursesWindow::~cursesWindow()
 {
-    std::ofstream ofstr;
-    std::string e = "Freeing memory of window " + winName;
-    ofstr.open("del_win_log.txt", std::ios::out);
-    ofstr << e << '\n';
-    ofstr.close();
+//    std::ofstream ofstr;
+//    std::string e = "Freeing memory of window " + winName;
+//    ofstr.open("del_win_log.txt", std::ios::out);
+//    ofstr << e << '\n';
+//    ofstr.close();
     if (win != nullptr) {
         delwin(win);
     }
@@ -76,14 +76,15 @@ void cursesWindow::resizeWin(winSize newSz)
     //wresize(win, newSz.row, newSz.col);
 
     if (win != NULL) {
-        int d = delwin(win);
-        if (d == ERR) {
-            std::ofstream ofstr;
-            std::string e = "Error while freeing memory of window " + winName;
-            ofstr.open("del_win_log.txt", std::ios::out);
-            ofstr << e << '\n';
-            ofstr.close();
-        }
+        delwin(win);
+//        int d = delwin(win);
+//        if (d == ERR) {
+//            std::ofstream ofstr;
+//            std::string e = "Error while freeing memory of window " + winName;
+//            ofstr.open("del_win_log.txt", std::ios::out);
+//            ofstr << e << '\n';
+//            ofstr.close();
+//        }
     }
 
     win = newwin(newSz.row, newSz.col, newSz.begy, newSz.begx);

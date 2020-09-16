@@ -830,7 +830,18 @@ int dlManagerUI::resizeDetWin(const std::string& filename)
     //resizeUI();
     setWinsSize();
     resizeDet = true;
-
+    detWin->resizeWin(dlDetSz);
+    detWin->touchWin();
+    detWin->refreshWin();
+    paintDetWin(filename);
+    point begyx = detWin->getBegyx();
+    point maxyx = detWin->getMaxyx();
+    winSize pSz = { maxyx.y, maxyx.x, begyx.y, begyx.x };
+    progressWin->resizeWin(pSz);
+    progressWin->drawBox(0, 0);
+    progressWin->touchWin();
+    progressWin->refreshWin();
+    resizeDet = false;
     startProgressBarThread(filename);
     return 0;
 }
@@ -932,18 +943,7 @@ void dlManagerUI::progressBar(const std::string& filename)
         {
             std::lock_guard<std::mutex> guard(dlProgMutex);
             if (resizeDet) {
-                detWin->resizeWin(dlDetSz);
-                paintDetWin(filename);
-                detWin->touchWin();
-                detWin->refreshWin();
-                point begyx = detWin->getBegyx();
-                point maxyx = detWin->getMaxyx();
-                winSize pSz = { maxyx.y, maxyx.x, begyx.y, begyx.x };
-                progressWin->resizeWin(pSz);
-                progressWin->drawBox(0, 0);
-                progressWin->touchWin();
-                progressWin->refreshWin();
-                resizeDet = false;
+                break; 
             }
         }
     }
