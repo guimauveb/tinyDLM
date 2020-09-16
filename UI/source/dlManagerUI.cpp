@@ -840,6 +840,7 @@ int dlManagerUI::resizeDetWin(const std::string& filename)
     paintDetWin(filename);
     detForm->populateField(REQ_FIRST_FIELD, dlManagerControl->getURL(filename));
     detForm->populateField(REQ_LAST_FIELD, filename);
+
     detWin->refreshWin();
     resizeDet = false;
     startProgressBarThread(filename);
@@ -926,6 +927,14 @@ int dlManagerUI::detNav(const std::string& filename)
 /* Display a subwindow containing details about the selected download */ 
 void dlManagerUI::progressBar(const std::string& filename)
 {
+    point maxyx = progressWin->getMaxyx();
+    
+    int progBarWidth = maxyx.x - 4;
+    int i = 0;
+
+    float progCounter = dlManagerControl->getProgress(filename);
+
+
     while (true) {
         {
             std::lock_guard<std::mutex> guard(dlProgMutex);
