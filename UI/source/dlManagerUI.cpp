@@ -718,8 +718,8 @@ int dlManagerUI::showDetails(const std::string& itemName)
     /* Disable cursor */
     curs_set(0);
     /* Navigate through the details window */
-    int n = detNav(itemName);
-    return n;
+    detNav(itemName);
+    return 1;
 }
 
 std::unique_ptr<cursesWindow> dlManagerUI::initDetWin(/* pass winsize */)
@@ -819,6 +819,7 @@ int dlManagerUI::stopProgressBarThread()
 
 int dlManagerUI::resizeDetWin(const std::string& filename)
 {
+    stopProgressBarThread();
 
     //endwin();
     //refresh();
@@ -826,6 +827,7 @@ int dlManagerUI::resizeDetWin(const std::string& filename)
     setWinsSize();
     resizeDet = true;
 
+    startProgressBarThread(filename);
     return 0;
 }
 
@@ -844,7 +846,6 @@ int dlManagerUI::detNav(const std::string& filename)
             case KEY_RESIZE:
                 {
                     updateMenu = true;
-                    done = true;
                     resizeDet = true;
                     /* Sleeping here fixes an issue where the old progress bar thread wouldn't have time 
                      * to terminate before a new one would start, causing a segfault / double free. 
@@ -895,12 +896,10 @@ int dlManagerUI::detNav(const std::string& filename)
         if (done) {
             break;
         }
-//        if (resizeDet) {
-//            stopProgressBarThread();
-//            resizeDetWin(filename);    
-//            resizeDet = false;
-//            startProgressBarThread(filename);
-//        }
+        if (resizeDet) {
+            resizeDetWin(filename);    
+            resizeDet = false;
+        }
     } 
     stopProgressBarThread();
     if (updateMenu) {
@@ -912,83 +911,29 @@ int dlManagerUI::detNav(const std::string& filename)
 /* Display a subwindow containing details about the selected download */ 
 void dlManagerUI::progressBar(const std::string& filename)
 {
-    //point maxyx = progressWin->getMaxyx();
-
-    {
-        std::lock_guard<std::mutex> guard(dlProgMutex);
-        progRef = true;
-    }
-
-    /* TODO - remove hardcoded values */
-    //int progBarWidth = maxyx.x - 4;
-//    int i = 0;
-
-    float progCounter = dlManagerControl->getProgress(filename);
-
-    if (progCounter == 100.0) {
-        std::string progStr;
-     //   for (i = 0; i < progBarWidth; ++i) {
-     //       progStr.push_back(' ');
-     //   }
-
-     //   {
-     //       std::lock_guard<std::mutex> guard(dlProgMutex);
-     //       progressWin->printInMiddle(1, 0, maxyx.x, hundredPer, COLOR_PAIR(2));
-     //       progressWin->winAttrOn(COLOR_PAIR(16));
-     //       progressWin->addStr(2, 2, progStr);
-     //       progressWin->winAttrOff(COLOR_PAIR(16));
-     //       progressWin->refreshWin();
-     //   }
-    }
-
-    else {
-        while (true) {
-      //      int curProg = progCounter * progBarWidth / 100.0;
-//            const std::string percent = stringifyNumber(dlManagerControl->getProgress(filename), 2); 
- //           std::string progStr;
-       //     for (i = 0; i < curProg + 1; ++i) {
-       //         progStr.push_back(' ');
-       //     }
-
-            {
-                std::lock_guard<std::mutex> guard(dlProgMutex);
-               // progressWin->printInMiddle(1, 0, maxyx.x, percent, COLOR_PAIR(2));
-               // progressWin->winAttrOn(COLOR_PAIR(16));
-               // progressWin->addStr(2, 2, progStr);
-               // progressWin->winAttrOff(COLOR_PAIR(16));
-               // progressWin->refreshWin();
-            }
-            progCounter = dlManagerControl->getProgress(filename);
-            if (progCounter == 100) {
+    while (true) {
+        {
+            std::lock_guard<std::mutex> guard(dlProgMutex);
+            if (!progRef) {
                 break;
             }
-            {
-                std::lock_guard<std::mutex> guard(dlProgMutex);
-                if (resizeDet) {
+        }
+        /* Sleep 100ms before refreshing the window again or the while loop will execute endlessly 
+         * so it doesn't monopolize time / ressources */ 
+        std::this_thread::sleep_for(std::chrono::milliseconds(100));
+        /* y represents the y postion of the infos to print on the screen - it matches the location
+         * of the corresponding download item on the futureUpdateDlsStatus part of the screen */
 
-                    //detForm->clearForm();
-                    //detForm = initDetForm(2);
-                    detWin->resizeWin(dlDetSz);
-                    //setDetForm();
-                    detWin->drawBox(0, 0);
-                    detWin->touchWin();
-                    //paintDetWin(filename);
-
-                    // detForm->populateField(REQ_FIRST_FIELD, dlManagerControl->getURL(filename));
-                    //detForm->populateField(REQ_LAST_FIELD, filename);
-                    detWin->refreshWin();
-                    //progressWin->resizeWin(dlProgSz);
-                    //progressWin->drawBox(0, 0);
-                    //progressWin->touchWin();
-                    //progressWin->refreshWin();
-                    resizeDet = false;
-                }
-                if (!progRef)
-                    break;
+        /* Refresh status window */
+        {
+            std::lock_guard<std::mutex> guard(dlProgMutex);
+            if (resizeDet) {
+                detWin->resizeWin(dlDetSz);
+                detWin->drawBox(0, 0);
+                detWin->touchWin();
+                detWin->refreshWin();
+                resizeDet = false;
             }
-            /* Sleep here to avoid uninterupted loop */
-            std::this_thread::sleep_for(std::chrono::milliseconds(200));
         }
     }
 }
-
