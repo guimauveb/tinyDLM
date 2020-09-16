@@ -57,13 +57,10 @@ int main()
                         /* showDetails returns true if the download was killed and that we should update the
                          * menu */
                         if (dlmc->showDetails(dlmc->menu->getItemName())) {
-                            dlmc->menu->clearMenu();
-                            dlmc->menu->clearItems();    
                             dlmc->updateDownloadsMenu();
                             dlmc->resetStatusDriver();
-                            dlmc->mainWindows.at(dlmc->dlsStatusWinIdx)->resetWin();
                         }
-
+                        
                         dlmc->startStatusUpdate(); 
                         break;
                     }

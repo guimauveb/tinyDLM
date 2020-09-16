@@ -223,6 +223,8 @@ void dlManagerUI::resizeUI()
     paintLabelsWin(mainWindows.at(labelsWinIdx));
 
     /* Refresh the downloads list */
+    menu->clearMenu();
+    menu->clearItems();
     mainWindows.at(dlsWinIdx)->resizeWin(mainWinSz);
     paintMainWinWin(mainWindows.at(dlsWinIdx));
 
@@ -827,8 +829,8 @@ int dlManagerUI::resizeDetWin(const std::string& filename)
 
     endwin();
     refresh();
-    //resizeUI();
-    setWinsSize();
+    resizeUI();
+   // setWinsSize();
     resizeDet = true;
     detWin->resizeWin(dlDetSz);
     paintDetWin(filename);
