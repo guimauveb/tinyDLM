@@ -20,7 +20,7 @@ Tested on:
 - **macOS Mojave (10.14.6)** 
 - **Linux Ubuntu (20.04 LTS)**
 
-**Missing functionalities that I wish to implement (but certainly won't since I'm moving to new projects):**
+**Missing functionalities that I wish to implement 
     
     - [ ] Limit download speed  
     - [ ] Chose number of max simultaneous downloads  
