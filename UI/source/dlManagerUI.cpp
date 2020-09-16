@@ -936,7 +936,7 @@ void dlManagerUI::progressBar(const std::string& filename)
 
     if (progCounter == 100.0) {
         std::string progStr;
-        for (i = 0; i < progBarWidth; ++i) {
+        for (i = 100; i < progBarWidth; ++i) {
             progStr.push_back(' ');
         }
 
@@ -948,26 +948,46 @@ void dlManagerUI::progressBar(const std::string& filename)
             progressWin->winAttrOff(COLOR_PAIR(16));
             progressWin->refreshWin();
         }
+    }
 
-        while (true) {
-            {
-                std::lock_guard<std::mutex> guard(dlProgMutex);
-                if (!progRef) {
-                    break;
-                }
+    while (true) {
+        {
+            std::lock_guard<std::mutex> guard(dlProgMutex);
+            if (!progRef) {
+                break;
             }
-            /* Sleep 100ms before refreshing the window again or the while loop will execute endlessly 
-             * so it doesn't monopolize time / ressources */ 
-            std::this_thread::sleep_for(std::chrono::milliseconds(100));
-            /* y represents the y postion of the infos to print on the screen - it matches the location
-             * of the corresponding download item on the futureUpdateDlsStatus part of the screen */
+        }
 
-            /* Refresh status window */
-            {
-                std::lock_guard<std::mutex> guard(dlProgMutex);
-                if (resizeDet) {
-                    break; 
-                }
+        int curProg = progCounter * progBarWidth / 100.0;
+        const std::string percent = stringifyNumber(dlManagerControl->getProgress(filename), 2); 
+        std::string progStr;
+        for (i = 0; i < curProg + 1; ++i) {
+            progStr.push_back(' ');
+        }
+
+        {
+            std::lock_guard<std::mutex> guard(dlProgMutex);
+            progressWin->printInMiddle(1, 0, maxyx.x, percent, COLOR_PAIR(2));
+            progressWin->winAttrOn(COLOR_PAIR(16));
+            progressWin->addStr(2, 2, progStr);
+            progressWin->winAttrOff(COLOR_PAIR(16));
+            progressWin->refreshWin();
+            progressWin->printInMiddle(1, 0, maxyx.x, percent, COLOR_PAIR(2));
+            progressWin->winAttrOn(COLOR_PAIR(16));
+        }
+        /* Sleep 100ms before refreshing the window again or the while loop will execute endlessly 
+         * so it doesn't monopolize time / ressources */ 
+        std::this_thread::sleep_for(std::chrono::milliseconds(100));
+        /* y represents the y postion of the infos to print on the screen - it matches the location
+         * of the corresponding download item on the futureUpdateDlsStatus part of the screen */
+
+        /* Refresh status window */
+        {
+            std::lock_guard<std::mutex> guard(dlProgMutex);
+            if (resizeDet) {
+                break; 
             }
         }
     }
+}
+
