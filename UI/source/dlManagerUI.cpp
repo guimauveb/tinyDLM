@@ -34,6 +34,8 @@ void dlManagerUI::initCurses()
 {
     setlocale(LC_ALL, "");
     initscr();
+    row = 26;
+    col = 112;
     cbreak();
     noecho();
     keypad(stdscr, TRUE);
@@ -58,7 +60,16 @@ void dlManagerUI::initColors()
 void dlManagerUI::setWinsSize()
 {
     /* Get terminal screen size in columns and rows */
-    getmaxyx(stdscr, row, col);
+    int nrow = 0, ncol = 0;
+
+    getmaxyx(stdscr, nrow, ncol);
+    /* Program min diemnsions */
+    if (nrow >= 26) {
+        row = nrow;
+    }
+    if (ncol >= 112) {
+        col = ncol;
+    }
 
     welWinSz = {row - 8, col, 4, 0};
 
@@ -493,8 +504,7 @@ int dlManagerUI::showDetails(const std::string& itemName)
     /* Disable cursor */
     curs_set(0);
     /* Navigate through the details window */
-    detNav(itemName);
-    return 1;
+    return (detNav(itemName));
 }
 
 /* Add a new download */
@@ -512,8 +522,7 @@ int dlManagerUI::addNewDl()
 
     addDlWin->refreshWin();
     /* No need to call free() for win and form -> class destructor will take care of it */
-    addDlNav();
-    return 1;
+    return addDlNav();
 }
 
 /* Init "Add a download" window */
@@ -526,6 +535,7 @@ void dlManagerUI::paintAddDlWin()
 {
     char *titleAdd = (char*)malloc((col / 2) + 1*sizeof(char));
     std::string addNL = addNewLabel;
+    point maxyx = addDlWin->getMaxyx();
 
     int i = 0;
     /* TODO - create a function for each */
@@ -544,19 +554,20 @@ void dlManagerUI::paintAddDlWin()
             titleAdd[i] = ' ';
         }
         titleAdd[i] = '\0';
-
-        point maxyx = addDlWin->getMaxyx();
-        addDlWin->addStr(3, 3, addURL);
-        addDlWin->addStr(7, 3, addSaveAs);
         addDlWin->printInMiddle(1, 0, maxyx.x , titleAdd, COLOR_PAIR(8));
-        addDlWin->printInMiddle(maxyx.y - 2, 0, maxyx.x / 3, msgStart, COLOR_PAIR(8));
-        addDlWin->printInMiddle(maxyx.y - 2, 0, maxyx.x, msgScheduleCtrl, COLOR_PAIR(8));
-        addDlWin->printInMiddle(maxyx.y - 2, 2 * maxyx.x / 3, maxyx.x / 3, msgCloseCtrl, COLOR_PAIR(8));
-        addDlWin->drawBox(0, 0);
-    }
-    free(titleAdd);
 
+    }
+
+    addDlWin->addStr(3, 3, addURL);
+    addDlWin->addStr(7, 3, addSaveAs);
+    addDlWin->printInMiddle(maxyx.y - 2, 0, maxyx.x / 3, msgStart, COLOR_PAIR(8));
+    addDlWin->printInMiddle(maxyx.y - 2, 0, maxyx.x, msgScheduleCtrl, COLOR_PAIR(8));
+    addDlWin->printInMiddle(maxyx.y - 2, 2 * maxyx.x / 3, maxyx.x / 3, msgCloseCtrl, COLOR_PAIR(8));
+    addDlWin->drawBox(0, 0);
+
+    free(titleAdd);
 }
+
 
 std::unique_ptr<cursesForm> dlManagerUI::initAddDlForm(size_t numFields)
 {
@@ -765,8 +776,8 @@ int dlManagerUI::addDlNav()
                 }
         }
         if (resizeAdd) {
-            //url = addDlForm->getFieldBuffer(0);
-            //filename = addDlForm->getFieldBuffer(1);
+            url = addDlForm->getFieldBuffer(0);
+            filename = addDlForm->getFieldBuffer(1);
             resizeAddDlNav(url, filename);
             resizeAdd = false;
         }
