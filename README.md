@@ -24,7 +24,6 @@ Tested on:
     
     - [ ] Limit download speed  
     - [ ] Chose number of max simultaneous downloads  
-    - [ ] Keep the window from resizing under a certain size  
     - [ ] Add multiple links at the same time  
     - [ ] Schedule download start  
     - [ ] Select download directory (transfers are stored in 'downloads')  
