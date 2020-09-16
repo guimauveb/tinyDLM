@@ -24,7 +24,6 @@ dlManagerUI::~dlManagerUI()
     /* Delete main windows */
     mainWindows.clear();
     /* TODO - save downloads list */
-    /* Empty the downloads list menu */
     endwin();
 }
 

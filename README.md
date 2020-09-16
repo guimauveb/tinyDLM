@@ -15,12 +15,11 @@ cURLpp and ncurses.
 
 ### Installation:
     
-    - [ ] makefile
+    - [TODO] makefile
 
-Works pretty well on **macOS Mojave (10.14.6)**, not so well on Linux (tested on Ubuntu and Kali) because of 
-a problem I have with threads and curses window sizes representation which seem to differ from macOS. 
-
-Full support for Linux is coming.
+Works pretty well on 
+- **macOS Mojave (10.14.6)** 
+- **Linux Ubuntu (20.04 LTS)**
 
 **Missing functionalities that I wish to implement (but certainly won't since I'm moving to new projects):**
     
