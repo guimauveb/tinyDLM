@@ -1,1 +1,1 @@
-Freeing memory of window prog
+Freeing memory of window detwin
