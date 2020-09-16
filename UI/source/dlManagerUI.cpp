@@ -929,6 +929,7 @@ void dlManagerUI::progressBar(const std::string& filename)
             std::lock_guard<std::mutex> guard(dlProgMutex);
             if (resizeDet) {
                 detWin->resizeWin(dlDetSz);
+                paintDetWin(filename);
                 detWin->drawBox(0, 0);
                 detWin->touchWin();
                 detWin->refreshWin();
