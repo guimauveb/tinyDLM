@@ -223,6 +223,7 @@ void dlManagerUI::resizeUI()
     paintLabelsWin(mainWindows.at(labelsWinIdx));
 
     /* Refresh the downloads list */
+    /* TODO - clearMenu(); */
     menu->clearMenu();
     menu->clearItems();
     mainWindows.at(dlsWinIdx)->resizeWin(mainWinSz);
@@ -708,13 +709,13 @@ int dlManagerUI::showDetails(const std::string& itemName)
     /* Important: We begin by assigning a new form to detForm unique_ptr and then assigning a new window to 
      * detWin unique_ptr -> if we reassign the detWin pointer first and then try to reassign detForm, since 
      * detForm has to free some memory corresponding to the old window (now deleted), we end up with a segfault */
-    //detForm = initDetForm(2);
+    detForm = initDetForm(2);
     detWin = initDetWin();
-    //setDetForm();
+    setDetForm();
     paintDetWin(itemName);
 
-    //detForm->populateField(REQ_FIRST_FIELD, dlManagerControl->getURL(itemName));
-    //detForm->populateField(REQ_LAST_FIELD, itemName);
+    detForm->populateField(REQ_FIRST_FIELD, dlManagerControl->getURL(itemName));
+    detForm->populateField(REQ_LAST_FIELD, itemName);
     detWin->refreshWin();
 
     /* Disable cursor */
@@ -832,8 +833,13 @@ int dlManagerUI::resizeDetWin(const std::string& filename)
     resizeUI();
    // setWinsSize();
     resizeDet = true;
+
+    detForm = initDetForm(2);
     detWin->resizeWin(dlDetSz);
+    setDetForm();
     paintDetWin(filename);
+    detForm->populateField(REQ_FIRST_FIELD, dlManagerControl->getURL(filename));
+    detForm->populateField(REQ_LAST_FIELD, filename);
     detWin->refreshWin();
     resizeDet = false;
     startProgressBarThread(filename);
