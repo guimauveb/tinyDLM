@@ -782,7 +782,6 @@ void dlManagerUI::setDetForm()
 
     detForm->postForm();
 }
-
 /* shared_ptr that will be moved to progressWin own thread */
 std::unique_ptr<cursesWindow> dlManagerUI::initProgressWin(const point& bx, const point& mx)
 {
@@ -792,7 +791,12 @@ std::unique_ptr<cursesWindow> dlManagerUI::initProgressWin(const point& bx, cons
 void dlManagerUI::startProgressBarThread(const std::string& filename)
 {
     /* Initialize progress bar according to its parent win (details win) dimensions */
-    
+    point begyx = detWin->getBegyx();
+    point maxyx = detWin->getMaxyx();
+    progressWin = initProgressWin(begyx, maxyx);
+    progressWin->drawBox(0, 0);
+    progressWin->touchWin();
+    progressWin->refreshWin();
     progRef = true;
     futureProgressBar = std::async(std::launch::async, &dlManagerUI::progressBar, this, filename);
 }
@@ -930,9 +934,15 @@ void dlManagerUI::progressBar(const std::string& filename)
             if (resizeDet) {
                 detWin->resizeWin(dlDetSz);
                 paintDetWin(filename);
-                detWin->drawBox(0, 0);
                 detWin->touchWin();
                 detWin->refreshWin();
+                point begyx = detWin->getBegyx();
+                point maxyx = detWin->getMaxyx();
+                winSize pSz = { maxyx.y, maxyx.x, begyx.y, begyx.x };
+                progressWin->resizeWin(pSz);
+                progressWin->drawBox(0, 0);
+                progressWin->touchWin();
+                progressWin->refreshWin();
                 resizeDet = false;
             }
         }
