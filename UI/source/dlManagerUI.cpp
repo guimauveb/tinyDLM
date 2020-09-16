@@ -44,6 +44,15 @@ void dlManagerUI::initColors()
 {
     start_color();
     use_default_colors();
+    if (can_change_color() && COLORS >= 16) {
+        init_color(BRIGHT_WHITE, 1000, 1000, 1000);
+    }
+    if (COLORS >= 16) {
+        init_pair(PAIR_BW, COLOR_BLACK, BRIGHT_WHITE);
+    } 
+    else {
+        init_pair(PAIR_BW, COLOR_BLACK, COLOR_WHITE);
+    }
 
     init_pair(1, COLOR_RED, COLOR_WHITE);
     init_pair(2, COLOR_GREEN, -1);
@@ -76,6 +85,7 @@ void dlManagerUI::setWinsSize()
     }
 
     welWinSz = {row - 8, col, 4, 0};
+    dlHelpSz = {18, col - (col / 2), (row / 4), col / 4};
 
     topBarSz = {1, col, 0, 0};
     labelsSz = {1, col, 2, 0};
@@ -88,7 +98,6 @@ void dlManagerUI::setWinsSize()
     dlDetSz = {row / 2, col - (col / 2), (row / 4), col / 4};
     dlProgSz = {4, (col - (col / 2)) -10, row / 2, col / 4 + 4};
 
-    dlHelpSz = {18, col - (col / 2), (row / 4), col / 4};
     //return struct of winSizes
 }
 
@@ -376,7 +385,7 @@ void dlManagerUI::populateStatusWin(const std::vector<downloadWinInfo>& vec)
     for (offset = yOffset; offset < vec.size(); ++offset) {
         if (curr == offset) {
             /* Highlight selected item */
-            color = COLOR_PAIR(8);
+            color = COLOR_PAIR(PAIR_BW);
         }
         else {
             color = COLOR_PAIR(7);

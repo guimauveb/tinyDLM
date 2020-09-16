@@ -176,6 +176,9 @@ class dlManagerUI
         const int lowSpeedLim = 56;
         const int lowSpeedTim = 60;
 
+        const int BRIGHT_WHITE  = 15;
+        const int PAIR_BW       = 8; 
+
         int topItem, botItem;
 
 };

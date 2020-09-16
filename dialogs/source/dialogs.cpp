@@ -23,7 +23,7 @@ const std::string msgHelpClear          = " c           :Clear inactive download
 const std::string msgHelpKill           = " k           :Stop and delete selected download ";
 const std::string msgHelpKillAll        = " K           :Stop and delete all downloads ";
 const std::string msgHelpExit           = " F1          :Exit tinyDLM ";
-const std::string msgHelpCloseWin       = " Press 'Return' key to hide ";
+const std::string msgHelpCloseWin       = " Press 'Return' to hide ";
 
 const std::string msgClose  = " x: close ";
 const std::string msgPause  = " p: pause ";
