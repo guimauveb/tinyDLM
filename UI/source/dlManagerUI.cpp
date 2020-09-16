@@ -831,7 +831,7 @@ int dlManagerUI::resizeDetWin(const std::string& filename)
     endwin();
     refresh();
     resizeUI();
-   // setWinsSize();
+    // setWinsSize();
     resizeDet = true;
 
     detForm = initDetForm(2);
@@ -928,32 +928,46 @@ int dlManagerUI::detNav(const std::string& filename)
 void dlManagerUI::progressBar(const std::string& filename)
 {
     point maxyx = progressWin->getMaxyx();
-    
+
     int progBarWidth = maxyx.x - 4;
     int i = 0;
 
     float progCounter = dlManagerControl->getProgress(filename);
 
-
-    while (true) {
-        {
-            std::lock_guard<std::mutex> guard(dlProgMutex);
-            if (!progRef) {
-                break;
-            }
+    if (progCounter == 100.0) {
+        std::string progStr;
+        for (i = 0; i < progBarWidth; ++i) {
+            progStr.push_back(' ');
         }
-        /* Sleep 100ms before refreshing the window again or the while loop will execute endlessly 
-         * so it doesn't monopolize time / ressources */ 
-        std::this_thread::sleep_for(std::chrono::milliseconds(100));
-        /* y represents the y postion of the infos to print on the screen - it matches the location
-         * of the corresponding download item on the futureUpdateDlsStatus part of the screen */
 
-        /* Refresh status window */
         {
             std::lock_guard<std::mutex> guard(dlProgMutex);
-            if (resizeDet) {
-                break; 
+            progressWin->printInMiddle(1, 0, maxyx.x, hundredPer, COLOR_PAIR(2));
+            progressWin->winAttrOn(COLOR_PAIR(16));
+            progressWin->addStr(2, 2, progStr);
+            progressWin->winAttrOff(COLOR_PAIR(16));
+            progressWin->refreshWin();
+        }
+
+        while (true) {
+            {
+                std::lock_guard<std::mutex> guard(dlProgMutex);
+                if (!progRef) {
+                    break;
+                }
+            }
+            /* Sleep 100ms before refreshing the window again or the while loop will execute endlessly 
+             * so it doesn't monopolize time / ressources */ 
+            std::this_thread::sleep_for(std::chrono::milliseconds(100));
+            /* y represents the y postion of the infos to print on the screen - it matches the location
+             * of the corresponding download item on the futureUpdateDlsStatus part of the screen */
+
+            /* Refresh status window */
+            {
+                std::lock_guard<std::mutex> guard(dlProgMutex);
+                if (resizeDet) {
+                    break; 
+                }
             }
         }
     }
-}
