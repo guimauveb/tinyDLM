@@ -6,7 +6,7 @@ int main()
     std::unique_ptr<dlManagerUI> dlmc = std::make_unique<dlManagerUI>();
     /* Display a message when starting the program. If the user exits while in firstStart(), terminate the 
      * program */
-    if (dlmc->firstStart()) {
+    if (!dlmc->firstStart()) {
         return 1;
     }
 
@@ -53,14 +53,14 @@ int main()
                             break;
                         }
                         dlmc->stopStatusUpdate();
-                        
+
                         /* showDetails returns true if the download was killed and that we should update the
                          * menu */
                         if (dlmc->showDetails(dlmc->menu->getItemName())) {
                             dlmc->updateDownloadsMenu();
                             dlmc->resetStatusDriver();
                         }
-                        
+
                         dlmc->startStatusUpdate(); 
                         break;
                     }
@@ -81,7 +81,10 @@ int main()
                     /* TODO - Display a help window */
                     {
                         dlmc->stopStatusUpdate();
-                        dlmc->showHelp();
+                        if (dlmc->showHelp()) {
+                            dlmc->updateDownloadsMenu();
+                            dlmc->resetStatusDriver();
+                        }
                         dlmc->startStatusUpdate();
                         break;
                     }

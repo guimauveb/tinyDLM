@@ -34,8 +34,6 @@ void dlManagerUI::initCurses()
 {
     setlocale(LC_ALL, "");
     initscr();
-    row = 26;
-    col = 112;
     cbreak();
     noecho();
     keypad(stdscr, TRUE);
@@ -67,8 +65,14 @@ void dlManagerUI::setWinsSize()
     if (nrow >= 26) {
         row = nrow;
     }
+    else {
+        row = 26;
+    }
     if (ncol >= 112) {
         col = ncol;
+    }
+    else {
+        col = 112;
     }
 
     welWinSz = {row - 8, col, 4, 0};
@@ -84,6 +88,7 @@ void dlManagerUI::setWinsSize()
     dlDetSz = {row / 2, col - (col / 2), (row / 4), col / 4};
     dlProgSz = {4, (col - (col / 2)) -10, row / 2, col / 4 + 4};
 
+    dlHelpSz = {18, col - (col / 2), (row / 4), col / 4};
     //return struct of winSizes
 }
 
@@ -148,33 +153,49 @@ int dlManagerUI::firstStart()
     /* Disable cursor because I can't print to the screen without moving it */
     curs_set(0);
     int ch = 0;
+    //bool done = false;
+    bool resize = false;
+    bool done = false;
     while ((ch = getch()) != KEY_F(1)) {
         switch(ch) {
-            /* TODO -do not resize under 108 * 24 */
             case KEY_RESIZE:
-                resizeUI();
-                welWin->resizeWin(welWinSz);
-                paintWelWin(welWin);
-                welWin->refreshWin();
-                break;
+                {
+                    resize = true;
+                    break;
+                }
             case 'a':
-                /* Open a window and exit the function */
-                addNewDl();
-                refreshMainWins();
-                startStatusUpdate();
-                return 0;
+                {
+                    /* Open a window and exit the function */
+                    addNewDl();
+                    done = true; 
+                    break;
+                }
             case 'h':
-                showHelp();
-                refreshMainWins();
-                startStatusUpdate();
-                return 0;
-                break;
+                {
+                    showHelp();
+                    done = true;
+                    break;
+                }
             default:
-                break;
+                {
+                    break;
+                }
+        }
+        if (resize) {
+            resizeUI();
+            welWin->resizeWin(welWinSz);
+            paintWelWin(welWin);
+            welWin->refreshWin();
+            resize = false;
+        }
+        if (done) {
+            startStatusUpdate();
+            break;
         }
     }
-    /* Signal to main that we should terminate the program */
-    return 1;
+    /* If done == false - signal to main that we should terminate the program */
+    refreshMainWins();
+    return done;
 }
 
 /* Init the main windows */
@@ -448,22 +469,58 @@ int dlManagerUI::stopStatusUpdate()
     return 0;
 }
 
-void dlManagerUI::showHelp()
+int dlManagerUI::showHelp()
 {
-    std::unique_ptr<cursesWindow> helpWin = initHelpWin();
+    helpWin = initHelpWin();
     paintHelpWin(helpWin);
     helpWin->refreshWin();
-    helpNav(helpWin);
+    return helpNav();
 }
 
-void dlManagerUI::helpNav(std::unique_ptr<cursesWindow>& win)
+int dlManagerUI::helpNav()
 {
-    getch();
+    int ch = 0;
+    bool done = false;
+    bool resize = false;
+    bool updateMenu = false;
+    while ((ch = getch())) {
+        switch(ch) {
+            case KEY_RESIZE:
+                {
+                    updateMenu = true;
+                    resize = true;
+                    break;
+                }
+            case 10:
+                {
+                    done = true;
+                    break;
+                }
+            default: 
+                {
+                    break;
+                }
+        }
+        if (done) {
+            break;
+        }
+        if (resize) {
+            resizeUI();
+            helpWin->resizeWin(dlHelpSz);
+            paintHelpWin(helpWin);
+            helpWin->refreshWin();
+            resize = false;
+        }
+    }
+    if (updateMenu) {
+        return 1;
+    }
+    return 0;
 }
 
 std::unique_ptr<cursesWindow> dlManagerUI::initHelpWin()
 {
-    return std::make_unique<cursesWindow>(row / 2 + 2, col - (col / 2), (row / 4), col / 4, "help");
+    return std::make_unique<cursesWindow>(18, col - (col / 2), (row / 4), col / 4, "help");
 }
 
 void dlManagerUI::paintHelpWin(std::unique_ptr<cursesWindow>& win)
@@ -504,7 +561,7 @@ int dlManagerUI::showDetails(const std::string& itemName)
     /* Disable cursor */
     curs_set(0);
     /* Navigate through the details window */
-    return (detNav(itemName));
+    return detNav(itemName);
 }
 
 /* Add a new download */
@@ -657,13 +714,13 @@ void dlManagerUI::resizeAddDlNav(std::string url, std::string filename)
     setAddDlForm();
     paintAddDlWin();
 
-    // url.push_back('\0');
-    // filename.push_back('\0');
-    // url = trimSpaces(url);
-    // filename = trimSpaces(filename);
+    url.push_back('\0');
+    filename.push_back('\0');
+    url = trimSpaces(url);
+    filename = trimSpaces(filename);
 
-    //addDlForm->populateField(REQ_FIRST_FIELD, url);
-    //addDlForm->populateField(REQ_LAST_FIELD, filename);
+    addDlForm->populateField(REQ_FIRST_FIELD, url);
+    addDlForm->populateField(REQ_LAST_FIELD, filename);
 
     addDlWin->refreshWin();
 }

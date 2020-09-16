@@ -28,11 +28,11 @@ class cursesMenu {
         int getItemNum();
 
         void clearItems();
-        
+
         bool itemsFreed = false;
         bool menuFreed = false;
     private:
-        
+
         std::vector<std::string> itemStrings;
         std::map<std::string, int> itemsMap;
         std::vector<ITEM *> items;

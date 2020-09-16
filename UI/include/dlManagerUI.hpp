@@ -46,7 +46,7 @@ class dlManagerUI
         int currItNo;
 
         /* Display help window */
-        void showHelp();
+        int showHelp();
         /* 'Add a new download' routine */
         int addNewDl();
         /* Details window routine */
@@ -79,9 +79,10 @@ class dlManagerUI
         /* Display tinyDLM help */
         std::unique_ptr<cursesWindow> initHelpWin();
         void paintHelpWin(std::unique_ptr<cursesWindow>& win);
-        void helpNav(std::unique_ptr<cursesWindow>& win);
+        int helpNav();
 
         /* Window holding the welcome message at first start */
+        std::unique_ptr<cursesWindow> helpWin;
         std::unique_ptr<cursesWindow> welcomeWinInit();
         void paintWelWin(std::unique_ptr<cursesWindow>& welWin);
 
@@ -166,6 +167,7 @@ class dlManagerUI
         winSize dlAddSz;
         winSize dlDetSz;
         winSize dlProgSz;
+        winSize dlHelpSz;
 
         /* Signals to stop refreshing progress subwindow */
         bool progRef = false;

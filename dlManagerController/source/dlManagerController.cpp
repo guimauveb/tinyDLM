@@ -81,7 +81,8 @@ void dlManagerController::clearInactive()
     std::map<std::string, int>::iterator it;
     std::vector<size_t> todel;
     for (size_t i = 0; i < dlManagerVec.size(); ++i) {
-        if(dlManagerVec.at(i)->getDownloadInfos()->status != downloadStatus::DOWNLOADING) {
+        if((dlManagerVec.at(i)->getDownloadInfos()->status == downloadStatus::ERROR) || 
+           (dlManagerVec.at(i)->getDownloadInfos()->status == downloadStatus::COMPLETED)) {
             it = downloadsMap.find(dlManagerVec.at(i)->
                     getDownloadInfos()->filename);
             if (it != downloadsMap.end()) {
