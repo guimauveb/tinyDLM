@@ -825,22 +825,14 @@ int dlManagerUI::resizeDetWin(const std::string& filename)
 {
     stopProgressBarThread();
 
-    //endwin();
-    //refresh();
+    endwin();
+    refresh();
     //resizeUI();
     setWinsSize();
     resizeDet = true;
     detWin->resizeWin(dlDetSz);
-    detWin->touchWin();
-    detWin->refreshWin();
     paintDetWin(filename);
-    point begyx = detWin->getBegyx();
-    point maxyx = detWin->getMaxyx();
-    winSize pSz = { maxyx.y, maxyx.x, begyx.y, begyx.x };
-    progressWin->resizeWin(pSz);
-    progressWin->drawBox(0, 0);
-    progressWin->touchWin();
-    progressWin->refreshWin();
+    detWin->refreshWin();
     resizeDet = false;
     startProgressBarThread(filename);
     return 0;
