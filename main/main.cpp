@@ -193,7 +193,6 @@ int main()
                     dlmc->menu->clearMenu();
                     dlmc->menu->clearItems();
                     dlmc->resizeUI();
-                    dlmc->resize = true;
                     dlmc->updateDownloadsMenu();
                     dlmc->resetStatusDriver();
                 }

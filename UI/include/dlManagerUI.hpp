@@ -26,7 +26,6 @@ class dlManagerUI
 
         /* Main windows are stored into a vector */
         std::vector<std::unique_ptr<cursesWindow>> mainWindows;
-        bool resize = false;
         void resizeUI();
         void setWinsSize();
         void refreshMainWins();
@@ -170,7 +169,6 @@ class dlManagerUI
 
         /* Signals to stop refreshing progress subwindow */
         bool progRef = false;
-        bool resizeDet = false;
 
         /* TODO - make it selectionable by the user */
         const int lowSpeedLim = 56;

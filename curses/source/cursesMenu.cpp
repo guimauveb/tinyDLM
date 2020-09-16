@@ -50,8 +50,8 @@ void cursesMenu::clearMenu()
     if (!menuFreed) {
         unpost_menu(menu);
         free_menu(menu);
+        menuFreed = true;
     }
-    menuFreed = true;
 }
 
 void cursesMenu::clearItems()
@@ -62,8 +62,9 @@ void cursesMenu::clearItems()
             free_item(items[i]);
         items.clear();
         itemStrings.clear();
+        itemsFreed = true;
     }
-    itemsFreed = true;
+
 }
 
 void cursesMenu::menuOptsOff(Menu_Options)
