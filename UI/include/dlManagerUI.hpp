@@ -28,6 +28,7 @@ class dlManagerUI
         std::vector<std::unique_ptr<cursesWindow>> mainWindows;
         bool resize = false;
         void resizeUI();
+        void setWinsSize();
         void refreshMainWins();
 
         /* Display a welcome message at first start */
@@ -74,7 +75,6 @@ class dlManagerUI
         /* Set the ground for curses */
         void initCurses();
         void initColors();
-        void setWinsSize();
         void initStatusDriver();
 
         /* Display tinyDLM help */

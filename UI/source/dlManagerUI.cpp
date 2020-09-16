@@ -718,8 +718,8 @@ int dlManagerUI::showDetails(const std::string& itemName)
     /* Disable cursor */
     curs_set(0);
     /* Navigate through the details window */
-    detNav(itemName);
-    return 1;
+    int n = detNav(itemName);
+    return n;
 }
 
 std::unique_ptr<cursesWindow> dlManagerUI::initDetWin(/* pass winsize */)
@@ -844,6 +844,7 @@ int dlManagerUI::detNav(const std::string& filename)
             case KEY_RESIZE:
                 {
                     updateMenu = true;
+                    done = true;
                     resizeDet = true;
                     /* Sleeping here fixes an issue where the old progress bar thread wouldn't have time 
                      * to terminate before a new one would start, causing a segfault / double free. 
@@ -894,12 +895,12 @@ int dlManagerUI::detNav(const std::string& filename)
         if (done) {
             break;
         }
-        if (resizeDet) {
-            stopProgressBarThread();
-            resizeDetWin(filename);    
-            resizeDet = false;
-            startProgressBarThread(filename);
-        }
+//        if (resizeDet) {
+//            stopProgressBarThread();
+//            resizeDetWin(filename);    
+//            resizeDet = false;
+//            startProgressBarThread(filename);
+//        }
     } 
     stopProgressBarThread();
     if (updateMenu) {
