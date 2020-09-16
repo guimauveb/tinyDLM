@@ -13,11 +13,10 @@ cURLpp and ncurses.
     - Transfers can be paused / resumed / killed.
     - Displays current download speed and progress for each transfer  
 
-### Installation:
-    
-    - [TODO] makefile
+### Installation (a makefile is coming) 
+    - clang++ main/main.cpp UI/source/dlManagerUI.cpp helper/source/userInputCheck.cpp dialogs/source/dialogs.cpp curses/source/cursesMenu.cpp curses/source/cursesForm.cpp curses/source/cursesWindow.cpp dlManager/source/dlManager.cpp dlManagerController/source/dlManagerController.cpp helper/source/stringify.cpp -o tinyDLM -std=c++17 -lncurses -lpanel -lmenu -lform -lcurl -lcurlpp -Wall -Wextra -Wmissing-field-initializers -Wuninitialized -Wshadow -g -Os
 
-Works pretty well on 
+Tested on: 
 - **macOS Mojave (10.14.6)** 
 - **Linux Ubuntu (20.04 LTS)**
 
