@@ -22,7 +22,7 @@ list(REMOVE_DUPLICATES tinyDLM_INCLUDE_DIRS)
 add_executable (tinyDLM ${tinyDLM_SOURCES})
 target_include_directories(tinyDLM PRIVATE ${tinyDLM_INCLUDE_DIRS})
 
-if(Linux)
+if("${CMAKE_SYSTEM_NAME}" MATCHES Linux)
     target_link_librairies(tinyDLM pthread)
 endif()
 
