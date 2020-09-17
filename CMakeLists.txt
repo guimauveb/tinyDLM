@@ -2,11 +2,14 @@ cmake_minimum_required(VERSION 3.10)
 project(tinyDLM)
 
 set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD_REQUIRED True)
+
 set(CMAKE_BUILD_TYPE Release)
 
 set(CMAKE_CXX_FLAGS "-Wall -Wextra")
 set(CMAKE_CXX_FLAGS_RELEASE "-O3")
 
+# Append find_package modules 
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_LIST_DIR}/cmake")
 
 message(STATUS "\nLooking for curses...")
@@ -19,6 +22,7 @@ if (CURSES_FOUND)
     list(APPEND tinyDLM_INCLUDE_DIRS ${CURSES_INCLUDE_DIR})
 else()
     message(FATAL_ERROR "Could not find curses.")
+    # TODO - installation command with sudo and homebrew (for instance)
 endif()
 
 if (CURSES_HAVE_NCURSES_H)
@@ -34,7 +38,8 @@ if (CURL_FOUND)
     message(STATUS "Using curl libraries: ${CURL_LIBRARIES}\n")
     list(APPEND tinyDLM_INCLUDE_DIRS ${CURL_INCLUDE_DIRS})
 else()
-    message(FATAL_ERROR "Could not find curl")
+    # TODO - installation command with sudo and homebrew (for instance)
+    message(FATAL_ERROR "Could not find curl.")
 endif()
 
 # Added a 'FindcURLpp.cmake' alongside LibFindMacros.cmake in ./cmake 
@@ -47,10 +52,11 @@ if (CURLPP_FOUND)
     message(STATUS "Using curlpp libraries: ${CURLPP_LIBRARY}\n")
     list(APPEND tinyDLM_INCLUDE_DIRS ${CURLPP_INCLUDE_DIR})
 else()
-    message(FATAL_ERROR "Could not find curlpp")
+    message(FATAL_ERROR "Could not find curlpp.")
+    # TODO - installation command with sudo and homebrew (for instance)
 endif()
 
-
+# Get all files recursively
 file(GLOB_RECURSE tinyDLM_SOURCES "./*.cxx")
 file(GLOB_RECURSE tinyDLM_HEADERS "./*.hxx")
 
@@ -64,6 +70,7 @@ list(REMOVE_DUPLICATES tinyDLM_INCLUDE_DIRS)
 add_executable (tinyDLM ${tinyDLM_SOURCES})
 target_include_directories(tinyDLM PRIVATE ${tinyDLM_INCLUDE_DIRS})
 
+# Need -lpthread flag on Linux
 if("${CMAKE_SYSTEM_NAME}" MATCHES Linux)
     target_link_libraries(tinyDLM pthread)
 endif()
@@ -72,6 +79,7 @@ target_link_libraries(tinyDLM ${CURL_LIBRARIES})
 target_link_libraries(tinyDLM ${CURLPP_LIBRARY})
 target_link_libraries(tinyDLM ${CURSES_LIBRARIES})
 
+# TODO - better way to add them ?
 target_link_libraries(tinyDLM menu)
 target_link_libraries(tinyDLM form)
 
