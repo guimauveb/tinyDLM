@@ -23,7 +23,7 @@ add_executable (tinyDLM ${tinyDLM_SOURCES})
 target_include_directories(tinyDLM PRIVATE ${tinyDLM_INCLUDE_DIRS})
 
 if("${CMAKE_SYSTEM_NAME}" MATCHES Linux)
-    target_link_librairies(tinyDLM pthread)
+    target_link_libraries(tinyDLM pthread)
 endif()
 
 target_link_libraries(tinyDLM curl)
