@@ -22,6 +22,10 @@ list(REMOVE_DUPLICATES tinyDLM_INCLUDE_DIRS)
 add_executable (tinyDLM ${tinyDLM_SOURCES})
 target_include_directories(tinyDLM PRIVATE ${tinyDLM_INCLUDE_DIRS})
 
+if(Linux)
+    target_link_librairies(tinyDLM pthread)
+endif()
+
 target_link_libraries(tinyDLM curl)
 target_link_libraries(tinyDLM curlpp)
 target_link_libraries(tinyDLM ncurses)
