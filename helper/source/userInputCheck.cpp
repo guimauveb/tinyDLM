@@ -22,7 +22,6 @@ int checkHttp(std::string& url)
 int checkHttps(std::string& url)
 {
     const std::string https = "https://";
-    /* http failed but let's check https */
     if (url.substr(0, 8) != https)
         return 1;
     return 0;
@@ -73,8 +72,12 @@ std::string& trimSpaces(std::string& str)
         while (str[i] && (!isalpha(str[i]) && !isdigit(str[i]))) {
             i++;
         }
-        /* Move from the end till first char */
-        while(!isalpha(str[j]) && !isdigit(str[j])) {
+        /* Move from the end till first char - using isspace() seems to cause trouble in the curses field 
+         * but would definetly be better to use here */
+        while(!isalpha(str[j]) && !isdigit(str[j]) && 
+              (str[j] != '/') && (str[j] != ':') &&
+              (str[j] != '-') && (str[j] != '_') &&
+              (str[j] != '.') && (str[j] != '~')) {
             j--;
         }
     } 

@@ -774,6 +774,7 @@ int dlManagerUI::addDlNav()
                             /* Erase error msg -> fill with white space */
                             addDlWin->printInMiddle(6, 0, maxyx.x, "                   ", COLOR_PAIR(7));
                             url.push_back('\0');
+                            urlErr = false;
                         }
 
                         if (!checkFilename(filename)){
@@ -784,18 +785,17 @@ int dlManagerUI::addDlNav()
                             /* Erase error msg -> fill with white space */
                             addDlWin->printInMiddle(10, 0, maxyx.x, "                        ", COLOR_PAIR(7));
                             filename.push_back('\0');
+                            fileErr = false;
                         }
 
                         if (fileErr || urlErr) {
                             if (fileErr) {
                                 addDlForm->formDriver(REQ_LAST_FIELD);
                                 addDlForm->formDriver(REQ_END_LINE);
-                                fileErr = false;
                             }
                             if (urlErr) {
                                 addDlForm->formDriver(REQ_FIRST_FIELD);
                                 addDlForm->formDriver(REQ_END_LINE);
-                                urlErr = false;
                             }
 
                             curs_set(1);
@@ -823,13 +823,20 @@ int dlManagerUI::addDlNav()
                     break;
                 }
         }
+
         if (resizeAdd) {
             resizeAddDlNav(addDlForm->getFieldBuffer(0), addDlForm->getFieldBuffer(1));
             resizeAdd = false;
-            addDlWin->printInMiddle(6, 0, maxyx.x, std::to_string(currField), COLOR_PAIR(1));
+            /* Restore cursor position */
             addDlForm->formDriver(currField); 
             addDlForm->formDriver(REQ_END_LINE); 
-            
+            /* Restore errors */
+            if (fileErr) {
+                addDlWin->printInMiddle(10, 0, maxyx.x, msgInvalidFilename, COLOR_PAIR(1));
+            }
+            if (urlErr) {
+                addDlWin->printInMiddle(6, 0, maxyx.x, msgInvalidURL, COLOR_PAIR(1));
+            }
         }
 
         if (done) {
