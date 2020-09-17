@@ -1,4 +1,4 @@
-#include "../include/cursesForm.hpp"
+#include "../include/cursesForm.hxx"
 
 /* Form is already declared as a private member variable - the constructor takes the number of fields we want
  * to create in the form */

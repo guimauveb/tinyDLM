@@ -1,5 +1,5 @@
-#include "../source/helper/winSize.cpp"
-#include "../source/helper/point.cpp"
+#include "../source/helper/winSize.cxx"
+#include "../source/helper/point.cxx"
 
 #include <ncurses.h>
 

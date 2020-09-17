@@ -1,4 +1,4 @@
-#include "../include/dialogs.hpp"
+#include "../include/dialogs.hxx"
 
 const std::string liteDL_label  = "tinyDLM v1.0";
 const std::string workInProg    = "Work in progress";

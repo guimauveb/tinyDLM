@@ -1,5 +1,5 @@
-#ifndef DOWNLOAD_HPP
-#define DOWNLOAD_HPP
+#ifndef DOWNLOAD_HXX
+#define DOWNLOAD_HXX
 
 #include <string>
 #include <vector>

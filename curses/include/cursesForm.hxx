@@ -1,6 +1,6 @@
-#include "../../helper/include/userInputCheck.hpp"
+#include "../../helper/include/userInputCheck.hxx"
 
-#include "cursesWindow.hpp"
+#include "cursesWindow.hxx"
 #include <form.h>
 
 #include <vector>

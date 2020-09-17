@@ -1,4 +1,4 @@
-#include "../include/dlManager.hpp"
+#include "../include/dlManager.hxx"
 
 /* Initialize the dlManager object with all the need infos to processs the download */
 dlManager::dlManager(const int& dlid, const std::string& u, const std::string& f, const std::string& sa, 

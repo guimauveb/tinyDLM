@@ -1,11 +1,11 @@
-#include "../../helper/include/futureState.hpp"
-#include "../../helper/include/userInputCheck.hpp"
-#include "../../dialogs/include/dialogs.hpp"
+#include "../../helper/include/futureState.hxx"
+#include "../../helper/include/userInputCheck.hxx"
+#include "../../dialogs/include/dialogs.hxx"
 
-#include "../../dlManagerController/include/dlManagerController.hpp"
+#include "../../dlManagerController/include/dlManagerController.hxx"
 
-/* cursesMenu.hpp includes cursesWindow and cursesForm */
-#include "../../curses/include/cursesMenu.hpp"
+/* cursesMenu.hxx includes cursesWindow and cursesForm */
+#include "../../curses/include/cursesMenu.hxx"
 
 /* TODO - is there a way to avoid a macro in this case ? */
 #define CTRL(c) ((c) & 037)

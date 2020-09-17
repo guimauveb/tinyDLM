@@ -1,4 +1,4 @@
-#include "../include/cursesWindow.hpp"
+#include "../include/cursesWindow.hxx"
 #include <fstream>
 
 cursesWindow::cursesWindow(int r, int c, int by, int bx, std::string name)

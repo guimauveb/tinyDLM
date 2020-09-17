@@ -1,9 +1,9 @@
 /* Controls all dlManager instances */
-#include "../../helper/include/flipMap.hpp"
-#include "../../helper/include/stringify.hpp"
-#include "../../helper/include/userInputCheck.hpp"
+#include "../../helper/include/flipMap.hxx"
+#include "../../helper/include/stringify.hxx"
+#include "../../helper/include/userInputCheck.hxx"
 
-#include "../../dlManager/include/dlManager.hpp"
+#include "../../dlManager/include/dlManager.hxx"
 
 class dlManagerController 
 {

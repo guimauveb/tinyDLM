@@ -1,0 +1,3 @@
+// the configured options and settings for tinyDLM
+#define tinyDLM_VERSION_MAJOR @tinyDLM_VERSION_MAJOR@
+#define tinyDLM_VERSION_MINOR @tinyDLM_VERSION_MINOR@

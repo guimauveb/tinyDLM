@@ -1,4 +1,4 @@
-#include "../include/dlManagerUI.hpp"
+#include "../include/dlManagerUI.hxx"
 
 dlManagerUI::dlManagerUI()
     :dlManagerControl{std::make_unique<dlManagerController>()}
@@ -826,7 +826,6 @@ int dlManagerUI::addDlNav()
 
         if (resizeAdd) {
             resizeAddDlNav(addDlForm->getFieldBuffer(0), addDlForm->getFieldBuffer(1));
-            resizeAdd = false;
             /* Restore cursor position */
             addDlForm->formDriver(currField); 
             addDlForm->formDriver(REQ_END_LINE); 

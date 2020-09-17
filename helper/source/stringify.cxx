@@ -1,6 +1,6 @@
-#include "../include/stringify.hpp"
-#include "../../dlManager/include/download.hpp"
-#include "../../dialogs/include/dialogs.hpp"
+#include "../include/stringify.hxx"
+#include "../../dlManager/include/download.hxx"
+#include "../../dialogs/include/dialogs.hxx"
 
 #include <sstream>
 

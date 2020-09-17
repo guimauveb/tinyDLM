@@ -1,4 +1,4 @@
-#ifndef FLIPMAP_HPP
+#ifndef FLIPMAP_HXX
 #include <map>
 #include <algorithm>
 

@@ -1,4 +1,4 @@
-#ifndef WINSIZE_CPP
+#ifndef WINSIZE_CXX
 /* Struct holding window dimensions: begy, begx, row, col */
 struct winSize {
     int row;

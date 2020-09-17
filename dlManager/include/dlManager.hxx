@@ -1,4 +1,4 @@
-#include "download.hpp"
+#include "download.hxx"
 
 #include <curlpp/cURLpp.hpp>
 #include <curlpp/Easy.hpp>

@@ -1,5 +1,5 @@
-#ifndef STRINGIFY_HPP
-#include "../../dlManager/include/download.hpp"
+#ifndef STRINGIFY_HXX
+#include "../../dlManager/include/download.hxx"
 #include <string>
 
 std::string stringifyNumber(const double val, const int n);

@@ -1,4 +1,4 @@
-#ifndef FIELSIZE_CPP
+#ifndef FIELSIZE_CXX
 struct fieldSize {
     int height;
     int width;

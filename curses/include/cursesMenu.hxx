@@ -1,4 +1,4 @@
-#include "cursesForm.hpp"
+#include "cursesForm.hxx"
 #include <menu.h>
 
 #include <vector>

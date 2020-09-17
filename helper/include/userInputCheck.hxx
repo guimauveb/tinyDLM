@@ -1,5 +1,5 @@
-#include "../../dlManager/include/download.hpp"
-#include "../../dialogs/include/dialogs.hpp"
+#include "../../dlManager/include/download.hxx"
+#include "../../dialogs/include/dialogs.hxx"
 
 #include <sstream>
 #include <cstring>

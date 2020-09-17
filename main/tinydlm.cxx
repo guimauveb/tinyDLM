@@ -1,4 +1,5 @@
-#include "../UI/include/dlManagerUI.hpp"
+#include "../UI/include/dlManagerUI.hxx"
+#include "tinyDLM.hxx"
 
 /* Initialize our dlManager user interface and browse it */
 int main()
@@ -189,10 +190,6 @@ int main()
             }
             if (resizeUI) {
                 dlmc->stopStatusUpdate();
-                endwin();
-                refresh();
-                dlmc->menu->clearMenu();
-                dlmc->menu->clearItems();
                 dlmc->resizeUI();
                 dlmc->updateDownloadsMenu();
                 dlmc->resetStatusDriver();

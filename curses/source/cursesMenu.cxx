@@ -1,4 +1,4 @@
-#include "../include/cursesMenu.hpp"
+#include "../include/cursesMenu.hxx"
 
 /* Initialize a menu with items as strings corresponding to downloads filenames */
 cursesMenu::cursesMenu(std::vector<std::string> itemsData)

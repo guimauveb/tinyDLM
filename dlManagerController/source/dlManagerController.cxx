@@ -1,4 +1,4 @@
-#include "../include/dlManagerController.hpp"
+#include "../include/dlManagerController.hxx"
 
 dlManagerController::dlManagerController()
 {

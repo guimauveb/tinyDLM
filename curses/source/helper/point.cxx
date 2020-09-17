@@ -1,4 +1,4 @@
-#ifndef POINT_CPP
+#ifndef POINT_CXX
 /* TODO - move */
 struct point {
     int y;
