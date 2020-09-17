@@ -148,3 +148,14 @@ void cursesWindow::keyPad(bool b)
     keypad(win, b);
 }
 
+void cursesWindow::wMove(int y, int x)
+{
+    move(y, x);
+    wrefresh(win);
+}
+
+void cursesWindow::clearToEOL()
+{
+    clrtoeol();
+}
+

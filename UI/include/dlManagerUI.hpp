@@ -104,6 +104,10 @@ class dlManagerUI
         void populateStatusWin(const std::vector<downloadWinInfo>& vec);
         /* Update status window in a designated thread */
         void updateDownloadsStatusWindow();
+        /* Bool signaling if the status window should be updated -> set to true when naviagating the download
+         * list window, otherwise set to false. Used by the status window thread and the main thread so it's
+         * protected by a mutex. */
+        bool updateStatus = false;
 
         /* TODO - move to the designated function */
         int row = 0, col = 0;
@@ -138,12 +142,11 @@ class dlManagerUI
         std::unique_ptr<cursesWindow> progressWin;
         void progressBar(const std::string& filename);
         void startProgressBarThread(const std::string& filename);       
+        /* Signals to stop refreshing progress subwindow */
+        bool progRef = false;
         int stopProgressBarThread();
 
-        /* Bool signaling if the status window should be updated -> set to true when naviagating the download
-         * list window, otherwise set to false. Used by the status window thread and the main thread so it's
-         * protected by a mutex. */
-        bool updateStatus = false;
+        
 
         /* future that will execute the status update function */
         std::future<void> futureUpdateDlsStatus;
@@ -153,8 +156,7 @@ class dlManagerUI
         /* Map holding window sizes */
         std::map<const std::string, winSize> winSizeMap;
 
-        /* Signals to stop refreshing progress subwindow */
-        bool progRef = false;
+        
 
         /* TODO - make it selectionable by the user */
         const int lowSpeedLim = 56;

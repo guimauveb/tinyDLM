@@ -81,7 +81,7 @@ void dlManagerUI::setWinsSize()
     winSizeMap["statusSz"]   = {row - 5, col / 2, 3, col / 2};
     winSizeMap["pHelpSz"]     = {1, col / 2, row - 1, 0};
     winSizeMap["infosSz"]    = {1, col / 2, row - 2, col / 2};
-    winSizeMap["addSz"]      = {row / 2, col - (col / 2), (row / 4), col / 4};
+    winSizeMap["addSz"]      = {row / 2 + 1, col - (col / 2), (row / 4), col / 4};
     winSizeMap["detSz"]      = {row / 2, col - (col / 2), (row / 4), col / 4};
     winSizeMap["progSz"]     = {4, (col - (col / 2)) -10, row / 2, col / 4 + 4};
 
@@ -684,25 +684,30 @@ void dlManagerUI::resizeAddDlNav(std::string url, std::string filename)
 /* Navigate through the 'Add a download' window */
 int dlManagerUI::addDlNav()
 {
-    curs_set(1);   
-    point maxyx = addDlWin->getMaxyx();
+
     int ch = 0;
 
     bool done = false;
     bool updateMenu = false;
     bool resizeAdd = false;
+    bool urlErr = false, fileErr = false;
 
     std::string urlField;
     std::string filenameField;
+    int currField = 0;
 
     while ((ch = getch())) {
+        curs_set(1);   
+        point maxyx = addDlWin->getMaxyx();
+
         switch (ch) {
-            /* TODO -do not resize under 108 * 24 */
             case KEY_RESIZE:
                 {
                     if (addDlForm->formDriver(REQ_VALIDATION) != E_OK) {
                         ;
                     }
+                    /* currField == first_field (518) + offset */
+                    currField = REQ_FIRST_FIELD + addDlForm->curFieldIdx();
                     resizeAdd = true;
                     updateMenu = true;
                     break;
@@ -746,6 +751,7 @@ int dlManagerUI::addDlNav()
 
             case 10:
                 {
+                    curs_set(0);   
                     if (addDlForm->formDriver(REQ_VALIDATION) != E_OK) {
                         //check error 
                         ;
@@ -756,28 +762,55 @@ int dlManagerUI::addDlNav()
                         /* Get user input from the fields */
                         std::string url = addDlForm->getFieldBuffer(0);
                         std::string filename = addDlForm->getFieldBuffer(1);
-                        std::string URLcleaned = trimSpaces(url);                        
-                        std::string filenameCleaned = trimSpaces(filename);
+                        url = trimSpaces(url);                        
+                        filename = trimSpaces(filename);
 
                         /* Must be at least 7 char long -> http:// */
-                        if (checkURL(url) == 1) {
-                            addDlWin->printInMiddle(maxyx.y - 4, 0, maxyx.x, msgInvalidURL, COLOR_PAIR(1));
-                            break;
+                        if (checkURL(url)) {
+                            addDlWin->printInMiddle(6, 0, maxyx.x, msgInvalidURL, COLOR_PAIR(1));
+                            urlErr = true;
                         }
+                        else {
+                            /* Erase error msg -> fill with white space */
+                            addDlWin->printInMiddle(6, 0, maxyx.x, "                   ", COLOR_PAIR(7));
+                            url.push_back('\0');
+                        }
+
                         if (!checkFilename(filename)){
-                            addDlWin->printInMiddle(maxyx.y - 4, 0, maxyx.x, msgInvalidFilename, COLOR_PAIR(1));
+                            addDlWin->printInMiddle(10, 0, maxyx.x, msgInvalidFilename, COLOR_PAIR(1));
+                            fileErr = true;
+                        }
+                        else {
+                            /* Erase error msg -> fill with white space */
+                            addDlWin->printInMiddle(10, 0, maxyx.x, "                        ", COLOR_PAIR(7));
+                            filename.push_back('\0');
+                        }
+
+                        if (fileErr || urlErr) {
+                            if (fileErr) {
+                                addDlForm->formDriver(REQ_LAST_FIELD);
+                                addDlForm->formDriver(REQ_END_LINE);
+                                fileErr = false;
+                            }
+                            if (urlErr) {
+                                addDlForm->formDriver(REQ_FIRST_FIELD);
+                                addDlForm->formDriver(REQ_END_LINE);
+                                urlErr = false;
+                            }
+
+                            curs_set(1);
+                            /* Break out of loop and reenter it */
                             break;
                         }
 
-                        URLcleaned.push_back('\0');
-                        filenameCleaned.push_back('\0');
+                        /* dlManagerControl returns the final filename after verifying there wasn't a duplicate.*/
+                        std::string f = dlManagerControl->createNewDl(dlFolder, filename, url,  0, 0);
                         /* Start dl if everything ok */
-                        std::string f = dlManagerControl->createNewDl(dlFolder, filenameCleaned, URLcleaned,  0, 0);
                         dlManagerControl->startDl(f);
                         /* Update downloads list in the menu */
                         updateDownloadsMenu();
                         done = true;
-                        /* Signals to reset downloads menu */
+                        /* Signals to reset menu window */
                         updateMenu = true;
                         break;
                     }
@@ -791,10 +824,12 @@ int dlManagerUI::addDlNav()
                 }
         }
         if (resizeAdd) {
-            urlField = addDlForm->getFieldBuffer(0);
-            filenameField = addDlForm->getFieldBuffer(1);
-            resizeAddDlNav(urlField, filenameField);
+            resizeAddDlNav(addDlForm->getFieldBuffer(0), addDlForm->getFieldBuffer(1));
             resizeAdd = false;
+            addDlWin->printInMiddle(6, 0, maxyx.x, std::to_string(currField), COLOR_PAIR(1));
+            addDlForm->formDriver(currField); 
+            addDlForm->formDriver(REQ_END_LINE); 
+            
         }
 
         if (done) {
@@ -849,7 +884,6 @@ const std::string dlManagerUI::initDetailsTitle(const std::string& itemName)
 
 void dlManagerUI::startProgressBarThread(const std::string& filename)
 {
-
     /* Initialize progress bar according to its parent win (details win) dimensions */
     progressWin = initWin(winSizeMap["progSz"], "prog");
     progressWin->drawBox(0, 0);

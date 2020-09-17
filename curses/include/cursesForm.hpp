@@ -28,6 +28,8 @@ class cursesForm {
         void saveFieldBuffer();
         void clearForm();
 
+        int curFieldIdx();
+
     private:
         size_t nFields;
         FORM *form = nullptr;

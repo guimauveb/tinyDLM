@@ -34,6 +34,8 @@ class cursesWindow
         /* Pass row / col etc */
         void printInMiddle(int starty, int startx, int width, std::string str, chtype color);
         void printAtTop(int starty, int startx, int width, std::string str, chtype color);
+        void wMove(int y, int x);
+        void clearToEOL();
 
         /* Important ! Will basically call destroyWin() then initWin() */
         void resizeWin(winSize newSz);

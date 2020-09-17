@@ -4,20 +4,9 @@
 int checkURLlength(std::string& url)
 {
     /* Check if the url is at least 7 char long (https://...) */
-    if (url.length() < 7) { 
+    if (url.length() < 8) { 
         return 1;
     }
-    return 0;
-}
-
-int checkURL(std::string& url)
-{
-    if (checkURLlength(url))
-        return 1;
-    if (checkHttp(url))
-        return 2;
-    if (checkHttps(url))
-        return 3;
     return 0;
 }
 
@@ -36,6 +25,15 @@ int checkHttps(std::string& url)
     /* http failed but let's check https */
     if (url.substr(0, 8) != https)
         return 1;
+    return 0;
+}
+
+int checkURL(std::string& url)
+{
+    if (checkURLlength(url))
+        return 1;
+    if (checkHttp(url) && checkHttps(url))
+        return 2;
     return 0;
 }
 

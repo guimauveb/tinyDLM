@@ -128,4 +128,9 @@ void cursesForm::populateField(size_t fieldIdx, const std::string str)
     }
 }
 
+int cursesForm::curFieldIdx()
+{
+    return field_index(current_field(form));
+}
+
 
