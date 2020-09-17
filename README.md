@@ -4,8 +4,7 @@
 
 ## Small multi-threaded download manager built around cURLpp / ncurses 
 
-I made this project to learn more about desktop applications, C++, threads, and great librairies that are cURL /
-cURLpp and ncurses.
+I made this project to learn more about desktop applications, C++, threads, cURL / cURLpp and ncurses.
 
 ### Features:
     - Supports Direct Download Link only 
@@ -23,7 +22,7 @@ Tested on:
 ### Missing features I want to implement
     
     - [ ] Limit download speed  
-    - [ ] Chose number of max simultaneous downloads  
+    - [ ] Limit the number of max simultaneous downloads  
     - [ ] Add multiple links at the same time  
     - [ ] Schedule download start  
     - [ ] Select download directory (transfers are stored in 'downloads')  
