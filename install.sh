@@ -40,7 +40,7 @@ clang=0
 
 # check for gcc
 gccout=$( { gcc  > outfile; } 2>&1 )
-if [[ $gccout == *"error"* ]]; then
+if [[ $gccout == *"command not found"* ]]; then
     echo "gcc is not installed"
     echo "checking if clang is installed..."
 else
