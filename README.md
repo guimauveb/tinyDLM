@@ -14,7 +14,7 @@ I made this project to learn more about desktop applications, C++, threads, cURL
 
 ### Installation 
     
-1. Dependencies needed:
+1. Make sure you have the following dependencies installed:
 ```
    - libcurl
    - libcurlpp
