@@ -71,7 +71,7 @@ ncurses=0
 if [ "${gcc}" -eq 1 ]; then
     # TODO - function for each dependency
     curlout=$( { gcc -lcurl > outfile; } 2>&1 ) 
-    if [[ $curlout != *"Undefined symbols"* ]]; then
+    if [[ $curlout != *"undefined reference to"* ]]; then
         echo "curl is not installed"
         if [ "$brew" -eq 1 ]; then
             read -p "Do you want to install curl ? Y/n " answer
@@ -89,7 +89,7 @@ if [ "${gcc}" -eq 1 ]; then
         echo "curl is installed."
     fi
     curlppout=$( { gcc -lcurlpp > outfile; } 2>&1 ) 
-    if [[ $curlppout != *"Undefined symbols"* ]]; then
+    if [[ $curlppout != *"undefined reference to"* ]]; then
         echo "curlpp is not installed"
         if [ "$brew" -eq 1 ]; then
             read -p "Do you want to install curlpp ? Y/n " answer
@@ -107,7 +107,7 @@ if [ "${gcc}" -eq 1 ]; then
         echo "curlpp is installed."
     fi
     ncursesout=$( { gcc -lncurses > outfile; } 2>&1 ) 
-    if [[ $curlppout != *"Undefined symbols"* ]]; then
+    if [[ $curlppout != *"undefined reference to"* ]]; then
         echo "ncurses is not installed"
         if [ "$brew" -eq 1 ]; then
             read -p "Do you want to install ncurses ? Y/n " answer
