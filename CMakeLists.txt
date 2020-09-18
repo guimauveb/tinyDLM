@@ -12,7 +12,7 @@ set(CMAKE_CXX_FLAGS_RELEASE "-O3")
 # Append find_package modules 
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_LIST_DIR}/cmake")
 
-message(STATUS "\nLooking for curses...")
+message(STATUS "Looking for curses...")
 find_package(Curses REQUIRED)
 
 if (CURSES_FOUND)

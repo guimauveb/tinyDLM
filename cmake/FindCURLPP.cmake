@@ -7,7 +7,7 @@
 
 include(LibFindMacros)
 
-# Dependencies
+# Dependencies - cURLpp needs curl
 libfind_package(cURLpp CURL)
 
 # Use pkg-config to get hints about paths

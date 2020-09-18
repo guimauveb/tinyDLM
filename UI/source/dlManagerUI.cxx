@@ -814,8 +814,8 @@ int dlManagerUI::addDlNav()
                         updateMenu = true;
                         break;
                     }
-                }
                 break;
+                }
 
             default:
                 {
@@ -826,9 +826,6 @@ int dlManagerUI::addDlNav()
 
         if (resizeAdd) {
             resizeAddDlNav(addDlForm->getFieldBuffer(0), addDlForm->getFieldBuffer(1));
-            /* Restore cursor position */
-            addDlForm->formDriver(currField); 
-            addDlForm->formDriver(REQ_END_LINE); 
             /* Restore errors */
             if (fileErr) {
                 addDlWin->printInMiddle(10, 0, maxyx.x, msgInvalidFilename, COLOR_PAIR(1));
@@ -836,6 +833,10 @@ int dlManagerUI::addDlNav()
             if (urlErr) {
                 addDlWin->printInMiddle(6, 0, maxyx.x, msgInvalidURL, COLOR_PAIR(1));
             }
+            /* Restore cursor position */
+            addDlForm->formDriver(currField); 
+            addDlForm->formDriver(REQ_END_LINE); 
+            resizeAdd = false;
         }
 
         if (done) {
