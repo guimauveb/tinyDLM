@@ -1,9 +1,12 @@
 #!/bin/bash
 
+# TODO - create functions instead of using the same blocks of code over and over
+
 # set some bools
 linux=0
 macos=0
 
+# set some bools
 apt=0
 brew=0
 
@@ -40,13 +43,13 @@ clang=0
 
 # check for gcc
 gccout=$( { gcc  > outfile; } 2>&1 )
-if [[ $gccout == *"command not found"* ]]; then
-    echo "gcc is not installed"
-    echo "checking if clang is installed..."
-else
+if [[ $gccout == *"no input files"* ]]; then
+    echo "gcc is installed" 
     gcc=1
     comp=1
-    echo "gcc is installed" 
+else
+    echo "gcc is not installed"
+    echo "checking if clang is installed..."
 fi
 
 if [[ "${comp}" -ne 1 ]]
@@ -54,12 +57,12 @@ then
     clout=$( { clang -v  > outfile; } 2>&1 )
     # check for clang
     # check if clang is installed
-    if [[ $clout == *"error"* ]]; then
-        echo "clang is not installed"
-    else 
+    if [[ $clout == *"no input files"* ]]; then
         echo "clang is installed"
         clang=1
         comp=1
+    else 
+        echo "clang is not installed"
     fi
 fi
 
