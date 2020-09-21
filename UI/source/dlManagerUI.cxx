@@ -730,12 +730,12 @@ int dlManagerUI::addDlNav()
                 addDlForm->formDriver(REQ_NEXT_CHAR);
                 break;
 
-            /* DEL backspace */
+            /* DEL backspace (macOS) */
             case 127:
                 addDlForm->formDriver(REQ_DEL_PREV);
                 break;
 
-            /* ASCII backspace */
+            /* ASCII backspace (Linux) */
             case 8:
                 addDlForm->formDriver(REQ_DEL_PREV);
                 break;
