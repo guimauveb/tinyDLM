@@ -13,34 +13,26 @@ I made this project to learn more about desktop applications, C++, threads, cURL
     - Displays current download speed and progress for each transfer  
 
 ### Installation 
+
+Works on Linux Debian based distributions and macOS (>= 10.14)
     
 1. Make sure you have the following dependencies installed:
 ```
-   - libcurl
-   - libcurlpp
-   - ncurses
+    cmake
 ```
 
-2. Create a **build** directory at the top of the project directory and cd into it
+2. Clone this repo
 ```
-   $ mkdir build
-   $ cd build
-``` 
-
-3. From **buid/** run cmake
-```
-    $ cmake ../
-    $ make
+    git clone https://github.com/guimauveb/tinyDLM.git
 ```
 
-4. Run **tinyDLM** newly created into **build/**
-```
-    $ ./tinyDLM
-```
+3. Run **install.sh**
 
-Tested on: 
+
+### Tested on: 
 - **macOS Mojave (10.14.6)** 
 - **Linux Ubuntu (20.04 LTS)**
+- **Kali Linux (20.03)**
 
 ### Missing features I want to implement
     
