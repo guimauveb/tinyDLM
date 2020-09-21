@@ -86,7 +86,7 @@ if [ "${gcc}" -eq 1 ]; then
         elif [ "$apt" -eq 1 ]; then 
             read -p "Do you want to install curl (using apt)? Y/n " answer
             if [ "$answer" == "Y" ] || [ "$answer" == "y" ]; then
-                sudo apt-get install libcurl4
+                sudo apt-get install libcurl4-openssl-dev
                 curl=1
                 echo curl is installed
             fi
@@ -165,7 +165,7 @@ if [ "${clang}" -eq 1 ]; then
         elif [ "$apt" -eq 1 ]; then 
             read -p "Do you want to install curl (using apt)? Y/n " answer
             if [ "$answer" == "Y" ] || [ "$answer" == "y" ]; then
-                sudo apt-get install libcurl4
+                sudo apt-get install libcurl4-openssl-dev
                 curl=1
                 echo curl is installed
             fi
@@ -174,6 +174,7 @@ if [ "${clang}" -eq 1 ]; then
         curl=1
         echo "curl is installed."
     fi
+
     curlppout=$( { clang -lcurlpp > outfile; } 2>&1 ) 
     if [[ $curlppout != *"main"* ]]; then
         echo "curlpp is not installed"
