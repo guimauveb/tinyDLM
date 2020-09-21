@@ -27,7 +27,7 @@ elif [[ "$OSTYPE" == "darwin"* ]]; then
     else
         echo brew is not installed
     fi 
-fi
+    fi
 
 # Create a build directory
 mkdir build
@@ -41,7 +41,7 @@ clang=0
 
 # check for gcc or clang presence
 
-# check for gcc
+# check if gcc is installed
 gccout=$( { gcc  > outfile; } 2>&1 )
 if [[ $gccout == *"no input files"* ]]; then
     echo "gcc is installed" 
@@ -52,11 +52,10 @@ else
     echo "checking if clang is installed..."
 fi
 
+# check if clang is installed
 if [[ "${comp}" -ne 1 ]]
 then
     clout=$( { clang -v  > outfile; } 2>&1 )
-    # check for clang
-    # check if clang is installed
     if [[ $clout == *"no input files"* ]]; then
         echo "clang is installed"
         clang=1
@@ -70,56 +69,75 @@ curl=0
 curlpp=0
 ncurses=0
 
-# gcc TODO 
 if [ "${gcc}" -eq 1 ]; then
     # TODO - function for each dependency
     curlout=$( { gcc -lcurl > outfile; } 2>&1 ) 
-    if [[ $curlout != *"undefined reference to"* ]]; then
+    if [[ $curlout != *"main"* ]]; then
         echo "curl is not installed"
         if [ "$brew" -eq 1 ]; then
-            read -p "Do you want to install curl ? Y/n " answer
+            read -p "Do you want to install curl (using homebrew)? Y/n " answer
             if [ "$answer" == "Y" ] || [ "$answer" == "y" ]; then
                 brew install curl
                 curl=1
-                #TODO check installation 
                 echo curl is installed
             else
                 echo Please install curl.
+            fi
+        elif [ "$apt" -eq 1 ]; then 
+            read -p "Do you want to install curl (using apt)? Y/n " answer
+            if [ "$answer" == "Y" ] || [ "$answer" == "y" ]; then
+                sudo apt-get install libcurl4
+                curl=1
+                echo curl is installed
             fi
         fi
     else 
         curl=1
         echo "curl is installed."
     fi
+
     curlppout=$( { gcc -lcurlpp > outfile; } 2>&1 ) 
-    if [[ $curlppout != *"undefined reference to"* ]]; then
+    if [[ $curlppout != *"main"* ]]; then
         echo "curlpp is not installed"
         if [ "$brew" -eq 1 ]; then
-            read -p "Do you want to install curlpp ? Y/n " answer
+            read -p "Do you want to install curlpp (using homebrew)? Y/n " answer
             if [ "$answer" == "Y" ] || [ "$answer" == "y" ]; then
                 brew install curlpp
                 curlpp=1
-                #TODO check installation 
                 echo curlpp is installed.
             else
                 echo Please install curlpp.
+            fi
+        elif [ "$apt" -eq 1 ]; then 
+            read -p "Do you want to install curlpp (using apt)? Y/n " answer
+            if [ "$answer" == "Y" ] || [ "$answer" == "y" ]; then
+                sudo apt-get install libcurlpp-dev
+                ncurses=1
+                echo curlpp is installed
             fi
         fi
     else 
         curlpp=1
         echo "curlpp is installed."
     fi
+
     ncursesout=$( { gcc -lncurses > outfile; } 2>&1 ) 
-    if [[ $curlppout != *"undefined reference to"* ]]; then
+    if [[ $curlppout != *"main"* ]]; then
         echo "ncurses is not installed"
         if [ "$brew" -eq 1 ]; then
-            read -p "Do you want to install ncurses ? Y/n " answer
+            read -p "Do you want to install ncurses (using homebrew)? Y/n " answer
             if [ "$answer" == "Y" ] || [ "$answer" == "y" ]; then
                 brew install ncurses
                 ncurses=1
-                #TODO check installation 
             else
                 echo Please install ncurses.
+            fi
+        elif [ "$apt" -eq 1 ]; then 
+            read -p "Do you want to install ncurses (using apt)? Y/n " answer
+            if [ "$answer" == "Y" ] || [ "$answer" == "y" ]; then
+                sudo apt-get install libncurses-dev
+                ncurses=1
+                echo ncurses is installed
             fi
         fi
     else 
@@ -133,17 +151,23 @@ fi
 if [ "${clang}" -eq 1 ]; then
     # TODO - function for each dependency
     curlout=$( { clang -lcurl > outfile; } 2>&1 ) 
-    if [[ $curlout != *"Undefined symbols"* ]]; then
+    if [[ $curlout != *"main"* ]]; then
         echo "curl is not installed"
         if [ "$brew" -eq 1 ]; then
-            read -p "Do you want to install curl ? Y/n " answer
+            read -p "Do you want to install curl (using homebrew)? Y/n " answer
             if [ "$answer" == "Y" ] || [ "$answer" == "y" ]; then
                 brew install curl
                 curl=1
-                #TODO check installation 
                 echo curl is installed
             else
                 echo Please install curl.
+            fi
+        elif [ "$apt" -eq 1 ]; then 
+            read -p "Do you want to install curl (using apt)? Y/n " answer
+            if [ "$answer" == "Y" ] || [ "$answer" == "y" ]; then
+                sudo apt-get install libcurl4
+                curl=1
+                echo curl is installed
             fi
         fi
     else 
@@ -151,17 +175,23 @@ if [ "${clang}" -eq 1 ]; then
         echo "curl is installed."
     fi
     curlppout=$( { clang -lcurlpp > outfile; } 2>&1 ) 
-    if [[ $curlppout != *"Undefined symbols"* ]]; then
+    if [[ $curlppout != *"main"* ]]; then
         echo "curlpp is not installed"
         if [ "$brew" -eq 1 ]; then
-            read -p "Do you want to install curlpp ? Y/n " answer
+            read -p "Do you want to install curlpp (using homebrew)? Y/n " answer
             if [ "$answer" == "Y" ] || [ "$answer" == "y" ]; then
                 brew install curlpp
                 curlpp=1
-                #TODO check installation 
                 echo curlpp is installed.
             else
                 echo Please install curlpp.
+            fi
+        elif [ "$apt" -eq 1 ]; then 
+            read -p "Do you want to install curlpp (using apt)? Y/n " answer
+            if [ "$answer" == "Y" ] || [ "$answer" == "y" ]; then
+                sudo apt-get install libcurlpp-dev
+                curlpp=1
+                echo curlpp is installed
             fi
         fi
     else 
@@ -169,16 +199,22 @@ if [ "${clang}" -eq 1 ]; then
         echo "curlpp is installed."
     fi
     ncursesout=$( { clang -lncurses > outfile; } 2>&1 ) 
-    if [[ $curlppout != *"Undefined symbols"* ]]; then
+    if [[ $curlppout != *"main"* ]]; then
         echo "ncurses is not installed"
         if [ "$brew" -eq 1 ]; then
-            read -p "Do you want to install ncurses ? Y/n " answer
+            read -p "Do you want to install ncurses (using homebrew)? Y/n " answer
             if [ "$answer" == "Y" ] || [ "$answer" == "y" ]; then
                 brew install ncurses
                 ncurses=1
-                #TODO check installation 
             else
                 echo Please install ncurses.
+            fi
+        elif [ "$apt" -eq 1 ]; then 
+            read -p "Do you want to install ncurses (using apt)? Y/n " answer
+            if [ "$answer" == "Y" ] || [ "$answer" == "y" ]; then
+                sudo apt-get install libncurses-dev
+                ncurses=1
+                echo ncurses is installed
             fi
         fi
     else 
