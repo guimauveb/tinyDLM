@@ -684,7 +684,6 @@ void dlManagerUI::resizeAddDlNav(std::string url, std::string filename)
 /* Navigate through the 'Add a download' window */
 int dlManagerUI::addDlNav()
 {
-
     int ch = 0;
 
     bool done = false;
@@ -731,7 +730,13 @@ int dlManagerUI::addDlNav()
                 addDlForm->formDriver(REQ_NEXT_CHAR);
                 break;
 
+            /* DEL backspace */
             case 127:
+                addDlForm->formDriver(REQ_DEL_PREV);
+                break;
+
+            /* ASCII backspace */
+            case 8:
                 addDlForm->formDriver(REQ_DEL_PREV);
                 break;
 
