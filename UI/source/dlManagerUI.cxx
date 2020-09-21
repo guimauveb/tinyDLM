@@ -872,7 +872,7 @@ void dlManagerUI::paintDetWin(const std::string& itemName)
     detWin->printInMiddle(maxyx.y - 2, maxyx.x / 4, maxyx.x / 4, msgPause, COLOR_PAIR(8));
     detWin->printInMiddle(maxyx.y - 2, 2 * maxyx.x / 4, maxyx.x / 4, msgResume, COLOR_PAIR(8));
     detWin->printInMiddle(maxyx.y - 2, 3 * maxyx.x / 4, maxyx.x / 4, msgKill, COLOR_PAIR(8));
-    detWin->printInMiddle(1, 0, maxyx.x, initDetailsTitle(itemName), COLOR_PAIR(7));
+    detWin->printInMiddle(1, 0, maxyx.x, initDetailsTitle(itemName), COLOR_PAIR(8));
 }
 
 const std::string dlManagerUI::initDetailsTitle(const std::string& itemName)
@@ -891,7 +891,8 @@ const std::string dlManagerUI::initDetailsTitle(const std::string& itemName)
         it.append(label);
     }
     it.push_back('\0');
-    return itemName;
+
+    return it;
 }
 
 void dlManagerUI::startProgressBarThread(const std::string& filename)
