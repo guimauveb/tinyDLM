@@ -109,10 +109,15 @@ if [ "${gcc}" -eq 1 ]; then
                 echo Please install curlpp.
             fi
         elif [ "$apt" -eq 1 ]; then 
-            read -p "Do you want to install curlpp (using apt)? Y/n " answer
+            read -p "Do you want to install curlpp ? Y/n " answer
             if [ "$answer" == "Y" ] || [ "$answer" == "y" ]; then
-                sudo apt-get install libcurlpp-dev
-                ncurses=1
+                cd ../dependencies/curlpp-0.8.1
+                mkdir build
+                cd build
+                sudo cmake ../
+                sudo make install
+                cd ../../build
+                curlpp=1
                 echo curlpp is installed
             fi
         fi
@@ -190,7 +195,12 @@ if [ "${clang}" -eq 1 ]; then
         elif [ "$apt" -eq 1 ]; then 
             read -p "Do you want to install curlpp (using apt)? Y/n " answer
             if [ "$answer" == "Y" ] || [ "$answer" == "y" ]; then
-                sudo apt-get install libcurlpp-dev
+                cd ../dependencies/curlpp-0.8.1
+                mkdir build
+                cd build
+                sudo cmake ../
+                sudo make install
+                cd ../../build
                 curlpp=1
                 echo curlpp is installed
             fi
