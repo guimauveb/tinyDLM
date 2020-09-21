@@ -122,7 +122,7 @@ if [ "${gcc}" -eq 1 ]; then
             cd build
             sudo cmake ../
             sudo make install
-            cd ../../build
+            cd ../../../build
             curlpp=1
             echo curlpp is installed
         fi
