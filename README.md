@@ -14,7 +14,7 @@ I made this project to learn more about desktop applications, C++, threads, cURL
 
 ### Installation 
 
-Works on Linux Debian based distributions and macOS (>= 10.14)
+Works on **Linux Debian based distributions** and **macOS (>= 10.14)**
     
 1. Make sure you have the following dependencies installed:
 ```
