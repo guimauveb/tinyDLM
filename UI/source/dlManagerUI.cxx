@@ -257,12 +257,10 @@ void dlManagerUI::paintTopWin(std::unique_ptr<cursesWindow>& topWin)
     /* TODO - create a function for each */
     for (i = 0; i < liteDL_label.length(); ++i)
         titleMain[i] = liteDL_label.at(i);
-    for (; i < (col - workInProg.length()) / 2; ++i)
+    for (; i < col; ++i)
         titleMain[i] = ' ';
-    for (size_t j = 0; j < workInProg.length(); ++j)
-        titleMain[i++] = workInProg.at(j);
-    for (; i < (size_t)col - 2; ++i)
-        titleMain[i] = ' ';
+    //for (size_t j = 0; j < workInProg.length(); ++j)
+    //   titleMain[i++] = workInProg.at(j);
     titleMain[i] = '\0';
 
     topWin->printInMiddle(0, 0, col, titleMain, COLOR_PAIR(8));
