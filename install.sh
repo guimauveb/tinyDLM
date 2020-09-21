@@ -1,5 +1,17 @@
 #!/bin/bash
 
+# Install script that will look for the required dependencies in the envionrment and will try to install them 
+# if not found. Once all the required dependencies are installed the script will build tinyDLM from source and
+# launch the program.
+
+# I only provide cURLpp source since it does not seem to be found on some Linux distributions using apt. 
+# macOS
+    # libcurl and libncurses will be installed via homebrew if homebrew is installed. Otherwise the installation
+    # will stop. 
+# Linux
+    # lbcurl and libncurses will be installed via apt on Linux Debian distributions. Otherwise the installation
+    # will stop.
+
 # TODO - create functions instead of using the same blocks of code over and over
 
 # set some bools
@@ -27,7 +39,7 @@ elif [[ "$OSTYPE" == "darwin"* ]]; then
     else
         echo brew is not installed
     fi 
-    fi
+fi
 
 # Create a build directory
 mkdir build
@@ -90,36 +102,29 @@ if [ "${gcc}" -eq 1 ]; then
                 curl=1
                 echo curl is installed
             fi
+        else 
+            echo Please install curl development libraries.
         fi
+
     else 
         curl=1
         echo "curl is installed."
     fi
 
+    # Build curlpp from source 
     curlppout=$( { gcc -lcurlpp > outfile; } 2>&1 ) 
     if [[ $curlppout != *"main"* ]]; then
         echo "curlpp is not installed"
-        if [ "$brew" -eq 1 ]; then
-            read -p "Do you want to install curlpp (using homebrew)? Y/n " answer
-            if [ "$answer" == "Y" ] || [ "$answer" == "y" ]; then
-                brew install curlpp
-                curlpp=1
-                echo curlpp is installed.
-            else
-                echo Please install curlpp.
-            fi
-        elif [ "$apt" -eq 1 ]; then 
-            read -p "Do you want to install curlpp ? Y/n " answer
-            if [ "$answer" == "Y" ] || [ "$answer" == "y" ]; then
-                cd ../dependencies/curlpp-0.8.1
-                mkdir build
-                cd build
-                sudo cmake ../
-                sudo make install
-                cd ../../build
-                curlpp=1
-                echo curlpp is installed
-            fi
+        read -p "Do you want to install curlpp ? Y/n " answer
+        if [ "$answer" == "Y" ] || [ "$answer" == "y" ]; then
+            cd ../dependencies/curlpp-0.8.1
+            mkdir build
+            cd build
+            sudo cmake ../
+            sudo make install
+            cd ../../build
+            curlpp=1
+            echo curlpp is installed
         fi
     else 
         curlpp=1
@@ -144,6 +149,8 @@ if [ "${gcc}" -eq 1 ]; then
                 ncurses=1
                 echo ncurses is installed
             fi
+        else
+            echo Please install ncurses development libraries.
         fi
     else 
         ncurses=1
@@ -174,6 +181,8 @@ if [ "${clang}" -eq 1 ]; then
                 curl=1
                 echo curl is installed
             fi
+        else
+            echo Please install curl development libraries.
         fi
     else 
         curl=1
@@ -192,23 +201,28 @@ if [ "${clang}" -eq 1 ]; then
             else
                 echo Please install curlpp.
             fi
-        elif [ "$apt" -eq 1 ]; then 
-            read -p "Do you want to install curlpp (using apt)? Y/n " answer
+        else 
+            read -p "Do you want to install curlpp ? Y/n " answer
             if [ "$answer" == "Y" ] || [ "$answer" == "y" ]; then
                 cd ../dependencies/curlpp-0.8.1
                 mkdir build
                 cd build
                 sudo cmake ../
                 sudo make install
+                cd ../
+                sudo rm -r build
                 cd ../../build
                 curlpp=1
                 echo curlpp is installed
+            else
+                echo Please install curlpp.
             fi
         fi
     else 
         curlpp=1
         echo "curlpp is installed."
     fi
+
     ncursesout=$( { clang -lncurses > outfile; } 2>&1 ) 
     if [[ $curlppout != *"main"* ]]; then
         echo "ncurses is not installed"
@@ -227,6 +241,8 @@ if [ "${clang}" -eq 1 ]; then
                 ncurses=1
                 echo ncurses is installed
             fi
+        else
+            echo Please install ncurses development libraries.
         fi
     else 
         ncurses=1
