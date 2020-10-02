@@ -51,6 +51,9 @@ void dlManagerUI::initColors()
     init_pair(8, COLOR_BLACK, COLOR_WHITE);
     /* Progress bar color pair */
     init_pair(16, COLOR_GREEN, COLOR_GREEN);
+    init_pair(17, -1, COLOR_GREEN);
+    init_pair(18, -1, COLOR_YELLOW);
+    init_pair(19, -1, COLOR_RED);
 }
 
 void dlManagerUI::setWinsSize()
@@ -229,7 +232,6 @@ void dlManagerUI::resizeUI()
     paintLabelsWin(mainWindows.at(labelsIdx));
 
     /* Refresh the downloads list */
-    /* TODO - clearMenu(); */
     menu->clearMenu();
     menu->clearItems();
     mainWindows.at(mainIdx)->resizeWin(winSizeMap["mainWinSz"]);
@@ -298,7 +300,6 @@ void dlManagerUI::initMainWins()
 
 void dlManagerUI::paintLabelsWin(std::unique_ptr<cursesWindow>& labelsWin)
 {
-    /* TODO - use a struct holding all that instead */
     labelsWin->printInMiddle(0, 0, col / 2, labelName, COLOR_PAIR(7));
     labelsWin->printInMiddle(0, col / 2, col / 8, labelProgress, COLOR_PAIR(7));
     labelsWin->printInMiddle(0, 5 * col / 8, col / 8, labelSpeed, COLOR_PAIR(7));
@@ -337,19 +338,33 @@ void dlManagerUI::populateStatusWin(const std::vector<downloadWinInfo>& vec)
         curr = currItNo;
     }
     for (offset = yOffset; offset < vec.size(); ++offset) {
+
+
+        /* Highlight selected item */
         if (curr == offset) {
-            /* Highlight selected item */
             color = COLOR_PAIR(8);
         }
-        else {
+        /* Highlight completed downloads in green */
+        else if (vec.at(offset).status == statusStrCd) {
+            color = COLOR_PAIR(17);
+        }
+        /* Highlight paused downloads in yellow */
+        else if (vec.at(offset).status == statusStrPd) {
+            color = COLOR_PAIR(18);
+        }
+        /* Highlight problematic downloads in red */
+        else if (vec.at(offset).status == statusStrEr) {
+            color = COLOR_PAIR(19);
+        }
+        else   {
             color = COLOR_PAIR(7);
         }
+
         mainWindows.at(statusIdx)->printInMiddle(y, 0, p.x / 4, vec.at(offset).progress, color);
-        mainWindows.at(statusIdx)->printInMiddle(y, 0, p.x / 4 + vec.at(offset).progress.length() + 1,
-                " %", color);
+        /* Display percent sign */
+        mainWindows.at(statusIdx)->printInMiddle(y, 0, p.x / 4 + vec.at(offset).progress.length() + 1," %", color);
         mainWindows.at(statusIdx)->printInMiddle(y, p.x / 4, p.x / 4, vec.at(offset).speed, color);
-        mainWindows.at(statusIdx)->printInMiddle(y, p.x / 4, p.x / 4 + vec.at(offset).speed.length() + 2,
-                " MBs", color);
+        mainWindows.at(statusIdx)->printInMiddle(y, p.x / 4, p.x / 4 + vec.at(offset).speed.length() + 2," MBs", color);
         //mainWindow.at(statusIdx)->printInMiddledlsStatusWiny, 2 * width / 4, width / 4, dl.eta, color);
         mainWindows.at(statusIdx)->printInMiddle(y, 3 * p.x / 4, p.x / 4, vec.at(offset).status, color);
         y++;
@@ -728,12 +743,12 @@ int dlManagerUI::addDlNav()
                 addDlForm->formDriver(REQ_NEXT_CHAR);
                 break;
 
-            /* DEL backspace (macOS) */
+                /* DEL backspace (macOS) */
             case 127:
                 addDlForm->formDriver(REQ_DEL_PREV);
                 break;
 
-            /* ASCII backspace (Linux) */
+                /* ASCII backspace (Linux) */
             case 8:
                 addDlForm->formDriver(REQ_DEL_PREV);
                 break;
@@ -817,7 +832,7 @@ int dlManagerUI::addDlNav()
                         updateMenu = true;
                         break;
                     }
-                break;
+                    break;
                 }
 
             default:

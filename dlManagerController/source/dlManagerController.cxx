@@ -14,7 +14,7 @@ std::string dlManagerController::createNewDl(std::string folder, std::string fil
     std::string f = filename;
     std::map<std::string, int>::iterator it = downloadsMap.find(filename);
 
-    /* TODO - create a table in which we store the number of duplicate / filename */
+    /* TODO - create a table in which we store the number of duplicates per filename */
     if (it != downloadsMap.end()) {
         createDuplicate(f, dlCounter);
     }
@@ -44,10 +44,9 @@ void dlManagerController::startDl(const std::string& dlToStart)
     } 
 }
 
-/*  Start multiple downloads at the same time */
+/* TODO - Start multiple downloads at the same time */
 void dlManagerController::startDl(const std::vector<std::string>& dlsToStart)
 {
-    /* TODO */
 }
 
 void dlManagerController::resume(const std::string& dlToResume)
@@ -181,7 +180,14 @@ std::vector<downloadWinInfo> dlManagerController::getAllDownloadsInfos()
         const int id = dl.first;
         const std::string f = dl.second;
         const std::string strstatus = stringifyStatus(getStatus(f));
-        const std::string spd = stringifyNumber(getSpeed(f), 2);
+        std::string spd;
+        /* Return ' - ' intead of a current speed that doesn't mean anything anymore */
+        if (strstatus != statusStrDl) {
+            spd = " - ";
+        }
+        else {
+            spd = stringifyNumber(getSpeed(f), 2);
+        }
         const std::string prog = stringifyNumber(getProgress(f), 2);
         //std::string eta = stringifyETA(dlManagerControlgetETA(f));
         const std::string eta = "ETA";

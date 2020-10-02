@@ -146,7 +146,7 @@ class dlManagerUI
         bool progRef = false;
         int stopProgressBarThread();
 
-        
+
 
         /* future that will execute the status update function */
         std::future<void> futureUpdateDlsStatus;
@@ -156,7 +156,7 @@ class dlManagerUI
         /* Map holding window sizes */
         std::map<const std::string, winSize> winSizeMap;
 
-        
+
 
         /* TODO - make it selectionable by the user */
         const int lowSpeedLim = 56;
