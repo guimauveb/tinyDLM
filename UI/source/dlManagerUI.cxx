@@ -49,11 +49,18 @@ void dlManagerUI::initColors()
     init_pair(4, COLOR_CYAN, COLOR_WHITE);
     init_pair(7, COLOR_WHITE, -1);
     init_pair(8, COLOR_BLACK, COLOR_WHITE);
+
+    /* Download status colors */
+    init_pair(9, -1, COLOR_GREEN);
+    init_pair(10, -1, COLOR_YELLOW);
+    init_pair(11, -1, COLOR_RED);
+
+    /* Highlighted download status colors */
+    init_pair(12, COLOR_GREEN, COLOR_WHITE);
+    init_pair(13, COLOR_YELLOW, COLOR_WHITE);
+    init_pair(14, COLOR_RED, COLOR_WHITE);
     /* Progress bar color pair */
     init_pair(16, COLOR_GREEN, COLOR_GREEN);
-    init_pair(17, -1, COLOR_GREEN);
-    init_pair(18, -1, COLOR_YELLOW);
-    init_pair(19, -1, COLOR_RED);
 }
 
 void dlManagerUI::setWinsSize()
@@ -328,7 +335,9 @@ void dlManagerUI::populateStatusWin(const std::vector<downloadWinInfo>& vec)
     size_t offset;
     size_t curr;
     point p = mainWindows.at(statusIdx)->getMaxyx();
-    chtype color; 
+    chtype color = COLOR_PAIR(7);
+    /* Status color */
+    chtype stcolor;
 
     /* Iterate over the list of downloads we obtained from dlManagerControl */
     /* Start iterating at the offset determined by the highlighted item in the menu */
@@ -340,25 +349,47 @@ void dlManagerUI::populateStatusWin(const std::vector<downloadWinInfo>& vec)
     for (offset = yOffset; offset < vec.size(); ++offset) {
 
 
+
+
         /* Highlight selected item */
         if (curr == offset) {
             color = COLOR_PAIR(8);
+
+            /* Highlight selected completed downloads status in green on white */
+            if (vec.at(offset).status == statusStrCd) {
+                stcolor = COLOR_PAIR(12);
+            }
+            /* Highlight selected paused downloads status in yellow on white */
+            else if (vec.at(offset).status == statusStrPd) {
+                stcolor = COLOR_PAIR(13);
+            }
+            /* Highlight selected problematic downloads status in red on white */
+            else if (vec.at(offset).status == statusStrEr) {
+                stcolor = COLOR_PAIR(14);
+            }
+            else {
+                stcolor = COLOR_PAIR(8);
+            }
         }
-        /* Highlight completed downloads in green */
-        else if (vec.at(offset).status == statusStrCd) {
-            color = COLOR_PAIR(17);
-        }
-        /* Highlight paused downloads in yellow */
-        else if (vec.at(offset).status == statusStrPd) {
-            color = COLOR_PAIR(18);
-        }
-        /* Highlight problematic downloads in red */
-        else if (vec.at(offset).status == statusStrEr) {
-            color = COLOR_PAIR(19);
-        }
+
         else   {
             color = COLOR_PAIR(7);
-        }
+            /* Highlight completed downloads status in green */
+            if (vec.at(offset).status == statusStrCd) {
+                stcolor = COLOR_PAIR(9);
+            }
+            /* Highlight paused downloads status in yellow */
+            else if (vec.at(offset).status == statusStrPd) {
+                stcolor = COLOR_PAIR(10);
+            }
+            /* Highlight problematic downloads status in red */
+            else if (vec.at(offset).status == statusStrEr) {
+                stcolor = COLOR_PAIR(11);
+            }
+            else {
+            stcolor = COLOR_PAIR(7);
+            }
+        }    
 
         mainWindows.at(statusIdx)->printInMiddle(y, 0, p.x / 4, vec.at(offset).progress, color);
         /* Display percent sign */
@@ -366,7 +397,7 @@ void dlManagerUI::populateStatusWin(const std::vector<downloadWinInfo>& vec)
         mainWindows.at(statusIdx)->printInMiddle(y, p.x / 4, p.x / 4, vec.at(offset).speed, color);
         mainWindows.at(statusIdx)->printInMiddle(y, p.x / 4, p.x / 4 + vec.at(offset).speed.length() + 2," MBs", color);
         //mainWindow.at(statusIdx)->printInMiddledlsStatusWiny, 2 * width / 4, width / 4, dl.eta, color);
-        mainWindows.at(statusIdx)->printInMiddle(y, 3 * p.x / 4, p.x / 4, vec.at(offset).status, color);
+        mainWindows.at(statusIdx)->printInMiddle(y, 3 * p.x / 4, p.x / 4, vec.at(offset).status, stcolor);
         y++;
     }
 }
