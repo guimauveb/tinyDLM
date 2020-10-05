@@ -1,6 +1,6 @@
 # tinyDLM - A tiny download manager
 
-![tinyDLM](/imgs/screenshot.png)
+![tinyDLM](/imgs/screenshot.jpg)
 
 ## Small multi-threaded download manager built around cURLpp / ncurses 
 
