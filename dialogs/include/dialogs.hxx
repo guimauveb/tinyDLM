@@ -7,6 +7,7 @@ extern const std::string workInProg;
 extern const std::string tinyDLMWelcome;
 extern const std::string tinyDLMVer;
 extern const std::string tinyHelp;
+extern const std::string madeBy;
 
 //extern const std::string msgKeyInfoP;
 //extern const std::string msgKeyInfoR;

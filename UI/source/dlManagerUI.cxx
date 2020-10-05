@@ -143,8 +143,9 @@ std::unique_ptr<cursesWindow> dlManagerUI::initWin(winSize& sz, const std::strin
 void dlManagerUI::paintWelWin(std::unique_ptr<cursesWindow>& welWin)
 {
     welWin->printInMiddle(row / 4, 0, col,  tinyDLMWelcome, COLOR_PAIR(7));
-    welWin->printInMiddle(row / 4 + 1, 0, col,  tinyDLMVer, COLOR_PAIR(7));
-    welWin->printInMiddle(row / 4 + 2, 0, col,  tinyHelp, COLOR_PAIR(7));
+    welWin->printInMiddle(row / 4 + 2, 0, col,  tinyDLMVer, COLOR_PAIR(7));
+    welWin->printInMiddle(row / 4 + 3, 0, col,  madeBy, COLOR_PAIR(7));
+    welWin->printInMiddle(row / 4 + 5, 0, col,  tinyHelp, COLOR_PAIR(7));
 }
 
 int dlManagerUI::firstStart()
@@ -229,7 +230,6 @@ void dlManagerUI::refreshMainWins()
 /* Resize program when terminal window size is detected */
 void dlManagerUI::resizeUI()
 {
-    // TODO - will return a struct of winSizes objects */
     setWinsSize();
 
     mainWindows.at(topBarIdx)->resizeWin(winSizeMap["topBarSz"]);
@@ -263,7 +263,6 @@ void dlManagerUI::paintTopWin(std::unique_ptr<cursesWindow>& topWin)
     char *titleMain = (char*)malloc(col*sizeof(char));
     size_t i = 0;
 
-    /* TODO - create a function for each */
     for (i = 0; i < liteDL_label.length(); ++i)
         titleMain[i] = liteDL_label.at(i);
     for (; i < col; ++i)
@@ -597,7 +596,6 @@ void dlManagerUI::paintAddDlWin()
     point maxyx = addDlWin->getMaxyx();
 
     int i = 0;
-    /* TODO - create a function for each */
     for (i = 0; i < (col / 2 - 18) / 2; ++i)
         titleAdd[i] = ' ';
 
@@ -802,8 +800,6 @@ int dlManagerUI::addDlNav()
                         ;
                     }
                     else {
-                        /* TODO - create a checkUserInput function that will call everyone */
-
                         /* Get user input from the fields */
                         std::string url = addDlForm->getFieldBuffer(0);
                         std::string filename = addDlForm->getFieldBuffer(1);
@@ -978,18 +974,10 @@ int dlManagerUI::detNav(const std::string& filename)
 
     while ((ch = getch())) {
         switch (ch) {
-            /* TODO -do not resize under 108 * 24 */
             case KEY_RESIZE:
                 {
                     updateMenu = true;
                     resizeDet = true;
-                    /* Sleeping here fixes an issue where the old progress bar thread wouldn't have time 
-                     * to terminate before a new one would start, causing a segfault / double free. 
-                     * Ugly fix but I don't have time to investigate further */
-                    //std::this_thread::sleep_for(std::chrono::milliseconds(100)); 
-                    /* Exit detNav and come back to the main window for now */
-                    //resizeUI();
-                    //done = true;
                     break;
                 }
 
@@ -1038,10 +1026,8 @@ int dlManagerUI::detNav(const std::string& filename)
         }
     } 
     stopProgressBarThread();
-    if (updateMenu) {
-        return 1;
-    }
-    return 0;
+
+    return updateMenu;
 }
 
 /* Display a subwindow containing details about the selected download */ 

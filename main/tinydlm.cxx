@@ -18,7 +18,6 @@ int main()
 
         while ((ch = getch()) != KEY_F(1)) {
             switch(ch) {
-                /* TODO - do not resize under 108 * 24 */
                 case KEY_RESIZE:
                     {
                         resizeUI = true;
@@ -60,6 +59,7 @@ int main()
                         if (dlmc->showDetails(dlmc->menu->getItemName())) {
                             dlmc->updateDownloadsMenu();
                             dlmc->resetStatusDriver();
+                            dlmc->mainWindows.at(dlmc->statusIdx)->resetWin();
                         }
 
                         dlmc->startStatusUpdate(); 
@@ -79,7 +79,6 @@ int main()
                     }
 
                 case 'h':
-                    /* TODO - Display a help window */
                     {
                         dlmc->stopStatusUpdate();
                         if (dlmc->showHelp()) {
@@ -134,7 +133,6 @@ int main()
                     }
 
                 case 'c':
-                    /* TODO - clearInactive() doesn't work properly when a download is in progress */
                     {
                         if (!dlmc->dlManagerControl->isActive()) {
                             break;

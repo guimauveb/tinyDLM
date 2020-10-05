@@ -42,6 +42,7 @@ else
 fi
 
     mkdir build
+    mkdir build/downloads
 
     cd build
 
