@@ -1,5 +1,9 @@
 #include "../include/dlManagerController.hxx"
 
+
+
+#include <curses.h>
+
 dlManagerController::dlManagerController()
 {
     dlCounter = 0;
@@ -17,6 +21,8 @@ std::string dlManagerController::createNewDl(std::string folder, std::string fil
     /* TODO - create a table in which we store the number of duplicates per filename */
     if (it != downloadsMap.end()) {
         createDuplicate(f, dlCounter);
+        endwin();
+        std::cout << filename << " already exists\n\rModified name = " << f << '\n';
     }
 
     it = downloadsMap.end();
@@ -111,13 +117,14 @@ void dlManagerController::clearInactive()
 void dlManagerController::stop(const std::string& dlToStop)
 {
     dlManagerVec.at(downloadsMap[dlToStop])->pause();
+    /* downloadsMap item returns an int corresponding to the index of the item in the vec */
     dlManagerVec.erase(dlManagerVec.begin() + downloadsMap[dlToStop]);
+
     std::map<std::string, int>::iterator it = downloadsMap.find(dlToStop);
     if (it != downloadsMap.end()) {
         downloadsMap.erase(it);
         /* Decrement downloads ids above deleted item since they are used as 
          * indexes to access dlManagerVec */
-        /* TODO - could we start iterating by ref at some index instead of map::begin ? */
         for (auto & el : downloadsMap) {
             if (el.second > it->second) {
                 --el.second;
