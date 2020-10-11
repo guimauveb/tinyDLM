@@ -1,9 +1,5 @@
 #include "../include/dlManagerController.hxx"
 
-
-
-#include <curses.h>
-
 dlManagerController::dlManagerController()
 {
     dlCounter = 0;
@@ -18,11 +14,14 @@ std::string dlManagerController::createNewDl(std::string folder, std::string fil
     std::string f = filename;
     std::map<std::string, int>::iterator it = downloadsMap.find(filename);
 
+    /* if filename in filenamesRecords
+     *      filenamesRecords["filename"] += 1
+     * else
+     *      filenamesRecords.insert(end, filename 1) */
+
     /* TODO - create a table in which we store the number of duplicates per filename */
     if (it != downloadsMap.end()) {
         createDuplicate(f, dlCounter);
-        endwin();
-        std::cout << filename << " already exists\n\rModified name = " << f << '\n';
     }
 
     it = downloadsMap.end();

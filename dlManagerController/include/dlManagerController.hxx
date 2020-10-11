@@ -41,6 +41,8 @@ class dlManagerController
         std::vector<std::string> getDownloadsList();
 
     private:
+        /* Store filenames and number of duplicates for each filenames to generate proper non-conflicting filenames */
+        std::map<std::string, int> filenamesRecords;
         /* Keep track of the number of downloads */
         int dlCounter;
 
