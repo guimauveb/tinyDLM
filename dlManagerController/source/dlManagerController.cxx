@@ -15,14 +15,16 @@ std::string dlManagerController::createNewDl(std::string folder, std::string fil
 {
     std::string f = filename;
     std::map<std::string, int>::iterator itA = downloadsMap.find(filename);
+    /* Duplicate number */
+    int n = 0;
     // if filename exists -> create duplicate routine 
     if (itA != downloadsMap.end()) {
         endwin();
         std::cout << "duplicate" << std::endl;
         std::map<std::string, std::vector<int>>::iterator it = filenamesRecords.find(filename);
-        int n = 0;
         bool found = false;
 
+        /* TODO - function() */
         /* If filename already exists, append (n) to it where n is equal to the number of duplicates */
         if (it != filenamesRecords.end()) {
             /* If vector size == 0, duplicate value = 1 */
@@ -69,9 +71,13 @@ std::string dlManagerController::createNewDl(std::string folder, std::string fil
         /* Append duplicate value */
         filenamesRecords[f].push_back(n);
         createDuplicate(f, n);
+        /* Store original filename and duplicate value and use final filename as key */
+        dlRecs.insert(dlRecs.end(), std::pair<std::string, dlRecord>(f, {filename, n}));
         endwin();
         std::this_thread::sleep_for(std::chrono::seconds(2));
         std::cout << "filename duplicate " << f << '\n';
+        std::cout << "dlrecs orig filename: " << dlRecs[f].origFilename << '\n';
+        std::cout << "dlrecs dup value : " << dlRecs[f].dupNum << '\n';
     }
     /* If filename is not present create new record */
     else {
@@ -79,6 +85,9 @@ std::string dlManagerController::createNewDl(std::string folder, std::string fil
         std::cout << "creating new record in filenamesrecords \n";
         filenamesRecords.insert(filenamesRecords.end(), std::pair<std::string, std::vector<int>>(f, std::vector<int>{}));
     }
+
+    /* Update vecDlRec keeping track of its original filename, its final name and duplicate number */
+    //vecDlRec.push_back({f, filename, n});
 
     std::map<std::string, int>::iterator itB = downloadsMap.end();
     downloadsMap.insert(itB, std::pair<std::string, int>(f, dlCounter));
@@ -190,8 +199,24 @@ void dlManagerController::stop(const std::string& dlToStop)
             }
         }   
     }
-    /* Decrement duplicate value of the filename deleted if it was a duplicate */
-    /* TODO */
+    std::map<std::string, dlRecord>::iterator itB = dlRecs.find(dlToStop);
+    /* If dl to stop is actually a duplicate */
+    if (itB != dlRecs.end()) {
+        endwin();
+        std::cout << "found filename in dlrecs\n";
+        std::cout << "dlRecs orig filename: " << itB->second.origFilename << '\n';
+        std::cout << "dlRecs dup value = " << itB->second.dupNum << '\n';
+        /* Remove duplicate number from filenamesRecords */
+        std::string orig = itB->second.origFilename;
+        int d = itB->second.dupNum;
+        filenamesRecords[orig].erase(std::remove(filenamesRecords[orig].begin(), filenamesRecords[orig].end(), d), filenamesRecords[orig].end());
+        endwin();
+        std::cout << "removed duplicate value from the array " << d << '\n';
+        std::cout << "filenamesRecords[orig] = [" << '\n';
+        for (auto& el : filenamesRecords[orig]) {
+            std::cout << el << ", \n";
+        }
+    }
 
     /* Decrement counter */
     dlCounter--;
@@ -203,13 +228,14 @@ void dlManagerController::stopAll()
         dlManagerVec.at(i)->pause();
 }
 
-/* Stops all ongoing transfers - clear the downloads menu and the downloads list - reset the download counter 
+/* Stops all ongoing transfers - clear downloads menu, downloads list and filenames records - reset download counter 
  * Sets activeDls to false. Does not delete already downloaded bytes from the hard drive */
 void dlManagerController::killAll()
 {
     stopAll();
     dlManagerVec.clear();
     downloadsMap.clear();
+    filenamesRecords.clear();
     dlCounter = 0;
 }
 

@@ -43,6 +43,13 @@ class dlManagerController
     private:
         /* Store filenames and number of duplicates for each filenames to generate proper non-conflicting filenames */
         std::map<std::string, std::vector<int>> filenamesRecords;
+        /* Struct storing filenames infos for any download. Allows to properly update filenamesRecord */
+        struct dlRecord {
+            const std::string origFilename;
+            int dupNum;
+        };
+        /* key = real filename */
+        std::map<std::string, dlRecord> dlRecs;
         /* Keep track of the number of downloads */
         int dlCounter;
 
@@ -52,5 +59,7 @@ class dlManagerController
         /* Maps a filename to a download id */
         std::map<std::string, int> downloadsMap;
         std::map<int, std::string> sortDownloadsMapByIds();
+        /* TODO - temp */
+        
 
 };
