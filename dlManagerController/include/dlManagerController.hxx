@@ -50,6 +50,8 @@ class dlManagerController
         };
         /* key = real filename */
         std::map<std::string, dlRecord> dlRecs;
+        std::string& recordDuplicate(std::string& f);
+        void createNewRecord(std::string& f);
         /* Keep track of the number of downloads */
         int dlCounter;
 
@@ -60,6 +62,6 @@ class dlManagerController
         std::map<std::string, int> downloadsMap;
         std::map<int, std::string> sortDownloadsMapByIds();
         /* TODO - temp */
-        
 
 };
+
