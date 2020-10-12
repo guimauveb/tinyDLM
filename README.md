@@ -12,6 +12,8 @@ I made this project to learn more about desktop applications, C++, threads, cURL
     - Transfers can be paused / resumed / killed.
     - Displays current download speed and progress for each transfer  
 
+
+
 ### Installation 
 
 Works on **Linux Debian based distributions** and **macOS (>= 10.14)**
@@ -34,14 +36,15 @@ Works on **Linux Debian based distributions** and **macOS (>= 10.14)**
 - **Linux Ubuntu (20.04 LTS)**
 - **Kali Linux (20.03)**
 
-### Missing features I want to implement
+### Missing features coming in version 1.1
     
-    - [ ] Limit download speed  
-    - [ ] Limit the number of max simultaneous downloads  
+    - [X] Duplicate filename checker 
     - [ ] Add multiple links at the same time  
+    - [ ] Limit the number of max simultaneous downloads  
     - [ ] Schedule download start  
+    - [ ] Compute / Display ETA  
+    - [ ] Limit download speed  
     - [ ] Select download directory (transfers are stored in 'downloads')  
-    - [ ] Compute the ETA  
     - [ ] Save downloads on exit and restore them on the next launch  
 
 
