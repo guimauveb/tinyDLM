@@ -846,10 +846,12 @@ int dlManagerUI::addDlNav()
 
                         /* dlManagerControl returns the final filename after verifying there wasn't a duplicate.*/
                         std::string f = dlManagerControl->createNewDl(dlFolder, filename, url,  0, 0);
-                        /* Start dl if everything ok */
-                        dlManagerControl->startDl(f);
-                        /* Update downloads list in the menu */
-                        updateDownloadsMenu();
+                        if (f != "NULL") {
+                            /* Start dl if everything ok */
+                            dlManagerControl->startDl(f);
+                            /* Update downloads list in the menu */
+                            updateDownloadsMenu();
+                        }
                         done = true;
                         /* Signals to reset menu window */
                         updateMenu = true;

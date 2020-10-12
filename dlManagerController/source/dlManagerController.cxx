@@ -23,20 +23,27 @@ std::string dlManagerController::createNewDl(std::string folder, std::string fil
         createNewRecord(filename);
     }
 
-    std::map<std::string, int>::iterator itB = downloadsMap.end();
-    downloadsMap.insert(itB, std::pair<std::string, int>(finalFilename, dlCounter));
+    /* If the duplicate filename generated is also existing, it means that the user manually appended (n) to a file */
+    /* Then leave the download using the same filename untouched and return without doing anything */
+    std::map<std::string, int>::iterator itB = downloadsMap.find(finalFilename);
+    if (itB == downloadsMap.end()) {
+        downloadsMap.insert(itB, std::pair<std::string, int>(finalFilename, dlCounter));
 
-    const std::string saveAs = dlFolder + finalFilename;
-    std::unique_ptr<dlManager> dlm = std::make_unique<dlManager>(dlCounter, url, finalFilename, saveAs, lowSpeedLim, lowSpeedTim);
-    dlManagerVec.emplace_back(std::move(dlm));
+        const std::string saveAs = dlFolder + finalFilename;
+        std::unique_ptr<dlManager> dlm = std::make_unique<dlManager>(dlCounter, url, finalFilename, saveAs, lowSpeedLim, lowSpeedTim);
+        dlManagerVec.emplace_back(std::move(dlm));
 
-    //endwin();
-    //std::this_thread::sleep_for(std::chrono::seconds(2));
-    //std::cout << "dlManagerVec.size() = " << dlManagerVec.size() << "\n\rdownloadsMap.size() = " << downloadsMap.size() << '\n';
+        //endwin();
+        //std::this_thread::sleep_for(std::chrono::seconds(2));
+        //std::cout << "dlManagerVec.size() = " << dlManagerVec.size() << "\n\rdownloadsMap.size() = " << downloadsMap.size() << '\n';
 
-    dlCounter++;
+        dlCounter++;
 
-    assert(dlManagerVec.size() == downloadsMap.size());
+        assert(dlManagerVec.size() == downloadsMap.size());
+    }
+    else {
+        finalFilename = "NULL";
+    }
 
     return finalFilename;
 }
@@ -48,13 +55,13 @@ std::string& dlManagerController::recordDuplicate(std::string& f) {
 
     std::string origFilename = f;
     /* Duplicate number */
-    int n = 0;
+    int n = 1;
     std::map<std::string, std::vector<int>>::iterator it = filenamesRecords.find(f);
     bool found = false;
 
     /* We suppose that the array minimum possible value is 1 */
     std::sort(filenamesRecords[f].begin(), filenamesRecords[f].end());
-    /* If filename already exists, append (n) to it where n is equal to the index of duplicates */
+    /* If filename already has duplicates, append (n) to it where n is equal to the index of duplicates */
     if (it != filenamesRecords.end()) {
         /* If vector size == 0, duplicate value = 1 */
         if (filenamesRecords[f].size() == 0) {
@@ -97,6 +104,7 @@ std::string& dlManagerController::recordDuplicate(std::string& f) {
         }
 
     }
+    /* If not duplicates was found, n = 1 */
     /* Append duplicate value to filename vector of duplicates values */
     filenamesRecords[f].push_back(n);
     createDuplicate(f, n);

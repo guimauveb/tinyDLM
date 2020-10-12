@@ -77,7 +77,8 @@ std::string& trimSpaces(std::string& str)
         while(!isalpha(str[j]) && !isdigit(str[j]) && 
                 (str[j] != '/') && (str[j] != ':') &&
                 (str[j] != '-') && (str[j] != '_') &&
-                (str[j] != '.') && (str[j] != '~')) {
+                (str[j] != '.') && (str[j] != '~') &&
+                (str[j] != ')') && (str[j] != '(')) {
             j--;
         }
     } 
