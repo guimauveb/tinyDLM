@@ -41,12 +41,11 @@ std::string dlManagerController::createNewDl(std::string folder, std::string fil
     return finalFilename;
 }
 
-/* Process the filename and find out what index must be appended to the filename according to records for this 
- * filename */
+/* Process the filename and find out what index must be appended according to records for this filename */
 std::string& dlManagerController::recordDuplicate(std::string& f) {
     //endwin();
     //std::cout << "duplicate" << std::endl;
-    
+
     std::string origFilename = f;
     /* Duplicate number */
     int n = 0;
@@ -223,12 +222,12 @@ void dlManagerController::stop(const std::string& dlToStop)
         std::string orig = itB->second.origFilename;
         int d = itB->second.dupNum;
         filenamesRecords[orig].erase(std::remove(filenamesRecords[orig].begin(), filenamesRecords[orig].end(), d), filenamesRecords[orig].end());
-       // endwin();
-       // std::cout << "removed duplicate value from the array " << d << '\n';
-       // std::cout << "filenamesRecords[orig] = [" << '\n';
-       // for (auto& el : filenamesRecords[orig]) {
-       //     std::cout << el << ", \n";
-       // }
+        // endwin();
+        // std::cout << "removed duplicate value from the array " << d << '\n';
+        // std::cout << "filenamesRecords[orig] = [" << '\n';
+        // for (auto& el : filenamesRecords[orig]) {
+        //     std::cout << el << ", \n";
+        // }
     }
 
     /* Decrement counter */
