@@ -1,5 +1,7 @@
 #include "../include/dlManagerController.hxx"
 
+#include <curses.h>
+
 dlManagerController::dlManagerController()
 {
     dlCounter = 0;
@@ -12,24 +14,82 @@ std::string dlManagerController::createNewDl(std::string folder, std::string fil
         const int lowSpeedLim, const int lowSpeedTim)
 {
     std::string f = filename;
-    std::map<std::string, int>::iterator it = downloadsMap.find(filename);
+    std::map<std::string, int>::iterator itA = downloadsMap.find(filename);
+    // if filename exists -> create duplicate routine 
+    if (itA != downloadsMap.end()) {
+        endwin();
+        std::cout << "duplicate" << std::endl;
+        std::map<std::string, std::vector<int>>::iterator it = filenamesRecords.find(filename);
+        int n = 0;
+        bool found = false;
 
-    /* if filename in filenamesRecords
-     *      filenamesRecords["filename"] += 1
-     * else
-     *      filenamesRecords.insert(end, filename 1) */
+        /* If filename already exists, append (n) to it where n is equal to the number of duplicates */
+        if (it != filenamesRecords.end()) {
+            /* If vector size == 0, duplicate value = 1 */
+            if (filenamesRecords[f].size() == 0) {
+                endwin();
+                std::cout << "n is equal to 1 because vector size is 0 \n";
+                n = 1;
+            }
+            /* If the first value is not 1, then we can conclude 1 is the minimum missing value */
+            else if(filenamesRecords[f].at(0) != 1) {
+                endwin();
+                std::cout << "n is equal to 1 because min value is not 1 \n";
+                n = 1;
+                found = true;
+            }
+            else {
+                /* We suppose that the array minimum possible value is 1 */
+                std::sort(filenamesRecords[f].begin(), filenamesRecords[f].end());
+                for (int i = 0; i < filenamesRecords[f].size(); ++i) {
+                    /* Check if next element exists */
+                    if (i + 1 < filenamesRecords[f].size()) {
+                        int j = i + 1;
+                        /* If the difference between the next element and the current element is not one, then there 
+                         * is a gap meaning that the min missing value is equal to current element + 1 */
+                        if (filenamesRecords[f].at(j) - filenamesRecords[f].at(i) != 1) {
+                            endwin();
+                            std::cout << "n is equal to min gap + 1 because gap \n";
+                            std::cout << filenamesRecords[f].at(j) << " " << filenamesRecords[f].at(i) << '\n';
+                            n = filenamesRecords[f].at(i) + 1;
+                            found = true;
+                            break;
+                        } 
+                    }
+                }
+                if (!found) {
+                    /* If we could not find a gap, then n is equal to the largest element + 1 */
+                    endwin();
+                    std::cout << "n is equal to largest value + 1 because no gap \n";
+                    n = filenamesRecords[f].at(filenamesRecords[f].size() - 1) + 1;
+                }
+            }
 
-    /* TODO - create a table in which we store the number of duplicates per filename */
-    if (it != downloadsMap.end()) {
-        createDuplicate(f, dlCounter);
+        }
+        /* Append duplicate value */
+        filenamesRecords[f].push_back(n);
+        createDuplicate(f, n);
+        endwin();
+        std::this_thread::sleep_for(std::chrono::seconds(2));
+        std::cout << "filename duplicate " << f << '\n';
+    }
+    /* If filename is not present create new record */
+    else {
+        endwin();
+        std::cout << "creating new record in filenamesrecords \n";
+        filenamesRecords.insert(filenamesRecords.end(), std::pair<std::string, std::vector<int>>(f, std::vector<int>{}));
     }
 
-    it = downloadsMap.end();
-    downloadsMap.insert(it, std::pair<std::string, int>(f, dlCounter));
+    std::map<std::string, int>::iterator itB = downloadsMap.end();
+    downloadsMap.insert(itB, std::pair<std::string, int>(f, dlCounter));
 
     const std::string saveAs = dlFolder + f;
     std::unique_ptr<dlManager> dlm = std::make_unique<dlManager>(dlCounter, url, f, saveAs, lowSpeedLim, lowSpeedTim);
     dlManagerVec.emplace_back(std::move(dlm));
+
+    endwin();
+    std::this_thread::sleep_for(std::chrono::seconds(2));
+    std::cout << "dlManagerVec.size() = " << dlManagerVec.size() << "\n\rdownloadsMap.size() = " << downloadsMap.size() << '\n';
 
     dlCounter++;
 
@@ -130,6 +190,9 @@ void dlManagerController::stop(const std::string& dlToStop)
             }
         }   
     }
+    /* Decrement duplicate value of the filename deleted if it was a duplicate */
+    /* TODO */
+
     /* Decrement counter */
     dlCounter--;
 }
