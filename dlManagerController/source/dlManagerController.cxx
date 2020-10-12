@@ -80,7 +80,7 @@ std::string& dlManagerController::recordDuplicate(std::string& f) {
                     /* If the difference between the next element and the current element is not one, then there 
                      * is a gap meaning that the min missing value is equal to current element + 1 */
                     if (filenamesRecords[f].at(j) - filenamesRecords[f].at(i) != 1) {
-                        endwin();
+                        //endwin();
                         //std::cout << "Gap found in array: n is equal to value before gap + 1. \n";
                         //std::cout << filenamesRecords[f].at(j) << " " << filenamesRecords[f].at(i) << '\n';
                         n = filenamesRecords[f].at(i) + 1;
@@ -215,20 +215,20 @@ void dlManagerController::stop(const std::string& dlToStop)
     std::map<std::string, dlRecord>::iterator itB = dlRecs.find(dlToStop);
     /* If dl to stop is actually a duplicate */
     if (itB != dlRecs.end()) {
-        endwin();
-        std::cout << "found filename in dlrecs\n";
-        std::cout << "dlRecs orig filename: " << itB->second.origFilename << '\n';
-        std::cout << "dlRecs dup value = " << itB->second.dupNum << '\n';
-        /* Remove duplicate number from filenamesRecords */
+        //endwin();
+        //std::cout << "found filename in dlrecs\n";
+        //std::cout << "dlRecs orig filename: " << itB->second.origFilename << '\n';
+        //std::cout << "dlRecs dup value = " << itB->second.dupNum << '\n';
+        /* Remove filename's duplicate number from filenamesRecords */
         std::string orig = itB->second.origFilename;
         int d = itB->second.dupNum;
         filenamesRecords[orig].erase(std::remove(filenamesRecords[orig].begin(), filenamesRecords[orig].end(), d), filenamesRecords[orig].end());
-        endwin();
-        std::cout << "removed duplicate value from the array " << d << '\n';
-        std::cout << "filenamesRecords[orig] = [" << '\n';
-        for (auto& el : filenamesRecords[orig]) {
-            std::cout << el << ", \n";
-        }
+       // endwin();
+       // std::cout << "removed duplicate value from the array " << d << '\n';
+       // std::cout << "filenamesRecords[orig] = [" << '\n';
+       // for (auto& el : filenamesRecords[orig]) {
+       //     std::cout << el << ", \n";
+       // }
     }
 
     /* Decrement counter */
