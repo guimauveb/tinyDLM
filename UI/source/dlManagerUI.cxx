@@ -580,6 +580,7 @@ int dlManagerUI::addNewDl()
 
     addDlForm = initForm(2);
     addDlWin = initWin(winSizeMap["addSz"], "add");
+    // TODO - create menu for buttons instead of keys - to allow \n input as a char and not as Enter key */
     setAddDlForm();
     paintAddDlWin();
     //addDlWin->drawBox(0, 0);
@@ -804,54 +805,78 @@ int dlManagerUI::addDlNav()
                         std::string url = addDlForm->getFieldBuffer(0);
                         std::string filename = addDlForm->getFieldBuffer(1);
                         url = trimSpaces(url);                        
+                        /* TODO - after having trimmed spaces, count hown many links we have */
+                        std::string urlField = url;
+                        urlField.push_back(' ');
+                        /* TODO - space + \n */
+                        std::string delimiter = "\n";
+                        std::string token;
+                        std::vector<std::string> urls;
+                        size_t pos = 0;
+                        while ((pos = urlField.find(delimiter)) != std::string::npos) {
+                            token = urlField.substr(0, pos);
+                            urls.push_back(token);
+                            // remove found token from buffer 
+                            urlField.erase(0, pos + delimiter.length());
+                        }
+
+
                         filename = trimSpaces(filename);
+                        /* tmp */
+                        filename.push_back('\0');
 
-                        /* Must be at least 7 char long -> http:// */
-                        if (checkURL(url)) {
-                            addDlWin->printInMiddle(6, 0, maxyx.x, msgInvalidURL, COLOR_PAIR(1));
-                            urlErr = true;
-                        }
-                        else {
-                            /* Erase error msg -> fill with white space */
-                            addDlWin->printInMiddle(6, 0, maxyx.x, "                   ", COLOR_PAIR(7));
-                            url.push_back('\0');
-                            urlErr = false;
-                        }
-
-                        if (!checkFilename(filename)){
-                            addDlWin->printInMiddle(10, 0, maxyx.x, msgInvalidFilename, COLOR_PAIR(1));
-                            fileErr = true;
-                        }
-                        else {
-                            /* Erase error msg -> fill with white space */
-                            addDlWin->printInMiddle(10, 0, maxyx.x, "                        ", COLOR_PAIR(7));
-                            filename.push_back('\0');
-                            fileErr = false;
-                        }
-
-                        if (fileErr || urlErr) {
-                            if (fileErr) {
-                                addDlForm->formDriver(REQ_LAST_FIELD);
-                                addDlForm->formDriver(REQ_END_LINE);
+                        //                        /* Must be at least 7 char long -> http:// */
+                        //                        if (checkURL(url)) {
+                        //                            addDlWin->printInMiddle(6, 0, maxyx.x, msgInvalidURL, COLOR_PAIR(1));
+                        //                            urlErr = true;
+                        //                        }
+                        //                        else {
+                        //                            /* Erase error msg -> fill with white space */
+                        //                            addDlWin->printInMiddle(6, 0, maxyx.x, "                   ", COLOR_PAIR(7));
+                        //                            url.push_back('\0');
+                        //                            urlErr = false;
+                        //                        }
+                        //
+                        //                        if (!checkFilename(filename)){
+                        //                            addDlWin->printInMiddle(10, 0, maxyx.x, msgInvalidFilename, COLOR_PAIR(1));
+                        //                            fileErr = true;
+                        //                        }
+                        //                        else {
+                        //                            /* Erase error msg -> fill with white space */
+                        //                            addDlWin->printInMiddle(10, 0, maxyx.x, "                        ", COLOR_PAIR(7));
+                        //                            filename.push_back('\0');
+                        //                            fileErr = false;
+                        //                        }
+                        //
+                        //                        if (fileErr || urlErr) {
+                        //                            if (fileErr) {
+                        //                                addDlForm->formDriver(REQ_LAST_FIELD);
+                        //                                addDlForm->formDriver(REQ_END_LINE);
+                        //                            }
+                        //                            if (urlErr) {
+                        //                                addDlForm->formDriver(REQ_FIRST_FIELD);
+                        //                                addDlForm->formDriver(REQ_END_LINE);
+                        //                            }
+                        //
+                        //                            curs_set(1);
+                        //                            /* Break out of loop and reenter it */
+                        //                            break;
+                        //                        }
+                        //
+                        //                      
+                        //
+                        for (auto el : urls) {
+                            endwin();
+                            std::cout << "el: " << el << "\n\r";
+                            /* dlManagerControl returns the final filename after verifying there wasn't a duplicate.*/
+                            std::string f = dlManagerControl->createNewDl(dlFolder, filename, el,  0, 0);
+                            if (f != "NULL") {
+                                /* Start dl if everything ok */
+                                dlManagerControl->startDl(f);
+                                /* Update downloads list in the menu */
                             }
-                            if (urlErr) {
-                                addDlForm->formDriver(REQ_FIRST_FIELD);
-                                addDlForm->formDriver(REQ_END_LINE);
-                            }
-
-                            curs_set(1);
-                            /* Break out of loop and reenter it */
-                            break;
                         }
-
-                        /* dlManagerControl returns the final filename after verifying there wasn't a duplicate.*/
-                        std::string f = dlManagerControl->createNewDl(dlFolder, filename, url,  0, 0);
-                        if (f != "NULL") {
-                            /* Start dl if everything ok */
-                            dlManagerControl->startDl(f);
-                            /* Update downloads list in the menu */
-                            updateDownloadsMenu();
-                        }
+                        updateDownloadsMenu();
                         done = true;
                         /* Signals to reset menu window */
                         updateMenu = true;
