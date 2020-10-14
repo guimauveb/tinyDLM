@@ -577,10 +577,10 @@ int dlManagerUI::addNewDl()
      * addDlForm has to free some memory corresponding to the old window (now deleted), we end up with a 
      * segfault */
 
-
     addDlForm = initForm(2);
     addDlWin = initWin(winSizeMap["addSz"], "add");
     // TODO - create menu for buttons instead of keys - to allow \n input as a char and not as Enter key */
+
     setAddDlForm();
     paintAddDlWin();
     //addDlWin->drawBox(0, 0);
