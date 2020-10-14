@@ -598,7 +598,7 @@ int dlManagerUI::addNewDl()
     setAddDlForm();
     setAddDlMenu();
     paintAddDlWin();
-  //  addMenuWin->refreshWin();
+    //addMenuWin->refreshWin();
 
     int r = addDlNav();
 
@@ -609,6 +609,7 @@ int dlManagerUI::addNewDl()
     return r;
 }
 
+/* Remark: */ 
 void dlManagerUI::setAddDlMenu()
 {
     //point pMax = addDlWin->getMaxyx();
@@ -616,7 +617,7 @@ void dlManagerUI::setAddDlMenu()
     addDlMenu->menuOptsOn(O_SHOWDESC);
     //addDlMenu->setMenuWin(addDlWin);
     addDlMenu->setMenuDer(addDlWin);
-//    addDlMenu->setMenuSubDer(addDlWin, 1, 34, pMax.y - 2, (pMax.x - 34) / 2);
+    //addDlMenu->setMenuSubDer(addDlWin, 1, 34, pMax.y - 2, (pMax.x - 34) / 2);
 
     addDlMenu->setMenuFormat(1, 3);
     addDlMenu->setMenuMark(" * ");

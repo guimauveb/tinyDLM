@@ -82,6 +82,12 @@ void cursesMenu::setMenuWin(std::unique_ptr<cursesWindow>& win)
     set_menu_win(menu, win->getRawPtr());
 }
 
+/* Works on macOS, not on Linux */
+void cursesMenu::setMenuSubDer(std::unique_ptr<cursesWindow>& win, int a, int b, int c, int d)
+{
+    set_menu_win(menu, derwin(win->getRawPtr(), a, b, c, d));
+}
+
 /* Set the window to be associated with the menu */
 void cursesMenu::setMenuSub(std::unique_ptr<cursesWindow>& win)
 {

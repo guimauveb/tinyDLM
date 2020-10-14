@@ -24,7 +24,6 @@ class cursesWindow
         // TODO
         void setDerwin(int nl, int nc, int by, int bx);
         WINDOW * getDerwin();
-        WINDOW * der;
 
         point getBegyx();
         point getMaxyx();
@@ -49,6 +48,7 @@ class cursesWindow
     private:
         /* We'll use the same pointer every time the window is resized (deleted then init) */
         WINDOW *win = nullptr;
+        WINDOW * der;
         /* Save all parameters we got from the initialisation so we can resize it */
         int row, col, begy, begx;
         std::string winName;
