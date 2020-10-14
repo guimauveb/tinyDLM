@@ -589,9 +589,9 @@ int dlManagerUI::addNewDl()
     //point pBeg = addDlWin->getBegyx();
     // Init a subwin for the menu
     // TODO - subwin getting its coordinates from addDlWin
-//    addMenuWin = std::make_unique<cursesWindow>(1, 34, pMax.y + row / 6, (col - 34) / 2, "addDlSubWin");
+    //addMenuWin = std::make_unique<cursesWindow>(1, 34, pMax.y + row / 6, (col - 34) / 2, "addDlSubWin");
     //addMenuWin->drawBox(0, 0);
- //   addMenuWin->touchWin();
+    //addMenuWin->touchWin();
     addDlMenu = initDownloadsMenu(tmpItems);
 
     setAddDlForm();
@@ -610,10 +610,12 @@ int dlManagerUI::addNewDl()
 
 void dlManagerUI::setAddDlMenu()
 {
+    point pMax = addDlWin->getMaxyx();
     //point pBeg = addDlWin->getBegyx();
     addDlMenu->menuOptsOn(O_SHOWDESC);
     addDlMenu->setMenuWin(addDlWin);
     //addDlMenu->setMenuSub(addDlWin);
+    addDlMenu->setMenuSubDer(addDlWin, 1, 34, pMax.y + row / 6, (col - 34) / 2);
 
     addDlMenu->setMenuFormat(1, 3);
     addDlMenu->setMenuMark(" * ");
