@@ -588,8 +588,8 @@ int dlManagerUI::addNewDl()
     point pMax = addDlWin->getMaxyx();
     point pBeg = addDlWin->getBegyx();
     // Init a subwin for the menu
-    addMenuWin = std::make_unique<cursesWindow>(2, pMax.x - 2, pMax.y - 1, pBeg.x + 1, "addDlSubWin");
-    addMenuWin->drawBox(0, 0);
+    addMenuWin = std::make_unique<cursesWindow>(4, pMax.x - 2, pMax.y - 1, pBeg.x + 1, "addDlSubWin");
+    //addMenuWin->drawBox(0, 0);
     addDlMenu = initDownloadsMenu(tmpItems);
 
     //setAddDlForm();
