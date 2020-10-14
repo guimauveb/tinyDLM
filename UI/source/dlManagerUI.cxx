@@ -598,7 +598,8 @@ void dlManagerUI::setAddDlMenu()
 {
     point pBeg = addDlWin->getBegyx();
     addDlMenu->menuOptsOn(O_SHOWDESC);
-    addDlMenu->setMenuSubDer(addDlWin, 1, 10, 10, 0);
+    addDlMenu->setMenuWin(addDlWin);
+    addDlMenu->setMenuSubDer(addDlWin, 1, 40, 11, 3);
 //    addDlMenu->setMenuSub(addDlWin);
 
     addDlMenu->setMenuFormat(10, 10);
