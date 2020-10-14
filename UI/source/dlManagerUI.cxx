@@ -762,6 +762,14 @@ int dlManagerUI::addDlNav()
     std::string filenameField;
     int currField = 0;
 
+    // TODO - cursor pos
+    int curPos = 0;
+    // curPos 0 -> first field
+    // curPos 1 -> second field
+    // curPos 2 -> Start button
+    // curPos 3 -> Schedule button
+    // curPos 4 -> Close button
+
     curs_set(1);   
     addDlWin->wMove(4, 4);
     addDlWin->refreshWin();
@@ -784,28 +792,70 @@ int dlManagerUI::addDlNav()
 
             case KEY_UP:
                 {
-                    addDlForm->formDriver(REQ_PREV_FIELD);
-                    addDlForm->formDriver(REQ_END_LINE);
+                    // first field  
+                    if (curPos == 0) {
+                        addDlMenu->menuDriver(REQ_LAST_ITEM);
+                        curPos = 4;
+                    }
+                    // second field
+                    else if (curPos == 1) {
+                       addDlForm->formDriver(REQ_PREV_FIELD);
+                       addDlForm->formDriver(REQ_END_LINE);
+                       curPos = 0;
+                    } 
+                    // any menu itme
+                    else {
+                        addDlForm->formDriver(REQ_LAST_FIELD);
+                        addDlForm->formDriver(REQ_END_LINE);
+                        curPos = 1;
+                    }
                     break;
                 }
 
             case KEY_DOWN:
                 {
-                    addDlForm->formDriver(REQ_NEXT_FIELD);
-                    addDlForm->formDriver(REQ_END_LINE);
+                    // first field
+                    if (curPos == 0) {
+                        addDlForm->formDriver(REQ_NEXT_FIELD);
+                        addDlForm->formDriver(REQ_END_LINE);
+                        curPos = 1;
+                    }
+                    // second field
+                    else if (curPos == 1) {
+                        addDlMenu->menuDriver(REQ_FIRST_ITEM);
+                        curPos = 2;
+                    }
+                    // any menu items
+                    else {
+                       addDlForm->formDriver(REQ_FIRST_FIELD);
+                       addDlForm->formDriver(REQ_END_LINE);
+                       curPos = 0;
+                    }
                     break;
                 }
             case KEY_LEFT:
                 {
-                    addDlMenu->menuDriver(REQ_PREV_ITEM);
-                    //addDlForm->formDriver(REQ_PREV_CHAR);
+                    // any field
+                    if (curPos == 0 || curPos == 1) {
+                        addDlForm->formDriver(REQ_PREV_CHAR);
+                    }
+                    else {
+                        addDlMenu->menuDriver(REQ_PREV_ITEM);
+                        curPos -= 1;
+                    }
                     break;
                 }
 
             case KEY_RIGHT:
                 {
-                    addDlMenu->menuDriver(REQ_NEXT_ITEM);
-                    //addDlForm->formDriver(REQ_NEXT_CHAR);
+                    // any field
+                    if (curPos == 0 || curPos == 1) {
+                        addDlForm->formDriver(REQ_NEXT_CHAR);
+                    }
+                    else {
+                        addDlMenu->menuDriver(REQ_NEXT_ITEM);
+                        curPos += 1;
+                    }
                     break;
                 }
 
