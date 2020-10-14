@@ -615,7 +615,7 @@ void dlManagerUI::setAddDlMenu()
     addDlMenu->menuOptsOn(O_SHOWDESC);
     addDlMenu->setMenuWin(addDlWin);
     //addDlMenu->setMenuSub(addDlWin);
-    addDlMenu->setMenuSubDer(addDlWin, 1, 34, pMax.y + row / 6, (col - 34) / 2);
+    addDlMenu->setMenuSubDer(addDlWin, 1, 34, pMax.y - 1, (pMax.x - 34) / 2);
 
     addDlMenu->setMenuFormat(1, 3);
     addDlMenu->setMenuMark(" * ");
@@ -962,6 +962,7 @@ int dlManagerUI::addDlNav()
         if (done) {
             break;
         }
+        addDlWin->touchWin();
         addDlWin->refreshWin();
         //addMenuWin->touchWin();
         //addMenuWin->refreshWin();
