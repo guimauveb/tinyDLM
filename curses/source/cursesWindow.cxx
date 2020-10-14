@@ -159,3 +159,7 @@ void cursesWindow::clearToEOL()
     clrtoeol();
 }
 
+void cursesWindow::setSubwin(int nl, int nc, int by, int bx)
+{
+    
+}
