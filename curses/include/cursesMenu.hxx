@@ -14,10 +14,13 @@ class cursesMenu {
         void newMenu();
         void menuOptsOff(Menu_Options);
         void menuOptsOn(Menu_Options);
+
         /* We use unique_ptr references since we know the pointer will outlive the cursesMenu object */
         void setMenuSubDer(std::unique_ptr<cursesWindow>& win, int a, int b, int c, int d);
+        void setMenuDer(std::unique_ptr<cursesWindow>& der);
         void setMenuWin(std::unique_ptr<cursesWindow>& win);
         void setMenuSub(std::unique_ptr<cursesWindow>& win);
+
         void setMenuFormat(int r, int c);
         void setMenuMark(const char *m);
         void postMenu();

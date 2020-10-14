@@ -159,7 +159,12 @@ void cursesWindow::clearToEOL()
     clrtoeol();
 }
 
-void cursesWindow::setSubwin(int nl, int nc, int by, int bx)
+void cursesWindow::setDerwin(int nl, int nc, int by, int bx) 
 {
-    
+    der = derwin(win, nl, nc, by, bx);    
+}
+
+WINDOW * cursesWindow::getDerwin()
+{
+    return der;
 }

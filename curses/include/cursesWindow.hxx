@@ -22,8 +22,9 @@ class cursesWindow
         void resetWin();
 
         // TODO
-        void setSubwin(int nl, int nc, int by, int bx);
-        void setDerwin();
+        void setDerwin(int nl, int nc, int by, int bx);
+        WINDOW * getDerwin();
+        WINDOW * der;
 
         point getBegyx();
         point getMaxyx();

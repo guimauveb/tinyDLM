@@ -82,15 +82,15 @@ void cursesMenu::setMenuWin(std::unique_ptr<cursesWindow>& win)
     set_menu_win(menu, win->getRawPtr());
 }
 
-void cursesMenu::setMenuSubDer(std::unique_ptr<cursesWindow>& win, int a, int b, int c, int d)
-{
-    set_menu_win(menu, derwin(win->getRawPtr(), a, b, c, d));
-}
-
 /* Set the window to be associated with the menu */
 void cursesMenu::setMenuSub(std::unique_ptr<cursesWindow>& win)
 {
     set_menu_sub(menu, win->getRawPtr());
+}
+
+void cursesMenu::setMenuDer(std::unique_ptr<cursesWindow>& der)
+{
+    set_menu_sub(menu, der->getDerwin());
 }
 
 /* Set the number of elements to fit the screen size */

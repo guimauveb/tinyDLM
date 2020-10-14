@@ -585,13 +585,14 @@ int dlManagerUI::addNewDl()
     // TODO - create menu for buttons instead of keys - to allow \n input as a char and not as Enter key */
     std::vector<std::string> tmpItems = {"Start", "Schedule", "Close"};
     // init downloads menu == init any menu 
-    //point pMax = addDlWin->getMaxyx();
+    point pMax = addDlWin->getMaxyx();
     //point pBeg = addDlWin->getBegyx();
     // Init a subwin for the menu
     // TODO - subwin getting its coordinates from addDlWin
     //addMenuWin = std::make_unique<cursesWindow>(1, 34, pMax.y + row / 6, (col - 34) / 2, "addDlSubWin");
     //addMenuWin->drawBox(0, 0);
     //addMenuWin->touchWin();
+    addDlWin->setDerwin(1, 34, pMax.y - 2, (pMax.x - 34) / 2);
     addDlMenu = initDownloadsMenu(tmpItems);
 
     setAddDlForm();
@@ -610,12 +611,12 @@ int dlManagerUI::addNewDl()
 
 void dlManagerUI::setAddDlMenu()
 {
-    point pMax = addDlWin->getMaxyx();
+    //point pMax = addDlWin->getMaxyx();
     //point pBeg = addDlWin->getBegyx();
     addDlMenu->menuOptsOn(O_SHOWDESC);
     //addDlMenu->setMenuWin(addDlWin);
-    //addDlMenu->setMenuSub(addDlWin);
-    addDlMenu->setMenuSubDer(addDlWin, 1, 34, pMax.y - 1, (pMax.x - 34) / 2);
+    addDlMenu->setMenuDer(addDlWin);
+//    addDlMenu->setMenuSubDer(addDlWin, 1, 34, pMax.y - 2, (pMax.x - 34) / 2);
 
     addDlMenu->setMenuFormat(1, 3);
     addDlMenu->setMenuMark(" * ");
