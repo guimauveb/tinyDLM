@@ -118,6 +118,7 @@ class dlManagerUI
 
         /* "Add a new download" routine */
         std::unique_ptr<cursesWindow> addDlWin;
+        std::unique_ptr<cursesWindow> addMenuWin;
         std::unique_ptr<cursesForm> addDlForm;
         std::unique_ptr<cursesMenu> addDlMenu;
         void paintAddDlWin();

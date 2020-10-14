@@ -579,16 +579,23 @@ int dlManagerUI::addNewDl()
 
     addDlForm = initForm(2);
     addDlWin = initWin(winSizeMap["addSz"], "add");
+    addDlWin->drawBox(0, 0);
+    addDlWin->refreshWin();
+
     // TODO - create menu for buttons instead of keys - to allow \n input as a char and not as Enter key */
     std::vector<std::string> tmpItems = {"Start download", "Start download","Start download","Start download","Start download","Start download", "Close"};
     // init downloads menu == init any menu 
+    point pMax = addDlWin->getMaxyx();
+    point pBeg = addDlWin->getBegyx();
+    // Init a subwin for the menu
+    addMenuWin = std::make_unique<cursesWindow>(2, pMax.x - 2, pMax.y - 1, pBeg.x + 1, "addDlSubWin");
+    addMenuWin->drawBox(0, 0);
     addDlMenu = initDownloadsMenu(tmpItems);
-    addDlWin->drawBox(0, 0);
 
     //setAddDlForm();
     setAddDlMenu();
-    addDlWin->refreshWin();
     //paintAddDlWin();
+    addMenuWin->refreshWin();
 
     /* No need to call free() for win and form -> class destructor will take care of it */
     return addDlNav();
@@ -596,10 +603,9 @@ int dlManagerUI::addNewDl()
 
 void dlManagerUI::setAddDlMenu()
 {
-    point pBeg = addDlWin->getBegyx();
+    //point pBeg = addDlWin->getBegyx();
     addDlMenu->menuOptsOn(O_SHOWDESC);
-    addDlMenu->setMenuWin(addDlWin);
-    addDlMenu->setMenuSubDer(addDlWin, 1, 40, 11, 3);
+    addDlMenu->setMenuWin(addMenuWin);
 //    addDlMenu->setMenuSub(addDlWin);
 
     addDlMenu->setMenuFormat(10, 10);
