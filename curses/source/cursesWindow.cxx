@@ -150,7 +150,7 @@ void cursesWindow::keyPad(bool b)
 
 void cursesWindow::wMove(int y, int x)
 {
-    move(y, x);
+    wmove(win, y, x);
     wrefresh(win);
 }
 

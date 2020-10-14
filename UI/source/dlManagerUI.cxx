@@ -156,7 +156,7 @@ int dlManagerUI::firstStart()
     /* Move to current active subwins so we know we have to resize them */
 
     /* Disable cursor because I can't print to the screen without moving it */
-    curs_set(0);
+    //curs_set(0);
     int ch = 0;
     //bool done = false;
     bool resize = false;
@@ -762,8 +762,11 @@ int dlManagerUI::addDlNav()
     std::string filenameField;
     int currField = 0;
 
+    curs_set(1);   
+    addDlWin->wMove(4, 4);
+    addDlWin->refreshWin();
+
     while ((ch = getch())) {
-        curs_set(1);   
         point maxyx = addDlWin->getMaxyx();
 
         switch (ch) {
