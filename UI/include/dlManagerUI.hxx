@@ -119,14 +119,15 @@ class dlManagerUI
         /* "Add a new download" routine */
         std::unique_ptr<cursesWindow> addDlWin;
         std::unique_ptr<cursesForm> addDlForm;
+        std::unique_ptr<cursesMenu> addDlMenu;
         void paintAddDlWin();
         void setAddDlForm();
+        void setAddDlMenu();
 
         /* Navigate through the 'Add a download' subwindow */
         int addDlNav();
         void populateForm(const std::string filename);
         void resizeAddDlNav(std::string url, std::string filename);
-
 
         /* Details window routine */
         std::unique_ptr<cursesWindow> detWin; 
@@ -146,8 +147,6 @@ class dlManagerUI
         bool progRef = false;
         int stopProgressBarThread();
 
-
-
         /* future that will execute the status update function */
         std::future<void> futureUpdateDlsStatus;
         /* future that will execute the progress bar update function */
@@ -155,8 +154,6 @@ class dlManagerUI
 
         /* Map holding window sizes */
         std::map<const std::string, winSize> winSizeMap;
-
-
 
         /* TODO - make it selectionable by the user */
         const int lowSpeedLim = 56;

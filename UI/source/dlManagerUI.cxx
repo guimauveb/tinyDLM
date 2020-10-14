@@ -580,14 +580,30 @@ int dlManagerUI::addNewDl()
     addDlForm = initForm(2);
     addDlWin = initWin(winSizeMap["addSz"], "add");
     // TODO - create menu for buttons instead of keys - to allow \n input as a char and not as Enter key */
+    std::vector<std::string> tmpItems = {"Start download", "Start download","Start download","Start download","Start download","Start download", "Close"};
+    // init downloads menu == init any menu 
+    addDlMenu = initDownloadsMenu(tmpItems);
+    addDlWin->drawBox(0, 0);
 
-    setAddDlForm();
-    paintAddDlWin();
-    //addDlWin->drawBox(0, 0);
-
+    //setAddDlForm();
+    setAddDlMenu();
     addDlWin->refreshWin();
+    //paintAddDlWin();
+
     /* No need to call free() for win and form -> class destructor will take care of it */
     return addDlNav();
+}
+
+void dlManagerUI::setAddDlMenu()
+{
+    point pBeg = addDlWin->getBegyx();
+    addDlMenu->menuOptsOn(O_SHOWDESC);
+    addDlMenu->setMenuSubDer(addDlWin, 1, 10, 10, 0);
+//    addDlMenu->setMenuSub(addDlWin);
+
+    addDlMenu->setMenuFormat(10, 10);
+    addDlMenu->setMenuMark(" * ");
+    addDlMenu->postMenu();
 }
 
 void dlManagerUI::paintAddDlWin()
