@@ -1,0 +1,12 @@
+# openssl error on killing downloads when transfers seems to be too numerous
+Process 46927 stopped
+* thread #1, queue = 'com.apple.main-thread', stop reason = EXC_BAD_ACCESS (code=1, address=0x60)
+frame #0: 0x00007fff5b56d7b5 libcrypto.42.dylib`ASN1_OBJECT_free + 14
+libcrypto.42.dylib`ASN1_OBJECT_free:
+->  0x7fff5b56d7b5 <+14>: movl   0x20(%rdi), %eax
+0x7fff5b56d7b8 <+17>: testb  $0x4, %al
+0x7fff5b56d7ba <+19>: je     0x7fff5b56d7d9            ; <+50>
+0x7fff5b56d7bc <+21>: movq   (%rbx), %rdi
+Target 0: (tinyDLM) stopped.
+
+# Errors seem to occur only when tinyDLM is launched from the bash script
