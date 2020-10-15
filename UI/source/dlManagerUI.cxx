@@ -427,7 +427,7 @@ void dlManagerUI::updateDownloadsStatusWindow()
         }
         /* Sleep 100ms before refreshing the window again or the while loop will execute endlessly 
          * so it doesn't monopolize time / ressources */ 
-        std::this_thread::sleep_for(std::chrono::milliseconds(100));
+        std::this_thread::sleep_for(std::chrono::milliseconds(200));
         /* y represents the y postion of the infos to print on the screen - it matches the location
          * of the corresponding download item on the futureUpdateDlsStatus part of the screen */
 
@@ -1217,7 +1217,7 @@ void dlManagerUI::progressBar(const std::string& filename)
             }
             /* Sleep 100ms before refreshing the window again or the while loop will execute endlessly 
              * so it doesn't monopolize time / ressources */ 
-            std::this_thread::sleep_for(std::chrono::milliseconds(100));
+            std::this_thread::sleep_for(std::chrono::milliseconds(200));
             /* y represents the y postion of the infos to print on the screen - it matches the location
              * of the corresponding download item on the futureUpdateDlsStatus part of the screen */
 
