@@ -86,7 +86,8 @@ std::string& trimSpaces(std::string& str)
             j--;
         }
     } 
-    return str = str.substr(i,j);
+    // string::substr(pos, len (num of char to include))
+    return str = str.substr(i, j + 1);
 }
 
 
