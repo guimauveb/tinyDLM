@@ -713,7 +713,7 @@ int dlManagerUI::resizeDetWin(const std::string& filename)
 {
     stopProgressBarThread();
 
-    endwin();
+    //endwin();
     refresh();
     resizeUI();
 
@@ -731,13 +731,25 @@ int dlManagerUI::resizeDetWin(const std::string& filename)
 
 void dlManagerUI::resizeAddDlNav(std::string url, std::string filename)
 {
-    endwin();
+    //endwin();
     refresh();
     resizeUI();
 
     addDlForm = initForm(2);
-    addDlWin->resizeWin(winSizeMap["addSz"]);
+    addDlWin = initWin(winSizeMap["addSz"], "add");
+
+    // TODO - create menu for buttons instead of keys - to allow \n input as a char and not as Enter key */
+    std::vector<std::string> tmpItems = {"Start", "Schedule", "Close"};
+    // init downloads menu == init any menu 
+    point pMax = addDlWin->getMaxyx();
+    //point pBeg = addDlWin->getBegyx();
+
+    // Init a subwin for the menu
+    addDlWin->setDerwin(1, 34, pMax.y - 2, (pMax.x - 34) / 2);
+    addDlMenu = initDownloadsMenu(tmpItems);
+
     setAddDlForm();
+    setAddDlMenu();
     paintAddDlWin();
 
     url.push_back('\0');
@@ -748,6 +760,7 @@ void dlManagerUI::resizeAddDlNav(std::string url, std::string filename)
     addDlForm->populateField(REQ_FIRST_FIELD, url);
     addDlForm->populateField(REQ_LAST_FIELD, filename);
 
+    addDlWin->touchWin();
     addDlWin->refreshWin();
 }
 
