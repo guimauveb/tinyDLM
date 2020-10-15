@@ -210,7 +210,6 @@ void dlManagerController::stop(const std::string& dlToStop)
 
     std::map<std::string, int>::iterator it = downloadsMap.find(dlToStop);
     if (it != downloadsMap.end()) {
-        downloadsMap.erase(it);
         /* Decrement downloads ids above deleted item since they are used as 
          * indexes to access dlManagerVec */
         for (auto & el : downloadsMap) {
@@ -218,6 +217,7 @@ void dlManagerController::stop(const std::string& dlToStop)
                 --el.second;
             }
         }   
+        downloadsMap.erase(it);
     }
     std::map<std::string, dlRecord>::iterator itB = dlRecs.find(dlToStop);
     /* If dl to stop is actually a duplicate */

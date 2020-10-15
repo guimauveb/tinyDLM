@@ -12,6 +12,19 @@ Target 0: (tinyDLM) stopped.
 # Errors seem to occur only when tinyDLM is launched from the bash script
 
 Errors detected from add san:
-paintTopBar -> strlen (buffer overflow)
+
+paintTopBar -> strlen (buffer overflow)                     TODO
+
+paintAddDlWin -> strlen (buffer overflow)                   TODO
+
+trimSpaces -> buffer overflow caused                        DONE
+    -> Caused by j becoming < 0 when iterating through the string
+
+dlManagerController -> heap use after free                  DONE
+    -> Caused by calling iterator::erase() then trying to access its value
+
+error when trying to create a duplicate filename            TODO
+
+
 
 
