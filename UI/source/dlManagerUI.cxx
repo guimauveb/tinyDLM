@@ -566,7 +566,9 @@ int dlManagerUI::showDetails(const std::string& itemName)
     /* Disable cursor */
     curs_set(0);
     /* Navigate through the details window */
-    return detNav(itemName);
+
+    int r = detNav(itemName);
+    return r;
 }
 
 /* Add a new download */
@@ -808,6 +810,7 @@ int dlManagerUI::addDlNav()
                 {
                     // first field  
                     if (curPos == 0) {
+                        curs_set(0);
                         addDlMenu->menuDriver(REQ_LAST_ITEM);
                         curPos = 4;
                     }
@@ -819,6 +822,7 @@ int dlManagerUI::addDlNav()
                     } 
                     // any menu itme
                     else {
+                        curs_set(1);
                         addDlForm->formDriver(REQ_LAST_FIELD);
                         addDlForm->formDriver(REQ_END_LINE);
                         curPos = 1;
@@ -836,11 +840,13 @@ int dlManagerUI::addDlNav()
                     }
                     // second field
                     else if (curPos == 1) {
+                        curs_set(0);
                         addDlMenu->menuDriver(REQ_FIRST_ITEM);
                         curPos = 2;
                     }
                     // any menu items
                     else {
+                        curs_set(1);
                         addDlForm->formDriver(REQ_FIRST_FIELD);
                         addDlForm->formDriver(REQ_END_LINE);
                         curPos = 0;
@@ -853,7 +859,11 @@ int dlManagerUI::addDlNav()
                     if (curPos == 0 || curPos == 1) {
                         addDlForm->formDriver(REQ_PREV_CHAR);
                     }
-                    // any menu items
+                    // Move to the right
+                    else if (curPos == 2) {
+                        addDlMenu->menuDriver(REQ_LAST_ITEM);
+                        curPos = 4;
+                    }
                     else {
                         addDlMenu->menuDriver(REQ_PREV_ITEM);
                         curPos -= 1;
@@ -867,7 +877,11 @@ int dlManagerUI::addDlNav()
                     if (curPos == 0 || curPos == 1) {
                         addDlForm->formDriver(REQ_NEXT_CHAR);
                     }
-                    // any menu items
+                    // Move to the left
+                    else if (curPos == 4) {
+                        addDlMenu->menuDriver(REQ_FIRST_ITEM);
+                        curPos = 2;
+                    }
                     else {
                         addDlMenu->menuDriver(REQ_NEXT_ITEM);
                         curPos += 1;
@@ -880,9 +894,16 @@ int dlManagerUI::addDlNav()
                     if (curPos == 0 || curPos == 1) {
                         addDlForm->formDriver(' ');
                     }
+                    else if (curPos == 3) {
+                        // TODO - schedule
+                    }
+                    else if (curPos == 4) {
+                        done = true;
+                    }
 
                     // Start button
-                    if (curPos == 2) {
+                    // TODO - move to a function() 
+                    else if (curPos == 2) {
                         if (addDlForm->formDriver(REQ_VALIDATION) != E_OK) {
                             //check error 
                             ;
