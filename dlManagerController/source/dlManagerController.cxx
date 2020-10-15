@@ -177,19 +177,19 @@ void dlManagerController::clearInactive()
     for (size_t i = 0; i < dlManagerVec.size(); ++i) {
         if((dlManagerVec.at(i)->getDownloadInfos()->status == downloadStatus::ERROR) || 
                 (dlManagerVec.at(i)->getDownloadInfos()->status == downloadStatus::COMPLETED)) {
-            it = downloadsMap.find(dlManagerVec.at(i)->
-                    getDownloadInfos()->filename);
+            it = downloadsMap.find(dlManagerVec.at(i)->getDownloadInfos()->filename);
             if (it != downloadsMap.end()) {
-                downloadsMap.erase(it);
-                todel.push_back(i);
                 /* Decrement downloads ids above deleted item since they are used as 
                  * indexes to access dlManagerVec */
                 /* TODO - could we start iterating by ref at some index instead of map::begin ? */
-                for (auto & el : downloadsMap) {
+                /* TODO - resizedownloadsmap ? */
+                for (auto& el : downloadsMap) {
                     if (el.second > it->second) {
                         --el.second;
                     }
                 }
+                downloadsMap.erase(it);
+                todel.push_back(i);
             }
         }
     }

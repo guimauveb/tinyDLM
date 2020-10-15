@@ -4,7 +4,6 @@
 #include <iostream>
 #include <ncurses.h>
 
-/* TODO - move somewhere else */
 int checkURLlength(std::string& url)
 {
     /* Check if the url is at least 7 char long (https://...) */

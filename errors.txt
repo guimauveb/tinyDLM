@@ -11,9 +11,11 @@ Target 0: (tinyDLM) stopped.
 
 # Errors detected from ASAN:
 
-paintTopBar -> strlen (buffer overflow)                     TODO
+paintTopBar -> strlen (buffer overflow)                     DONE
+    -> Caused by not allocating space for the null terminator char
 
-paintAddDlWin -> strlen (buffer overflow)                   TODO
+paintAddDlWin -> strlen (buffer overflow)                   DONE
+    -> Caused by not pushing a null terminator char to the string even it was not used
 
 trimSpaces -> buffer overflow caused                        DONE
     -> Caused by j becoming < 0 when iterating through the string
@@ -21,8 +23,7 @@ trimSpaces -> buffer overflow caused                        DONE
 dlManagerController -> heap use after free                  DONE
     -> Caused by calling iterator::erase() then trying to access its value
 
-error when trying to create a duplicate filename            TODO
-
-
+error when trying to create a duplicate filename            DONE
+    -> error caused by the absence of a null character in some strings
 
 

@@ -233,7 +233,7 @@ void dlManagerUI::resizeUI()
     setWinsSize();
 
     mainWindows.at(topBarIdx)->resizeWin(winSizeMap["topBarSz"]);
-    //paintTopWin(mainWindows.at(topBarIdx));
+    paintTopWin(mainWindows.at(topBarIdx));
 
     mainWindows.at(labelsIdx)->resizeWin(winSizeMap["labelsSz"]);
     paintLabelsWin(mainWindows.at(labelsIdx));
@@ -260,15 +260,15 @@ void dlManagerUI::paintTopWin(std::unique_ptr<cursesWindow>& topWin)
 {
     /* Print a whole black on white row at the top of the main window that will be the size of the terminal
      * window width*/
-    char *titleMain = (char*)malloc(col*sizeof(char));
+    char *titleMain = (char*)malloc((col + 1)*sizeof(char));
     size_t i = 0;
 
-    for (i = 0; i < liteDL_label.length(); ++i)
+    for (i = 0; i < liteDL_label.length(); ++i) {
         titleMain[i] = liteDL_label.at(i);
-    for (; i < col; ++i)
+    }
+    for (; i < col; ++i) {
         titleMain[i] = ' ';
-    //for (size_t j = 0; j < workInProg.length(); ++j)
-    //   titleMain[i++] = workInProg.at(j);
+    }
     titleMain[i] = '\0';
 
     topWin->printInMiddle(0, 0, col, titleMain, COLOR_PAIR(8));
@@ -282,7 +282,7 @@ void dlManagerUI::initMainWins()
 
     /* Window containing top bar title */
     mainWindows.emplace_back(initWin(winSizeMap["topBarSz"], "topBar"));
-    //paintTopWin(mainWindows.at(topBarIdx));
+    paintTopWin(mainWindows.at(topBarIdx));
 
     /* Top window containing labels such as "name", "url","speed" etc  */
     mainWindows.emplace_back(initWin(winSizeMap["labelsSz"], "labels"));
@@ -593,7 +593,7 @@ int dlManagerUI::addNewDl()
     setAddDlForm();
     setAddDlMenu();
     // TODO - problematic - strlen 
-    //paintAddDlWin();
+    paintAddDlWin();
 
     addDlWin->touchWin();
     addDlWin->refreshWin();
@@ -625,7 +625,9 @@ void dlManagerUI::setAddDlMenu()
 // TODO - problematic - strlen 
 void dlManagerUI::paintAddDlWin()
 {
-    char *titleAdd = (char*)malloc((col / 2) + 1*sizeof(char));
+    char *titleAdd = (char*)malloc(((col / 2) + 1)*sizeof(char));
+    titleAdd[col / 2] = '\0';
+
     std::string addNL = addNewLabel;
     point maxyx = addDlWin->getMaxyx();
 
@@ -644,7 +646,6 @@ void dlManagerUI::paintAddDlWin()
         for (; i < col / 2 ; ++i) {
             titleAdd[i] = ' ';
         }
-        titleAdd[i] = '\0';
         addDlWin->printInMiddle(1, 0, maxyx.x , titleAdd, COLOR_PAIR(8));
 
     }
@@ -737,8 +738,7 @@ void dlManagerUI::resizeAddDlNav(std::string url, std::string filename)
     addDlForm = initForm(2);
     addDlWin->resizeWin(winSizeMap["addSz"]);
     setAddDlForm();
-    // TODO - problematic - strlen 
-    //paintAddDlWin();
+    paintAddDlWin();
 
     url.push_back('\0');
     filename.push_back('\0');
@@ -761,8 +761,6 @@ int dlManagerUI::addDlNav()
     bool resizeAdd = false;
     bool urlErr = false, fileErr = false;
 
-    std::string urlField;
-    std::string filenameField;
     int currField = 0;
 
     // TODO - cursor pos
@@ -884,7 +882,7 @@ int dlManagerUI::addDlNav()
                             /* TODO - after having trimmed spaces, count hown many links we have */
                             std::string urlField = url;
                             urlField.push_back(' ');
-                            // \n is replaced by ' ' 
+                            // '\n' is replaced by ' ' 
                             std::string delimiter = " ";
                             std::string token;
                             std::vector<std::string> urls;
@@ -892,54 +890,55 @@ int dlManagerUI::addDlNav()
                             while ((pos = urlField.find(delimiter)) != std::string::npos) {
                                 token = urlField.substr(0, pos);
                                 urls.push_back(token);
-                                // remove found token from buffer 
+                                // Remove found token from buffer 
                                 urlField.erase(0, pos + delimiter.length());
                             }
 
-                            filename.push_back('\0');
+                            // TODO - same for filename
+                            std::string filenameField;
                             filename = trimSpaces(filename);
                             /* tmp */
 
-                            //                        /* Must be at least 7 char long -> http:// */
-                            //                        if (checkURL(url)) {
-                            //                            addDlWin->printInMiddle(6, 0, maxyx.x, msgInvalidURL, COLOR_PAIR(1));
-                            //                            urlErr = true;
-                            //                        }
-                            //                        else {
-                            //                            /* Erase error msg -> fill with white space */
-                            //                            addDlWin->printInMiddle(6, 0, maxyx.x, "                   ", COLOR_PAIR(7));
-                            //                            url.push_back('\0');
-                            //                            urlErr = false;
-                            //                        }
-                            //
-                            //                        if (!checkFilename(filename)){
-                            //                            addDlWin->printInMiddle(10, 0, maxyx.x, msgInvalidFilename, COLOR_PAIR(1));
-                            //                            fileErr = true;
-                            //                        }
-                            //                        else {
-                            //                            /* Erase error msg -> fill with white space */
-                            //                            addDlWin->printInMiddle(10, 0, maxyx.x, "                        ", COLOR_PAIR(7));
-                            //                            filename.push_back('\0');
-                            //                            fileErr = false;
-                            //                        }
-                            //
-                            //                        if (fileErr || urlErr) {
-                            //                            if (fileErr) {
-                            //                                addDlForm->formDriver(REQ_LAST_FIELD);
-                            //                                addDlForm->formDriver(REQ_END_LINE);
-                            //                            }
-                            //                            if (urlErr) {
-                            //                                addDlForm->formDriver(REQ_FIRST_FIELD);
-                            //                                addDlForm->formDriver(REQ_END_LINE);
-                            //                            }
-                            //
-                            //                            curs_set(1);
-                            //                            /* Break out of loop and reenter it */
-                            //                            break;
-                            //                        }
-                            //
-                            //                      
-                            //
+                            /* Must be at least 7 char long -> http:// */
+                            if (checkURL(url)) {
+                                addDlWin->printInMiddle(6, 0, maxyx.x, msgInvalidURL, COLOR_PAIR(1));
+                                urlErr = true;
+                            }
+                            else {
+                                /* Erase error msg -> fill with white space */
+                                addDlWin->printInMiddle(6, 0, maxyx.x, "                   ", COLOR_PAIR(7));
+                                url.push_back('\0');
+                                urlErr = false;
+                            }
+
+                            if (!checkFilename(filename)){
+                                addDlWin->printInMiddle(10, 0, maxyx.x, msgInvalidFilename, COLOR_PAIR(1));
+                                fileErr = true;
+                            }
+                            else {
+                                /* Erase error msg -> fill with white space */
+                                addDlWin->printInMiddle(10, 0, maxyx.x, "                        ", COLOR_PAIR(7));
+                                filename.push_back('\0');
+                                fileErr = false;
+                            }
+
+                            if (fileErr || urlErr) {
+                                if (fileErr) {
+                                    addDlForm->formDriver(REQ_LAST_FIELD);
+                                    addDlForm->formDriver(REQ_END_LINE);
+                                }
+                                if (urlErr) {
+                                    addDlForm->formDriver(REQ_FIRST_FIELD);
+                                    addDlForm->formDriver(REQ_END_LINE);
+                                }
+
+                                curs_set(1);
+                                /* Break out of loop and reenter it */
+                                break;
+                            }
+
+
+
                             for (auto el : urls) {
                                 /* dlManagerControl returns the final filename after verifying there wasn't a duplicate.*/
                                 std::string f = dlManagerControl->createNewDl(dlFolder, filename, el,  0, 0);

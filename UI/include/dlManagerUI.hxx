@@ -7,7 +7,6 @@
 /* cursesMenu.hxx includes cursesWindow and cursesForm */
 #include "../../curses/include/cursesMenu.hxx"
 
-/* TODO - is there a way to avoid a macro in this case ? */
 #define CTRL(c) ((c) & 037)
 
 /* Class defining a dlManager curses interface */
