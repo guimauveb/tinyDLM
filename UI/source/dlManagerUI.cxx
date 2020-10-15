@@ -233,7 +233,7 @@ void dlManagerUI::resizeUI()
     setWinsSize();
 
     mainWindows.at(topBarIdx)->resizeWin(winSizeMap["topBarSz"]);
-    paintTopWin(mainWindows.at(topBarIdx));
+    //paintTopWin(mainWindows.at(topBarIdx));
 
     mainWindows.at(labelsIdx)->resizeWin(winSizeMap["labelsSz"]);
     paintLabelsWin(mainWindows.at(labelsIdx));
@@ -282,7 +282,7 @@ void dlManagerUI::initMainWins()
 
     /* Window containing top bar title */
     mainWindows.emplace_back(initWin(winSizeMap["topBarSz"], "topBar"));
-    paintTopWin(mainWindows.at(topBarIdx));
+    //paintTopWin(mainWindows.at(topBarIdx));
 
     /* Top window containing labels such as "name", "url","speed" etc  */
     mainWindows.emplace_back(initWin(winSizeMap["labelsSz"], "labels"));
@@ -427,7 +427,7 @@ void dlManagerUI::updateDownloadsStatusWindow()
         }
         /* Sleep 100ms before refreshing the window again or the while loop will execute endlessly 
          * so it doesn't monopolize time / ressources */ 
-        std::this_thread::sleep_for(std::chrono::milliseconds(200));
+        std::this_thread::sleep_for(std::chrono::milliseconds(100));
         /* y represents the y postion of the infos to print on the screen - it matches the location
          * of the corresponding download item on the futureUpdateDlsStatus part of the screen */
 
@@ -592,7 +592,8 @@ int dlManagerUI::addNewDl()
 
     setAddDlForm();
     setAddDlMenu();
-    paintAddDlWin();
+    // TODO - problematic - strlen 
+    //paintAddDlWin();
 
     addDlWin->touchWin();
     addDlWin->refreshWin();
@@ -621,6 +622,7 @@ void dlManagerUI::setAddDlMenu()
     addDlMenu->postMenu();
 }
 
+// TODO - problematic - strlen 
 void dlManagerUI::paintAddDlWin()
 {
     char *titleAdd = (char*)malloc((col / 2) + 1*sizeof(char));
@@ -735,7 +737,8 @@ void dlManagerUI::resizeAddDlNav(std::string url, std::string filename)
     addDlForm = initForm(2);
     addDlWin->resizeWin(winSizeMap["addSz"]);
     setAddDlForm();
-    paintAddDlWin();
+    // TODO - problematic - strlen 
+    //paintAddDlWin();
 
     url.push_back('\0');
     filename.push_back('\0');
@@ -893,9 +896,9 @@ int dlManagerUI::addDlNav()
                                 urlField.erase(0, pos + delimiter.length());
                             }
 
+                            filename.push_back('\0');
                             filename = trimSpaces(filename);
                             /* tmp */
-                            filename.push_back('\0');
 
                             //                        /* Must be at least 7 char long -> http:// */
                             //                        if (checkURL(url)) {
@@ -1217,7 +1220,7 @@ void dlManagerUI::progressBar(const std::string& filename)
             }
             /* Sleep 100ms before refreshing the window again or the while loop will execute endlessly 
              * so it doesn't monopolize time / ressources */ 
-            std::this_thread::sleep_for(std::chrono::milliseconds(200));
+            std::this_thread::sleep_for(std::chrono::milliseconds(100));
             /* y represents the y postion of the infos to print on the screen - it matches the location
              * of the corresponding download item on the futureUpdateDlsStatus part of the screen */
 

@@ -10,3 +10,8 @@ libcrypto.42.dylib`ASN1_OBJECT_free:
 Target 0: (tinyDLM) stopped.
 
 # Errors seem to occur only when tinyDLM is launched from the bash script
+
+Errors detected from add san:
+paintTopBar -> strlen (buffer overflow)
+
+

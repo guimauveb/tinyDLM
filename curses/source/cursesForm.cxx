@@ -95,7 +95,8 @@ void cursesForm::postForm()
 
 std::string cursesForm::getFieldBuffer(size_t fieldIdx)
 {
-    return std::string(field_buffer(fields.at(fieldIdx), 0)); 
+    std::string str = field_buffer(fields.at(fieldIdx), 0);
+    return str; 
 
 }
 void cursesForm::clearForm()

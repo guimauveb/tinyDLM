@@ -1,0 +1,8 @@
+[?1049h[1;24r(B[m[4l[?7h[?1h=[39;49m[39;49m(B[m[H[2J
+
+[H[2J
+
+
+
+[4;57H[24d[H[24;57H[H[3;26H[37m NAME [3;60HPROGRESS[75GSPEED[4;29H[39m(B[m
+[4;57H[24;27H[24;57H[5d[H[11;38H[37m tinyDLM - A tiny downloader manager [13;50H version 1.0 [14;50H by guimauve [16;40H Press 'a' to add a new download. [39m(B[m[24;1H[?1049l[?1l>

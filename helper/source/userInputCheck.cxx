@@ -1,5 +1,9 @@
 #include "../../helper/include/userInputCheck.hxx"
 
+//tmp
+#include <iostream>
+#include <ncurses.h>
+
 /* TODO - move somewhere else */
 int checkURLlength(std::string& url)
 {
@@ -74,7 +78,7 @@ std::string& trimSpaces(std::string& str)
         }
         /* Move from the end till first char - using isspace() seems to cause trouble in the curses field 
          * but would definetly be better to use here */
-        while(!isalpha(str[j]) && !isdigit(str[j]) && 
+        while(j > 0 && !isalpha(str[j]) && !isdigit(str[j]) && 
                 (str[j] != '/') && (str[j] != ':') &&
                 (str[j] != '-') && (str[j] != '_') &&
                 (str[j] != '.') && (str[j] != '~') &&
@@ -82,7 +86,7 @@ std::string& trimSpaces(std::string& str)
             j--;
         }
     } 
-    return str = str.substr(i, j + 1);
+    return str = str.substr(i,j);
 }
 
 
