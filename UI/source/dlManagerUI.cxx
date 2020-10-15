@@ -884,7 +884,7 @@ int dlManagerUI::addDlNav()
                             /* TODO - after having trimmed spaces, count hown many links we have */
                             std::string urlField = url;
                             urlField.push_back(' ');
-                            /* TODO - space + \n */
+                            // \n is replaced by ' ' 
                             std::string delimiter = " ";
                             std::string token;
                             std::vector<std::string> urls;
