@@ -35,6 +35,7 @@ void dlManagerUI::initCurses()
     cbreak();
     noecho();
     keypad(stdscr, TRUE);
+    curs_set(0);
 }
 
 /* Initialize all the colors and color pairs */

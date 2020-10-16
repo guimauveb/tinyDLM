@@ -41,9 +41,8 @@ else
     echo tinyDLM can only be installed on Linux and macOS for now.
 fi
 
+    mkdir -p app/downloads
     mkdir build
-    mkdir build/downloads
-
     cd build
 
 # comp will either be "gcc" or "clang" 
@@ -168,6 +167,12 @@ if [ "${comp}" != "0" ] && [ "${curl}" -eq 1 ] && [ "${curlpp}" -eq 1 ] && [ "${
     cmake ../
     # run make
     make
+
+    mv tinyDLM ../app/tinyDLM
+    cd ../app
+
+    # remove build files
+    rm -r ../build
 
     if [ ! -f tinyDLM ]; then
         echo "Couldn't locate tinyDLM. Build certainly failed. Check cmake error logs."
