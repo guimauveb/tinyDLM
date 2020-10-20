@@ -44,7 +44,7 @@ Works on **Linux Debian based distributions** and **macOS (>= 10.14)**
     - [ ] Schedule download start  
     - [ ] Compute / Display ETA  
     - [ ] Limit download speed  
-    - [ ] Select download directory (transfers are stored in 'downloads')  
+    - [ ] Select download directory (transfers are stored in 'downloads') by creating a file explorer 
     - [ ] Save downloads on exit and restore them on the next launch  
 
 
