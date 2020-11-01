@@ -41,7 +41,7 @@ Works on **Linux Debian based distributions** and **macOS (>= 10.14)**
 ### Missing features coming in version 1.1
     
     - [X] Duplicate filename checker 
-    - [ ] Add multiple links at the same time **DOING** 
+    - [IN PROGRESS] Add multiple links at the same time 
     - [ ] Limit the number of max simultaneous downloads  
     - [ ] Schedule download start  
     - [ ] Compute / Display ETA  
