@@ -11,6 +11,8 @@ I made this project to learn more about desktop applications, C++, threads, cURL
     - Supports simultaneous transfers  
     - Transfers can be paused / resumed / killed.
     - Displays current download speed and progress for each transfer  
+    - Very low CPU / memory consumption
+    - **NEW** Partially supports adding multiple links at the same time
 
 
 
@@ -39,7 +41,7 @@ Works on **Linux Debian based distributions** and **macOS (>= 10.14)**
 ### Missing features coming in version 1.1
     
     - [X] Duplicate filename checker 
-    - [ ] Add multiple links at the same time  
+    - [ ] Add multiple links at the same time **DOING** 
     - [ ] Limit the number of max simultaneous downloads  
     - [ ] Schedule download start  
     - [ ] Compute / Display ETA  
