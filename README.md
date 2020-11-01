@@ -1,4 +1,4 @@
-# tinyDLM - A tiny download manager
+# tinyDLM - A C++ download manager
 
 ![tinyDLM](/imgs/screenshot.jpg)
 
