@@ -71,7 +71,7 @@ std::string& dlManagerController::recordDuplicate(std::string& f) {
             n = 1;
         }
         /* If the first value is not 1 we can conclude 1 is the minimum missing value */
-        else if(filenamesRecords[f].at(0) != 1) {
+        else if (filenamesRecords[f].at(0) != 1) {
             //endwin();
             //std::cout << "n is equal to 1 because min value is not 1. \n";
             n = 1;
