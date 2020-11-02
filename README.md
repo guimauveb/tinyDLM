@@ -38,8 +38,7 @@ Works on **Linux Debian based distributions** and **macOS (>= 10.14)**
 - **Linux Ubuntu (20.04 LTS)**
 - **Kali Linux (20.03)**
 
-### Missing features coming in version 1.1
-    
+### Missing features coming soon 
     - [X] Duplicate filename checker 
     - [IN PROGRESS] Add multiple links at the same time 
     - [ ] Limit the number of max simultaneous downloads  
