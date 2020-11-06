@@ -168,20 +168,16 @@ if [ "${comp}" != "0" ] && [ "${curl}" -eq 1 ] && [ "${curlpp}" -eq 1 ] && [ "${
     # run make
     make
 
-    mv tinyDLM ../app/tinyDLM
-    cd ../app
-
-    # remove build files
-    rm -r ../build
-
     if [ ! -f tinyDLM ]; then
         echo "Couldn't locate tinyDLM. Build certainly failed. Check cmake error logs."
-    else 
-        # ask user if he wants to run the program 
+    elif [ -f tinyDLM ]; then  
+
+        mv tinyDLM ../app/tinyDLM
+        cd ../app
+
         read -p "Do you want to launch tinyDLM ? [Y/n] " answer
         if [ "$answer" == "Y" ] || [ "$answer" == "y" ]
         then
-            # run tinyDLM
             ./tinyDLM
         else 
             echo tinyDLM was built successfully.
@@ -190,4 +186,6 @@ if [ "${comp}" != "0" ] && [ "${curl}" -eq 1 ] && [ "${curlpp}" -eq 1 ] && [ "${
 else
     echo Installation failed. Please install all required dependencies.
 fi
+
+rm -r ../build
 
