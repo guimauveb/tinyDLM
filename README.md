@@ -15,7 +15,6 @@ I made this project to learn more about desktop applications, C++, threads, cURL
     - **NEW** Partially supports adding multiple links at the same time
 
 
-
 ### Installation 
 
 Works on **Linux Debian based distributions** and **macOS (>= 10.14)**
@@ -41,7 +40,8 @@ Works on **Linux Debian based distributions** and **macOS (>= 10.14)**
 ### Missing features coming soon 
     - [X] Duplicate filename checker 
     - [IN PROGRESS] Add multiple links at the same time 
-    - [ ] Limit the number of max simultaneous downloads  
+    - [ ] Set the default number of simultaneous transfers to the number of CPU cores / threads
+    - [ ] Set the number of max simultaneous transfers  
     - [ ] Schedule download start  
     - [ ] Compute / Display ETA  
     - [ ] Limit download speed  
