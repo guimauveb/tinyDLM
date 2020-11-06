@@ -33,10 +33,6 @@ std::string dlManagerController::createNewDl(std::string folder, std::string fil
         std::unique_ptr<dlManager> dlm = std::make_unique<dlManager>(dlCounter, url, finalFilename, saveAs, lowSpeedLim, lowSpeedTim);
         dlManagerVec.emplace_back(std::move(dlm));
 
-        //endwin();
-        //std::this_thread::sleep_for(std::chrono::seconds(2));
-        //std::cout << "dlManagerVec.size() = " << dlManagerVec.size() << "\n\rdownloadsMap.size() = " << downloadsMap.size() << '\n';
-
         dlCounter++;
 
         assert(dlManagerVec.size() == downloadsMap.size());
@@ -50,9 +46,6 @@ std::string dlManagerController::createNewDl(std::string folder, std::string fil
 
 /* Process the filename and find out what index must be appended according to records for this filename */
 std::string& dlManagerController::recordDuplicate(std::string& f) {
-    //endwin();
-    //std::cout << "duplicate" << std::endl;
-
     std::string origFilename = f;
     /* Duplicate number */
     int n = 1;
@@ -65,15 +58,11 @@ std::string& dlManagerController::recordDuplicate(std::string& f) {
     if (it != filenamesRecords.end()) {
         /* If vector size == 0, duplicate value = 1 */
         if (filenamesRecords[f].size() == 0) {
-            //endwin();
-            //std::cout << "n is equal to 1 because vector size is 0. \n";
             found = true;
             n = 1;
         }
         /* If the first value is not 1 we can conclude 1 is the minimum missing value */
         else if (filenamesRecords[f].at(0) != 1) {
-            //endwin();
-            //std::cout << "n is equal to 1 because min value is not 1. \n";
             n = 1;
             found = true;
         }
@@ -86,9 +75,6 @@ std::string& dlManagerController::recordDuplicate(std::string& f) {
                     /* If the difference between the next element and the current element is not one, then there 
                      * is a gap meaning that the min missing value is equal to current element + 1 */
                     if (filenamesRecords[f].at(j) - filenamesRecords[f].at(i) != 1) {
-                        //endwin();
-                        //std::cout << "Gap found in array: n is equal to value before gap + 1. \n";
-                        //std::cout << filenamesRecords[f].at(j) << " " << filenamesRecords[f].at(i) << '\n';
                         n = filenamesRecords[f].at(i) + 1;
                         found = true;
                         break;
@@ -97,8 +83,6 @@ std::string& dlManagerController::recordDuplicate(std::string& f) {
             }
             if (!found) {
                 /* If we could not find a gap, then n is equal to the largest element + 1 */
-                //endwin();
-                //std::cout << "n is equal to largest value + 1 because no gap \n";
                 n = filenamesRecords[f].at(filenamesRecords[f].size() - 1) + 1;
             }
         }
@@ -111,19 +95,11 @@ std::string& dlManagerController::recordDuplicate(std::string& f) {
     /* Store original filename and duplicate value in dlRecs and use final filename as key */
     dlRecs.insert(dlRecs.end(), std::pair<std::string, dlRecord>(f, {origFilename, n}));
 
-    //endwin();
-    //std::this_thread::sleep_for(std::chrono::seconds(2));
-    //std::cout << "filename duplicate " << f << '\n';
-    //std::cout << "dlrecs orig filename: " << dlRecs[f].origFilename << '\n';
-    //std::cout << "dlrecs dup value : " << dlRecs[f].dupNum << '\n';
-
     return f;
 }
 
 void dlManagerController::createNewRecord(std::string& f)
 {
-    //endwin();
-    //std::cout << "Creating new record in filenamesrecords \n";
     filenamesRecords.insert(filenamesRecords.end(), std::pair<std::string, std::vector<int>>(f, std::vector<int>{}));
 }
 
@@ -148,7 +124,6 @@ void dlManagerController::resume(const std::string& dlToResume)
     dlManagerVec.at(downloadsMap[dlToResume])->resume();
 }
 
-/* Resume transfer if status == PAUSED */ 
 void dlManagerController::resumeAll()
 {
     for (size_t i = 0; i < dlManagerVec.size(); ++i) {
@@ -222,20 +197,10 @@ void dlManagerController::stop(const std::string& dlToStop)
     std::map<std::string, dlRecord>::iterator itB = dlRecs.find(dlToStop);
     /* If dl to stop is actually a duplicate */
     if (itB != dlRecs.end()) {
-        //endwin();
-        //std::cout << "found filename in dlrecs\n";
-        //std::cout << "dlRecs orig filename: " << itB->second.origFilename << '\n';
-        //std::cout << "dlRecs dup value = " << itB->second.dupNum << '\n';
         /* Remove filename's duplicate number from filenamesRecords */
         std::string orig = itB->second.origFilename;
         int d = itB->second.dupNum;
         filenamesRecords[orig].erase(std::remove(filenamesRecords[orig].begin(), filenamesRecords[orig].end(), d), filenamesRecords[orig].end());
-        // endwin();
-        // std::cout << "removed duplicate value from the array " << d << '\n';
-        // std::cout << "filenamesRecords[orig] = [" << '\n';
-        // for (auto& el : filenamesRecords[orig]) {
-        //     std::cout << el << ", \n";
-        // }
     }
 
     /* Decrement counter */

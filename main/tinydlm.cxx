@@ -1,4 +1,9 @@
-
+/* To come in version 1.1:
+ *  - Duplicate filename checker DONE
+ *  - Adding multiple downloads at the same time TODO
+ *  - Chose number of simultaneous downloads TODO
+ *  - Limit download speed TODO 
+ */
 #include "../UI/include/dlManagerUI.hxx"
 #include "tinyDLM.hxx"
 

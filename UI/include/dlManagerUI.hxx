@@ -2,7 +2,7 @@
 #include "../../helper/include/userInputCheck.hxx"
 #include "../../dialogs/include/dialogs.hxx"
 
-#include "../../dlManagerController/include/dlManagerController.hxx"
+#include "../../controller/include/controller.hxx"
 
 /* cursesMenu.hxx includes cursesWindow and cursesForm */
 #include "../../curses/include/cursesMenu.hxx"
