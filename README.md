@@ -4,9 +4,6 @@
 
 ## Small multi-threaded download manager built around cURLpp / ncurses 
 
-I made this project to learn more about desktop applications, C++, threads, cURL / cURLpp and ncurses.
-C++ download manager built around cURLpp and ncurses
-
 I've never encountered a simple yet efficient download manager that would be free AND still maintained.
 
 So I decided to build my own and figured out it would be a great way to learn more about C++, multithreading, sockets and desktop applications and I did learn a lot along the way !
