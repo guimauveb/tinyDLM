@@ -595,7 +595,6 @@ int dlManagerUI::addNewDl()
 
     setAddDlForm();
     setAddDlMenu();
-    // TODO - problematic - strlen 
     paintAddDlWin();
 
     addDlWin->touchWin();
@@ -903,7 +902,7 @@ int dlManagerUI::addDlNav()
                     }
 
                     // Start button
-                    // TODO - move to a function() 
+                    // TODO - Split all this into functions
                     else if (curPos == 2) {
                         if (addDlForm->formDriver(REQ_VALIDATION) != E_OK) {
                             //check error 

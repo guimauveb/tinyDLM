@@ -14,11 +14,12 @@ std::string dlManagerController::createNewDl(std::string folder, std::string fil
     std::string finalFilename = filename;
     std::map<std::string, int>::iterator itA = downloadsMap.find(filename);
 
-    /* If filename exists create a duplicate according to records for this filename. Returns duplicate filename */ 
+    /* If filename exists create a duplicate according to the records for this filename. Returns the proper
+     * duplicate filename */ 
     if (itA != downloadsMap.end()) {
         finalFilename = recordDuplicate(filename);
     }
-    /* If filename is not present create new record and keep original filename */
+    /* If filename is not present create new record and keep the original filename */
     else {
         createNewRecord(filename);
     }
