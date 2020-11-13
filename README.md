@@ -1,6 +1,6 @@
 # tinyDLM - A C++ download manager
 
-![tinyDLM](/imgs/screenshot.jpg)
+![tinyDLM](/imgs/logo.png)
 
 ## Small multi-threaded download manager built around cURLpp / ncurses 
 
