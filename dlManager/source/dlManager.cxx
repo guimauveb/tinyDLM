@@ -172,7 +172,6 @@ void dlManager::runThread()
 /* Perform the download once we have all the info we need */
 int dlManager::dlPerform()
 {
-    /* TODO - write to log */
     //std::cout << "Downloading '" << saveAs << "'..." << "\n";
     try {
         /* Initialise our output file stream before anything else so we don't try to download the file

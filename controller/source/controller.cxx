@@ -111,7 +111,7 @@ void dlManagerController::startDl(const std::string& dlToStart)
         dlManagerVec.at(downloadsMap[dlToStart])->runThread();
     }
     catch (const std::out_of_range& oor) {
-        /* TODO - write to log */
+        // TODO - write to log 
     } 
 }
 

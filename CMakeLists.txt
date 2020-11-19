@@ -1,3 +1,6 @@
+# TODO - Add support for macOS Big Sur 
+# Find how to manage builds according to the system
+# https://stackoverflow.com/questions/7752609/cmake-ordering-of-include-directories-how-to-mix-system-and-user-based-includ
 cmake_minimum_required(VERSION 3.10)
 project(tinyDLM)
 
@@ -7,6 +10,14 @@ set(CMAKE_CXX_STANDARD_REQUIRED True)
 set(CMAKE_BUILD_TYPE Release)
 
 set(CMAKE_CXX_FLAGS_RELEASE "-O3")
+
+# ncurses
+#include_directories(/usr/local/opt/ncurses/include)
+#link_directories(/usr/local/opt/ncurses/lib)
+
+# curlpp
+include_directories(/usr/local/opt/curlpp/include)
+link_directories(/usr/local/opt/curlpp/lib)
 
 # Append find_package modules 
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_LIST_DIR}/cmake")
@@ -56,26 +67,26 @@ else()
 endif()
 
 
-# Added a 'FindcURLpp.cmake' alongside LibFindMacros.cmake in ./cmake 
-message(STATUS "Looking for curlpp...")
-find_package(CURLPP REQUIRED)
-
-if (CURLPP_FOUND)
-    message(STATUS "Found curlpp version: ${CURLPP_VERSION}")
-    message(STATUS "Using curlpp include dir: ${CURLPP_INCLUDE_DIR}")
-    message(STATUS "Using curlpp libraries: ${CURLPP_LIBRARY}\n")
-    list(APPEND tinyDLM_INCLUDE_DIRS ${CURLPP_INCLUDE_DIR})
-else()
-    message(FATAL_ERROR "Could not find curlpp.")
-    if("${CMAKE_SYSTEM_NAME}" MATCHES Linux)
-        message(STATUS "Install libcurlpp with the following command:\n")
-        message(STATUS "sudo apt-get install libcurlpp-dev")
-    elseif ("${CMAKE_SYSTEM_NAME}" MATCHES Darwin)
-        message(STATUS "Install curlpp with homebrew using the following command:")
-        message(STATUS "brew install curlpp\n")
-    endif()
-endif()
-
+## Added a 'FindcURLpp.cmake' alongside LibFindMacros.cmake in ./cmake 
+#message(STATUS "Looking for curlpp...")
+#find_package(CURLPP REQUIRED)
+#
+#if (CURLPP_FOUND)
+#    message(STATUS "Found curlpp version: ${CURLPP_VERSION}")
+#    message(STATUS "Using curlpp include dir: ${CURLPP_INCLUDE_DIR}")
+#    message(STATUS "Using curlpp libraries: ${CURLPP_LIBRARY}\n")
+#    list(APPEND tinyDLM_INCLUDE_DIRS ${CURLPP_INCLUDE_DIR})
+#else()
+#    message(FATAL_ERROR "Could not find curlpp.")
+#    if("${CMAKE_SYSTEM_NAME}" MATCHES Linux)
+#        message(STATUS "Install libcurlpp with the following command:\n")
+#        message(STATUS "sudo apt-get install libcurlpp-dev")
+#    elseif ("${CMAKE_SYSTEM_NAME}" MATCHES Darwin)
+#        message(STATUS "Install curlpp with homebrew using the following command:")
+#        message(STATUS "brew install curlpp\n")
+#    endif()
+#endif()
+#
 # Get all files recursively
 file(GLOB_RECURSE tinyDLM_SOURCES "./*.cxx")
 file(GLOB_RECURSE tinyDLM_HEADERS "./*.hxx")

@@ -90,7 +90,7 @@ void dlManagerUI::setWinsSize()
     winSizeMap["labelsSz"]   = {1, col, 2, 0};
     winSizeMap["mainWinSz"]  = {row - 4, col / 2, 4, 0};
     winSizeMap["statusSz"]   = {row - 5, col / 2, 3, col / 2};
-    winSizeMap["pHelpSz"]     = {1, col / 2, row - 1, 0};
+    winSizeMap["pHelpSz"]    = {1, col / 2, row - 1, 0};
     winSizeMap["infosSz"]    = {1, col / 2, row - 2, col / 2};
     winSizeMap["addSz"]      = {row / 2 + 1, col - (col / 2), (row / 4), col / 4};
     winSizeMap["detSz"]      = {row / 2, col - (col / 2), (row / 4), col / 4};
@@ -260,7 +260,7 @@ void dlManagerUI::resizeUI()
 void dlManagerUI::paintTopWin(std::unique_ptr<cursesWindow>& topWin)
 {
     /* Print a whole black on white row at the top of the main window that will be the size of the terminal
-     * window width*/
+     * window width */
     char *titleMain = (char*)malloc((col + 1)*sizeof(char));
     size_t i = 0;
 
@@ -572,7 +572,6 @@ int dlManagerUI::showDetails(const std::string& itemName)
     return r;
 }
 
-/* Add a new download */
 int dlManagerUI::addNewDl()
 {
     /* Important: We begin by assigning a new form to addDlForm unique_ptr and then assigning a new window to 
@@ -583,14 +582,13 @@ int dlManagerUI::addNewDl()
     addDlForm = initForm(2);
     addDlWin = initWin(winSizeMap["addSz"], "add");
 
-    // TODO - create menu for buttons instead of keys - to allow \n input as a char and not as Enter key */
     std::vector<std::string> tmpItems = {"Start", "Schedule", "Close"};
-    // init downloads menu == init any menu 
     point pMax = addDlWin->getMaxyx();
     //point pBeg = addDlWin->getBegyx();
 
     // Init a subwin for the menu
     addDlWin->setDerwin(1, 34, pMax.y - 2, (pMax.x - 34) / 2);
+    // init downloads menu == init any menu. TODO - Create initMenu() 
     addDlMenu = initDownloadsMenu(tmpItems);
 
     setAddDlForm();
@@ -602,7 +600,6 @@ int dlManagerUI::addNewDl()
 
     int r = addDlNav();
 
-    /* No need to call free() for win and form -> class destructor will take care of it */
     addDlMenu->clearMenu();
     addDlMenu->clearItems();
 
@@ -624,7 +621,6 @@ void dlManagerUI::setAddDlMenu()
     addDlMenu->postMenu();
 }
 
-// TODO - problematic - strlen 
 void dlManagerUI::paintAddDlWin()
 {
     char *titleAdd = (char*)malloc(((col / 2) + 1)*sizeof(char));
@@ -971,8 +967,6 @@ int dlManagerUI::addDlNav()
                                 break;
                             }
 
-
-
                             for (auto el : urls) {
                                 /* dlManagerControl returns the final filename after verifying there wasn't a duplicate.*/
                                 std::string f = dlManagerControl->createNewDl(dlFolder, filename, el,  0, 0);
@@ -988,7 +982,7 @@ int dlManagerUI::addDlNav()
                             updateMenu = true;
                         }
                     }
-                    // if enter (actually '\n' happens in a field treat it as a char 
+                    // if 'Enter' (actually '\n') happens in a field -> treat it as a char 
                     break;
                 }
                 /* DEL backspace (macOS) */
@@ -1024,9 +1018,7 @@ int dlManagerUI::addDlNav()
                     done = true;
                     break;
                 }
-
-
-
+                
             default:
                 {
                     addDlForm->formDriver(ch);
@@ -1058,10 +1050,8 @@ int dlManagerUI::addDlNav()
         //addMenuWin->refreshWin();
     }
     curs_set(0);
-    if (updateMenu) {
-        return 1;
-    }
-    return 0;
+
+    return updateMenu;
 }
 
 void dlManagerUI::updateDownloadsMenu()
@@ -1154,14 +1144,12 @@ int dlManagerUI::detNav(const std::string& filename)
                 }
 
             case 'r':
-                /* Resume transfer - if the transfer is ongoing - does nothing */
                 {
                     dlManagerControl->resume(filename);
                 }
                 break;
 
             case 'p':
-                /* Pause transfer - if the transfer is already paused - does nothing */
                 {
                     dlManagerControl->pause(filename);
                 }

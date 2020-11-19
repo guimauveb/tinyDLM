@@ -1,13 +1,13 @@
-/* To come in version 1.1:
- *  - Duplicate filename checker DONE
- *  - Adding multiple downloads at the same time TODO
- *  - Chose number of simultaneous downloads TODO
- *  - Limit download speed TODO 
+/* TODO in version 1.2:
+ *  - Adding multiple downloads at the same time DOING
+ *  - Chose number of simultaneous downloads (default to number of cores / threads ) 
+ *  - Limit download speed 
+ *  - Save downloads at exit and restore them on launch 
  */
 #include "../UI/include/dlManagerUI.hxx"
 #include "tinyDLM.hxx"
 
-/* Initialize our dlManager user interface and browse it */
+/* Initialize our user interface and browse it */
 int main()
 {
     std::unique_ptr<dlManagerUI> dlmc = std::make_unique<dlManagerUI>();
