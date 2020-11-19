@@ -15,8 +15,10 @@ Using different threads for windows was also a challenge since curses (actually 
 
 I plan on adding some other useful features like limiting the number of simultaneous transfers or adding more than one link at the same time.
 
+NOTE: install.sh doesn't work on Big Sur. I have to make a few changes in CMakeLists.txt. In the meantime use the command in **compileMacOs.txt** to compile.
+
 ### Features:
-    - Works on macOS and Linux Debian based distributions
+    - Works on macOS (>= 10.14) and Linux Debian based distributions
     - Supports Direct Download Links
     - Supports simultaneous transfers (tested up to 32)
     - Transfers can be paused / resumed / killed
