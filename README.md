@@ -15,7 +15,7 @@ Using different threads for windows was also a challenge since curses (actually 
 
 I plan on adding some other useful features like limiting the number of simultaneous transfers or adding more than one link at the same time.
 
-NOTE: install.sh doesn't work on Big Sur. I have to make a few changes in CMakeLists.txt. In the meantime use the command in **compileMacOs.txt** to compile.
+**NOTE**: install.sh doesn't work on Big Sur. I have to make a few changes in CMakeLists.txt. In the meantime use the command in **compileMacOs.txt** to compile.
 
 ### Features:
     - Works on macOS (>= 10.14) and Linux Debian based distributions
@@ -47,6 +47,7 @@ Works on **Linux Debian based distributions** and **macOS (>= 10.14)**
 
 
 ### Tested on: 
+- **macOS Big Sur (11.0)**
 - **macOS Mojave (10.14.6)** 
 - **Linux Ubuntu (20.04 LTS)**
 - **Kali Linux (20.03)**
