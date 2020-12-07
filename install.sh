@@ -173,15 +173,8 @@ if [ "${comp}" != "0" ] && [ "${curl}" -eq 1 ] && [ "${curlpp}" -eq 1 ] && [ "${
     elif [ -f tinyDLM ]; then  
 
         mv tinyDLM ../app/tinyDLM
-        cd ../app
-
-        read -p "Do you want to launch tinyDLM ? [Y/n] " answer
-        if [ "$answer" == "Y" ] || [ "$answer" == "y" ]
-        then
-            ./tinyDLM
-        else 
-            echo tinyDLM was built successfully.
-        fi
+         
+        echo tinyDLM was successfully built in app/.
     fi
 else
     echo Installation failed. Please install all required dependencies.
