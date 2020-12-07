@@ -3,7 +3,7 @@
 const std::string liteDL_label  = "tinyDLM v1.1";
 const std::string workInProg    = "Work in progress";
 
-const std::string tinyDLMWelcome = " tinyDLM - A tiny downloader manager ";
+const std::string tinyDLMWelcome = " tinyDLM - A tiny download manager ";
 const std::string tinyDLMVer     = " version 1.0 ";
 const std::string madeBy         = " by guimauve ";
 const std::string tinyHelp       = " Press 'a' to add a new download. ";
