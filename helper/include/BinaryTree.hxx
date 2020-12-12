@@ -1,4 +1,4 @@
-#include "node.hxx"
+#include "Node.hxx"
 
 class BinaryTree {
     public:
@@ -6,13 +6,13 @@ class BinaryTree {
         ~BinaryTree();
 
         void insert(int key);
-        node *search(int key);
+        Node *search(int key);
         void destroy_tree();
 
     private:
-        void destroy_tree(node *leaf);
-        void insert(int key, node *leaf);
-        node *search(int key, node *leaf);
+        void destroy_tree(Node *leaf);
+        void insert(int key, Node *leaf);
+        Node *search(int key, Node *leaf);
 
-        node *root;
+        Node *root;
 };

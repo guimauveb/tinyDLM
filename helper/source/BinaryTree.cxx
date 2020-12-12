@@ -10,7 +10,7 @@ BinaryTree::~BinaryTree()
     destroy_tree();
 }
 
-void BinaryTree::destroy_tree(node *leaf)
+void BinaryTree::destroy_tree(Node *leaf)
 {
 
 }
