@@ -1,4 +1,4 @@
-#include "../source/helper/winSize.cxx"
+#include "../source/helper/WinSize.cxx"
 #include "../source/helper/point.cxx"
 
 #include <ncurses.h>
@@ -7,11 +7,11 @@
 #include <iostream>
 #include <thread>
 
-class cursesWindow 
+class CursesWindow 
 {
     public:
-        cursesWindow(int r, int c, int by, int bx, std::string name);
-        ~cursesWindow();
+        CursesWindow(int r, int c, int by, int bx, std::string name);
+        ~CursesWindow();
 
         WINDOW *getRawPtr();
 
@@ -42,7 +42,7 @@ class cursesWindow
         void clearToEOL();
 
         /* Important ! Will basically call destroyWin() then initWin() */
-        void resizeWin(winSize newSz);
+        void resizeWin(WinSize new_size);
         void keyPad(bool b);
 
     private:

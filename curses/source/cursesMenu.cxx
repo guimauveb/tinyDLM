@@ -1,9 +1,9 @@
-#include "../include/cursesMenu.hxx"
+#include "../include/CursesMenu.hxx"
 
 /* Initialize a menu with items as strings corresponding to downloads filenames */
-cursesMenu::cursesMenu(std::vector<std::string> itemsData)
+CursesMenu::CursesMenu(std::vector<std::string> items_data)
 {
-    itemStrings = itemsData;
+    itemStrings = items_data;
     /* Push choices elements into a vector of ITEM * */
     for (size_t i = 0; i < itemStrings.size(); ++i) {
         /* The filename of each download will be used as the item name */
@@ -18,13 +18,13 @@ cursesMenu::cursesMenu(std::vector<std::string> itemsData)
 
 }
 
-int cursesMenu::getItemNum()
+int CursesMenu::getItemNum()
 {
     return (int)items.size();
 }
 
 /* Returns highlighted item id */
-int cursesMenu::getItemNo()
+int CursesMenu::getItemNo()
 {
     std::string tmp = getItemName();
     std::map<std::string, int>::iterator it = itemsMap.find(tmp);
@@ -35,16 +35,16 @@ int cursesMenu::getItemNo()
     return 1; 
 }
 
-/* Creates an empty cursesMenu object to initialize the program */
-cursesMenu::cursesMenu(){}
+/* Creates an empty CursesMenu object to initialize the program */
+CursesMenu::CursesMenu(){}
 
-cursesMenu::~cursesMenu()
+CursesMenu::~CursesMenu()
 {
     clearMenu();
     clearItems();
 }
 
-void cursesMenu::clearMenu()
+void CursesMenu::clearMenu()
 {
     /* If menu already cleared manually and not by the destructor, set to yes so we don't try to free it twice */
     if (!menuFreed) {
@@ -54,7 +54,7 @@ void cursesMenu::clearMenu()
     }
 }
 
-void cursesMenu::clearItems()
+void CursesMenu::clearItems()
 {
     if (!itemsFreed) {
         const int n = items.size();
@@ -67,55 +67,55 @@ void cursesMenu::clearItems()
 
 }
 
-void cursesMenu::menuOptsOff(Menu_Options)
+void CursesMenu::menuOptsOff(Menu_Options)
 {
     menu_opts_off(menu, O_SHOWDESC);
 }
 
-void cursesMenu::menuOptsOn(Menu_Options)
+void CursesMenu::menuOptsOn(Menu_Options)
 {
 
 }
 
-void cursesMenu::setMenuWin(std::unique_ptr<cursesWindow>& win)
+void CursesMenu::setMenuWin(std::unique_ptr<CursesWindow>& win)
 {
     set_menu_win(menu, win->getRawPtr());
 }
 
 /* Works on macOS, not on Linux */
-void cursesMenu::setMenuSubDer(std::unique_ptr<cursesWindow>& win, int a, int b, int c, int d)
+void CursesMenu::setMenuSubDer(std::unique_ptr<CursesWindow>& win, int a, int b, int c, int d)
 {
     set_menu_win(menu, derwin(win->getRawPtr(), a, b, c, d));
 }
 
 /* Set the window to be associated with the menu */
-void cursesMenu::setMenuSub(std::unique_ptr<cursesWindow>& win)
+void CursesMenu::setMenuSub(std::unique_ptr<CursesWindow>& win)
 {
     set_menu_sub(menu, win->getRawPtr());
 }
 
-void cursesMenu::setMenuDer(std::unique_ptr<cursesWindow>& der)
+void CursesMenu::setMenuDer(std::unique_ptr<CursesWindow>& der)
 {
     set_menu_sub(menu, der->getDerwin());
 }
 
 /* Set the number of elements to fit the screen size */
-void cursesMenu::setMenuFormat(int r, int c)
+void CursesMenu::setMenuFormat(int r, int c)
 {
     set_menu_format(menu, r, c);
 }
 
-void cursesMenu::postMenu()
+void CursesMenu::postMenu()
 {
     post_menu(menu);
 }
 
-void cursesMenu::setMenuMark(const char *m)
+void CursesMenu::setMenuMark(const char *m)
 {
     set_menu_mark(menu, m);
 }
 
-std::string cursesMenu::getItemName()
+std::string CursesMenu::getItemName()
 {
     std::string itemName = item_name(current_item(menu));
     /* char * returned by item_name doesn't seem to be null terminated */
@@ -123,7 +123,7 @@ std::string cursesMenu::getItemName()
     return itemName;
 }
 
-void cursesMenu::menuDriver(int c)
+void CursesMenu::menuDriver(int c)
 {
     menu_driver(menu, c);
 }

@@ -1,7 +1,7 @@
-#include "../include/dlManager.hxx"
+#include "../include/DownloaderCore.hxx"
 
-/* Initialize the dlManager object with all the need infos to processs the download */
-dlManager::dlManager(const int& dlid, const std::string& u, const std::string& f, const std::string& sa, 
+/* Initialize the DownloaderCore object with all the need infos to processs the download */
+DownloaderCore::DownloaderCore(const int& dlid, const std::string& u, const std::string& f, const std::string& sa, 
         const int& lsl = 0, const int& lst = 0)
 {
     /* Inetialize our download object- partial initializion but all non set values should be set to 0 or null */
@@ -28,14 +28,14 @@ dlManager::dlManager(const int& dlid, const std::string& u, const std::string& f
     downloadPtr->cookie = "";
 }
 
-const std::shared_ptr<download>& dlManager::getDownloadInfos()
+const std::shared_ptr<download>& DownloaderCore::getDownloadInfos()
 {
     std::lock_guard<std::mutex> guard(*dlMutPtr);
     return downloadPtr;
 }
 
 /* Make sure our threads are done executing when calling the destructor */
-dlManager::~dlManager()
+DownloaderCore::~DownloaderCore()
 {
     for (size_t i = 0; i < ThreadVector.size(); ++i)
         ThreadVector.at(i).join();
@@ -43,7 +43,7 @@ dlManager::~dlManager()
 
 /* Compute the current download speed which corresponds to the average speed during the second preceding the call
  * to this function. */
-void dlManager::downloadSpeed()
+void DownloaderCore::downloadSpeed()
 {
     /* Make a copy of the vector and work with the copy to avoid blocking the downloading thread for too
      * long */
@@ -54,7 +54,6 @@ void dlManager::downloadSpeed()
     }
     /* Reverse the values so the most recent ones are at the begining */
     std::reverse(tmp.begin(), tmp.end());
-
     double totalDur = 0, totalBytes = 0;
     double keptVal = 0;
     /* Iterate from the end to (end - 1sec) */
@@ -76,7 +75,7 @@ void dlManager::downloadSpeed()
 }
 
 /* Use the progress callback to display progress and pause / resume the transfer */
-int dlManager::ProgressCallbackFunctor::Progress(curlpp::Easy *handle, double dltotal, double dlnow, double ultotal, double ulnow)
+int DownloaderCore::ProgressCallbackFunctor::Progress(curlpp::Easy *handle, double dltotal, double dlnow, double ultotal, double ulnow)
 {
     /* TODO - why curl resets dlnow after a resume but finally manage to update it to the total number of
      * bytes downloaded before we paused the transfer ???? */
@@ -137,7 +136,7 @@ int dlManager::ProgressCallbackFunctor::Progress(curlpp::Easy *handle, double dl
 
 /* Our header callback will output the header to a stringstream that we' ll parse for info */
 /* TODO - parse response header for infos about the download / server */
-size_t dlManager::HeaderCallbackFunctor::Write(curlpp::Easy *handle, char *ptr, size_t size, size_t nitems)
+size_t DownloaderCore::HeaderCallbackFunctor::Write(curlpp::Easy *handle, char *ptr, size_t size, size_t nitems)
 {
     size_t realsize = size * nitems;
     sStream->write(ptr, realsize);
@@ -147,7 +146,7 @@ size_t dlManager::HeaderCallbackFunctor::Write(curlpp::Easy *handle, char *ptr, 
 }
 
 /* Define our Write Callback functor */
-size_t dlManager::WriteCallbackFunctor::Write(curlpp::Easy *handle, char *ptr, size_t size, size_t nmemb)
+size_t DownloaderCore::WriteCallbackFunctor::Write(curlpp::Easy *handle, char *ptr, size_t size, size_t nmemb)
 {
     ++writeRound;
 
@@ -163,14 +162,14 @@ size_t dlManager::WriteCallbackFunctor::Write(curlpp::Easy *handle, char *ptr, s
 }
 
 /* Perform the transfer in a distinct thread */
-void dlManager::runThread()
+void DownloaderCore::runThread()
 {
-    ThreadVector.emplace_back(&dlManager::dlPerform, this);
+    ThreadVector.emplace_back(&DownloaderCore::dlPerform, this);
 }
 
 /* Set will be used to modify these values after the object has been created */
 /* Perform the download once we have all the info we need */
-int dlManager::dlPerform()
+int DownloaderCore::dlPerform()
 {
     //std::cout << "Downloading '" << saveAs << "'..." << "\n";
     try {
@@ -265,13 +264,13 @@ int dlManager::dlPerform()
     return EXIT_SUCCESS;
 }
 
-void dlManager::pause()
+void DownloaderCore::pause()
 {
     std::lock_guard<std::mutex> guard(*dlMutPtr);
     *pausePtr = true;
 }
 
-void dlManager::resume()
+void DownloaderCore::resume()
 {
     if (downloadPtr->status == downloadStatus::PAUSED) {
         *resumePtr = true;
@@ -280,5 +279,5 @@ void dlManager::resume()
     }
 }
 
-const std::string dlManager::USER_AGENT = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/84.0.4147.89 Safari/537.36";
+const std::string DownloaderCore::USER_AGENT = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/84.0.4147.89 Safari/537.36";
 

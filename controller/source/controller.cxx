@@ -1,23 +1,23 @@
-#include "../include/controller.hxx"
+#include "../include/Controller.hxx"
 
-dlManagerController::dlManagerController()
+Controller::Controller()
 {
-    dlCounter = 0;
+    dl_counter = 0;
 }
 
-dlManagerController::~dlManagerController() {}
+Controller::~Controller() {}
 
-/* Initialize a new dlManager object then place it in a vector */
-std::string dlManagerController::createNewDl(std::string folder, std::string filename, const std::string url,  
-        const int lowSpeedLim, const int lowSpeedTim)
+/* Initialize a new DownloaderCore object then place it in a vector */
+std::string Controller::createNewDl(std::string folder, std::string filename, const std::string url,  
+        const int low_speed_limit, const int low_speed_time_limit)
 {
-    std::string finalFilename = filename;
-    std::map<std::string, int>::iterator itA = downloadsMap.find(filename);
+    std::string final_filename = filename;
+    std::map<std::string, int>::iterator ita = downloads_map.find(filename);
 
     /* If filename exists create a duplicate according to the records for this filename. Returns the proper
      * duplicate filename */ 
-    if (itA != downloadsMap.end()) {
-        finalFilename = recordDuplicate(filename);
+    if (ita != downloads_map.end()) {
+        final_filename = recordDuplicate(filename);
     }
     /* If filename is not present create new record and keep the original filename */
     else {
@@ -26,57 +26,60 @@ std::string dlManagerController::createNewDl(std::string folder, std::string fil
 
     /* If the duplicate filename generated is also existing, it means that the user manually appended (n) to a file */
     /* Then leave the download using the same filename untouched and return without doing anything */
-    std::map<std::string, int>::iterator itB = downloadsMap.find(finalFilename);
-    if (itB == downloadsMap.end()) {
-        downloadsMap.insert(itB, std::pair<std::string, int>(finalFilename, dlCounter));
+    std::map<std::string, int>::iterator itb = downloads_map.find(final_filename);
+    if (itb == downloads_map.end()) {
+        downloads_map.insert(itb, std::pair<std::string, int>(final_filename, dl_counter));
 
-        const std::string saveAs = dlFolder + finalFilename;
-        std::unique_ptr<dlManager> dlm = std::make_unique<dlManager>(dlCounter, url, finalFilename, saveAs, lowSpeedLim, lowSpeedTim);
-        dlManagerVec.emplace_back(std::move(dlm));
+        const std::string saveAs = downloads_folder + final_filename;
+        std::unique_ptr<DownloaderCore> dlm = std::make_unique<DownloaderCore>(dl_counter, url, final_filename, 
+                saveAs, low_speed_limit, low_speed_time_limit);
+        downloader_core_vec.emplace_back(std::move(dlm));
 
-        dlCounter++;
+        dl_counter++;
 
-        assert(dlManagerVec.size() == downloadsMap.size());
+        assert(downloader_core_vec.size() == downloads_map.size());
     }
     else {
-        finalFilename = "NULL";
+        final_filename = "NULL";
     }
 
-    return finalFilename;
+    return final_filename;
 }
 
 /* Process the filename and find out what index must be appended according to records for this filename */
-std::string& dlManagerController::recordDuplicate(std::string& f) {
-    std::string origFilename = f;
+std::string& Controller::recordDuplicate(std::string& f) {
+    std::string original_filename = f;
     /* Duplicate number */
     int n = 1;
-    std::map<std::string, std::vector<int>>::iterator it = filenamesRecords.find(f);
+    std::map<std::string, std::vector<int>>::iterator it = filenames_records.find(f);
     bool found = false;
 
+    /* TODO - Use a binary tree instead ! */
+
     /* We suppose that the array minimum possible value is 1 */
-    std::sort(filenamesRecords[f].begin(), filenamesRecords[f].end());
+    std::sort(filenames_records[f].begin(), filenames_records[f].end());
     /* If filename already has duplicates, append (n) to it where n is equal to the index of duplicates */
-    if (it != filenamesRecords.end()) {
+    if (it != filenames_records.end()) {
         /* If vector size == 0, duplicate value = 1 */
-        if (filenamesRecords[f].size() == 0) {
+        if (filenames_records[f].size() == 0) {
             found = true;
             n = 1;
         }
         /* If the first value is not 1 we can conclude 1 is the minimum missing value */
-        else if (filenamesRecords[f].at(0) != 1) {
+        else if (filenames_records[f].at(0) != 1) {
             n = 1;
             found = true;
         }
         else {
 
-            for (int i = 0; i < filenamesRecords[f].size(); ++i) {
+            for (int i = 0; i < filenames_records[f].size(); ++i) {
                 /* Check if next element exists */
-                if (i + 1 < filenamesRecords[f].size()) {
+                if (i + 1 < filenames_records[f].size()) {
                     int j = i + 1;
                     /* If the difference between the next element and the current element is not one, then there 
                      * is a gap meaning that the min missing value is equal to current element + 1 */
-                    if (filenamesRecords[f].at(j) - filenamesRecords[f].at(i) != 1) {
-                        n = filenamesRecords[f].at(i) + 1;
+                    if (filenames_records[f].at(j) - filenames_records[f].at(i) != 1) {
+                        n = filenames_records[f].at(i) + 1;
                         found = true;
                         break;
                     } 
@@ -84,31 +87,31 @@ std::string& dlManagerController::recordDuplicate(std::string& f) {
             }
             if (!found) {
                 /* If we could not find a gap, then n is equal to the largest element + 1 */
-                n = filenamesRecords[f].at(filenamesRecords[f].size() - 1) + 1;
+                n = filenames_records[f].at(filenames_records[f].size() - 1) + 1;
             }
         }
 
     }
     /* If not duplicates was found, n = 1 */
     /* Append duplicate value to filename vector of duplicates values */
-    filenamesRecords[f].push_back(n);
+    filenames_records[f].push_back(n);
     createDuplicate(f, n);
-    /* Store original filename and duplicate value in dlRecs and use final filename as key */
-    dlRecs.insert(dlRecs.end(), std::pair<std::string, dlRecord>(f, {origFilename, n}));
+    /* Store original filename and duplicate value in dl_records and use final filename as key */
+    dl_records.insert(dl_records.end(), std::pair<std::string, DownloadRecord>(f, {original_filename, n}));
 
     return f;
 }
 
-void dlManagerController::createNewRecord(std::string& f)
+void Controller::createNewRecord(std::string& f)
 {
-    filenamesRecords.insert(filenamesRecords.end(), std::pair<std::string, std::vector<int>>(f, std::vector<int>{}));
+    filenames_records.insert(filenames_records.end(), std::pair<std::string, std::vector<int>>(f, std::vector<int>{}));
 }
 
 /* Start one dl */
-void dlManagerController::startDl(const std::string& dlToStart)
+void Controller::startDl(const std::string& download_to_start)
 {
     try {
-        dlManagerVec.at(downloadsMap[dlToStart])->runThread();
+        downloader_core_vec.at(downloads_map[download_to_start])->runThread();
     }
     catch (const std::out_of_range& oor) {
         // TODO - write to log 
@@ -116,148 +119,146 @@ void dlManagerController::startDl(const std::string& dlToStart)
 }
 
 /* TODO - Start multiple downloads at the same time */
-void dlManagerController::startDl(const std::vector<std::string>& dlsToStart)
+void Controller::startDl(const std::vector<std::string>& downloads_to_start) {}
+
+void Controller::resume(const std::string& dlToResume)
 {
+    downloader_core_vec.at(downloads_map[dlToResume])->resume();
 }
 
-void dlManagerController::resume(const std::string& dlToResume)
+void Controller::resumeAll()
 {
-    dlManagerVec.at(downloadsMap[dlToResume])->resume();
-}
-
-void dlManagerController::resumeAll()
-{
-    for (size_t i = 0; i < dlManagerVec.size(); ++i) {
-        dlManagerVec.at(i)->resume();
+    for (size_t i = 0; i < downloader_core_vec.size(); ++i) {
+        downloader_core_vec.at(i)->resume();
     }
 }
 
-void dlManagerController::pause(const std::string& dlToPause)
+void Controller::pause(const std::string& dlToPause)
 {
-    dlManagerVec.at(downloadsMap[dlToPause])->pause();
+    downloader_core_vec.at(downloads_map[dlToPause])->pause();
 }
 
-void dlManagerController::pauseAll()
+void Controller::pauseAll()
 {
-    for (size_t i = 0; i < dlManagerVec.size(); ++i) {
-        if (dlManagerVec.at(i)->getDownloadInfos()->status == downloadStatus::DOWNLOADING)
-            dlManagerVec.at(i)->pause();
+    for (size_t i = 0; i < downloader_core_vec.size(); ++i) {
+        if (downloader_core_vec.at(i)->getDownloadInfos()->status == downloadStatus::DOWNLOADING)
+            downloader_core_vec.at(i)->pause();
     }
 }
 
-void dlManagerController::clearInactive()
+void Controller::clearInactive()
 {
-    assert(dlManagerVec.size() == downloadsMap.size());
+    assert(downloader_core_vec.size() == downloads_map.size());
     std::map<std::string, int>::iterator it;
     std::vector<size_t> todel;
-    for (size_t i = 0; i < dlManagerVec.size(); ++i) {
-        if((dlManagerVec.at(i)->getDownloadInfos()->status == downloadStatus::ERROR) || 
-                (dlManagerVec.at(i)->getDownloadInfos()->status == downloadStatus::COMPLETED)) {
-            it = downloadsMap.find(dlManagerVec.at(i)->getDownloadInfos()->filename);
-            if (it != downloadsMap.end()) {
+    for (size_t i = 0; i < downloader_core_vec.size(); ++i) {
+        if((downloader_core_vec.at(i)->getDownloadInfos()->status == downloadStatus::ERROR) || 
+                (downloader_core_vec.at(i)->getDownloadInfos()->status == downloadStatus::COMPLETED)) {
+            it = downloads_map.find(downloader_core_vec.at(i)->getDownloadInfos()->filename);
+            if (it != downloads_map.end()) {
                 /* Decrement downloads ids above deleted item since they are used as 
-                 * indexes to access dlManagerVec */
+                 * indexes to access downloader_core_vec */
                 /* TODO - could we start iterating by ref at some index instead of map::begin ? */
                 /* TODO - resizedownloadsmap ? */
-                for (auto& el : downloadsMap) {
+                for (auto& el : downloads_map) {
                     if (el.second > it->second) {
                         --el.second;
                     }
                 }
-                downloadsMap.erase(it);
+                downloads_map.erase(it);
                 todel.push_back(i);
             }
         }
     }
     if (!todel.empty()) {
         for (size_t i = 0; i < todel.size(); ++i) {
-            dlManagerVec.erase(dlManagerVec.begin() + (todel.at(i) - i));
-            dlCounter--;
+            downloader_core_vec.erase(downloader_core_vec.begin() + (todel.at(i) - i));
+            dl_counter--;
         }
 
     }
 }
 
-void dlManagerController::stop(const std::string& dlToStop)
+void Controller::stop(const std::string& dlToStop)
 {
-    dlManagerVec.at(downloadsMap[dlToStop])->pause();
-    /* downloadsMap item returns an int corresponding to the index of the item in the vec */
-    dlManagerVec.erase(dlManagerVec.begin() + downloadsMap[dlToStop]);
+    downloader_core_vec.at(downloads_map[dlToStop])->pause();
+    /* downloads_map item returns an int corresponding to the index of the item in the vec */
+    downloader_core_vec.erase(downloader_core_vec.begin() + downloads_map[dlToStop]);
 
-    std::map<std::string, int>::iterator it = downloadsMap.find(dlToStop);
-    if (it != downloadsMap.end()) {
+    std::map<std::string, int>::iterator it = downloads_map.find(dlToStop);
+    if (it != downloads_map.end()) {
         /* Decrement downloads ids above deleted item since they are used as 
-         * indexes to access dlManagerVec */
-        for (auto & el : downloadsMap) {
+         * indexes to access downloader_core_vec */
+        for (auto & el : downloads_map) {
             if (el.second > it->second) {
                 --el.second;
             }
         }   
-        downloadsMap.erase(it);
+        downloads_map.erase(it);
     }
-    std::map<std::string, dlRecord>::iterator itB = dlRecs.find(dlToStop);
+    std::map<std::string, DownloadRecord>::iterator itb = dl_records.find(dlToStop);
     /* If dl to stop is actually a duplicate */
-    if (itB != dlRecs.end()) {
-        /* Remove filename's duplicate number from filenamesRecords */
-        std::string orig = itB->second.origFilename;
-        int d = itB->second.dupNum;
-        filenamesRecords[orig].erase(std::remove(filenamesRecords[orig].begin(), filenamesRecords[orig].end(), d), filenamesRecords[orig].end());
+    if (itb != dl_records.end()) {
+        /* Remove filename's duplicate number from filenames_records */
+        std::string orig = itb->second.orig_filename;
+        int d = itb->second.dup_num;
+        filenames_records[orig].erase(std::remove(filenames_records[orig].begin(), filenames_records[orig].end(), d), filenames_records[orig].end());
     }
 
     /* Decrement counter */
-    dlCounter--;
+    dl_counter--;
 }
 
-void dlManagerController::stopAll()
+void Controller::stopAll()
 {
-    for (size_t i = 0; i < dlManagerVec.size(); ++i)
-        dlManagerVec.at(i)->pause();
+    for (size_t i = 0; i < downloader_core_vec.size(); ++i)
+        downloader_core_vec.at(i)->pause();
 }
 
 /* Stops all ongoing transfers - clear downloads menu, downloads list and filenames records - reset download counter 
  * Sets activeDls to false. Does not delete already downloaded bytes from the hard drive */
-void dlManagerController::killAll()
+void Controller::killAll()
 {
     stopAll();
-    dlManagerVec.clear();
-    downloadsMap.clear();
-    filenamesRecords.clear();
-    dlCounter = 0;
+    downloader_core_vec.clear();
+    downloads_map.clear();
+    filenames_records.clear();
+    dl_counter = 0;
 }
 
-std::string dlManagerController::getURL(const std::string& filename)
+std::string Controller::getURL(const std::string& filename)
 {
-    return dlManagerVec.at(downloadsMap[filename])->getDownloadInfos()->url;
+    return downloader_core_vec.at(downloads_map[filename])->getDownloadInfos()->url;
 }
 
-std::string dlManagerController::getETA(const std::string& filename)
+std::string Controller::getETA(const std::string& filename)
 {
-    return dlManagerVec.at(downloadsMap[filename])->getDownloadInfos()->eta;
+    return downloader_core_vec.at(downloads_map[filename])->getDownloadInfos()->eta;
 }
 
-double dlManagerController::getProgress(const std::string& filename)
+double Controller::getProgress(const std::string& filename)
 {
-    return dlManagerVec.at(downloadsMap[filename])->getDownloadInfos()->progress;
+    return downloader_core_vec.at(downloads_map[filename])->getDownloadInfos()->progress;
 }
 
-double dlManagerController::getSpeed(const std::string& filename)
+double Controller::getSpeed(const std::string& filename)
 {
-    dlManagerVec.at(downloadsMap[filename])->downloadSpeed();
-    return dlManagerVec.at(downloadsMap[filename])->getDownloadInfos()->speed;
+    downloader_core_vec.at(downloads_map[filename])->downloadSpeed();
+    return downloader_core_vec.at(downloads_map[filename])->getDownloadInfos()->speed;
 }
 
-downloadStatus dlManagerController::getStatus(const std::string& filename)
+downloadStatus Controller::getStatus(const std::string& filename)
 {
-    return dlManagerVec.at(downloadsMap[filename])->getDownloadInfos()->status;
+    return downloader_core_vec.at(downloads_map[filename])->getDownloadInfos()->status;
 }
 
 /* Get all downloads statuses infos */
-std::vector<downloadWinInfo> dlManagerController::getAllDownloadsInfos() 
+std::vector<downloadWinInfo> Controller::getAllDownloadsInfos() 
 {
     std::vector<downloadWinInfo> vec;
     /* Loop over all downloads sorted by id */
     std::map<int, std::string> dlsSorted = sortDownloadsMapByIds();
-    for (auto dl : dlsSorted) {
+    for (auto &dl: dlsSorted) {
         const int id = dl.first;
         const std::string f = dl.second;
         const std::string strstatus = stringifyStatus(getStatus(f));
@@ -270,7 +271,7 @@ std::vector<downloadWinInfo> dlManagerController::getAllDownloadsInfos()
             spd = stringifyNumber(getSpeed(f), 2);
         }
         const std::string prog = stringifyNumber(getProgress(f), 2);
-        //std::string eta = stringifyETA(dlManagerControlgetETA(f));
+        //std::string eta = stringifyETA(DownloaderCoreControlgetETA(f));
         const std::string eta = "ETA";
         vec.emplace_back(id, strstatus, spd, prog, eta);
     }
@@ -278,19 +279,19 @@ std::vector<downloadWinInfo> dlManagerController::getAllDownloadsInfos()
 }
 
 /* Returns false if the map is empty */
-bool dlManagerController::isActive()
+bool Controller::isActive()
 {
-    return downloadsMap.size() != 0 ? true : false;  
+    return downloads_map.size() != 0 ? true : false;  
 }
 
-std::map<int, std::string> dlManagerController::sortDownloadsMapByIds()
+std::map<int, std::string> Controller::sortDownloadsMapByIds()
 {
     /* Start by sorting the downloads by id then flip the map and use the name of the downloads as the key
      * while keeping the map sorted by id */
-    return flipMap(downloadsMap);
+    return flipMap(downloads_map);
 }
 
-std::vector<std::string> dlManagerController::getDownloadsList()
+std::vector<std::string> Controller::getDownloadsList()
 {
     std::vector<std::string> vec;
     std::map<int, std::string> m = sortDownloadsMapByIds();

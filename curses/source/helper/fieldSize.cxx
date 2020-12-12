@@ -1,5 +1,5 @@
 #ifndef FIELSIZE_CXX
-struct fieldSize {
+struct FieldSize {
     int height;
     int width;
     int toprow;

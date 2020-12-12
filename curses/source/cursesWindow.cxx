@@ -1,7 +1,7 @@
-#include "../include/cursesWindow.hxx"
-#include <fstream>
+#include "../include/CursesWindow.hxx"
+//#include <fstream>
 
-cursesWindow::cursesWindow(int r, int c, int by, int bx, std::string name)
+CursesWindow::CursesWindow(int r, int c, int by, int bx, std::string name)
     :row{r}, col{c}, begy{by}, begx{bx}
 {
     winName = name;
@@ -20,7 +20,7 @@ cursesWindow::cursesWindow(int r, int c, int by, int bx, std::string name)
     wrefresh(win);
 }
 
-cursesWindow::~cursesWindow()
+CursesWindow::~CursesWindow()
 {
     //    std::ofstream ofstr;
     //    std::string e = "Freeing memory of window " + winName;
@@ -32,48 +32,48 @@ cursesWindow::~cursesWindow()
     }
 }
 
-WINDOW *cursesWindow::getRawPtr()
+WINDOW *CursesWindow::getRawPtr()
 {
     return win;
 }
 
-void cursesWindow::winAttrOn(chtype ct)
+void CursesWindow::winAttrOn(chtype ct)
 {
     wattron(win, ct);
 }
 
-void cursesWindow::winAttrOff(chtype ct)
+void CursesWindow::winAttrOff(chtype ct)
 {
     wattroff(win, ct);
 }
 
-void cursesWindow::touchWin()
+void CursesWindow::touchWin()
 {
     touchwin(win);
 }
 
-void cursesWindow::refreshWin()
+void CursesWindow::refreshWin()
 {
     wrefresh(win);
 }
 
-void cursesWindow::eraseWin()
+void CursesWindow::eraseWin()
 {
     werase(win);
 }
 
 /* reset == erase then refresh */
-void cursesWindow::resetWin()
+void CursesWindow::resetWin()
 {
     werase(win);
     wrefresh(win);
 }
 
 /* Couldn't get wresize() to work properly. Calling delwin() then newwin() instead */
-void cursesWindow::resizeWin(winSize newSz)
+void CursesWindow::resizeWin(WinSize new_size)
 {
     //werase(win);
-    //wresize(win, newSz.row, newSz.col);
+    //wresize(win, new_size.row, new_size.col);
 
     if (win != NULL) {
         delwin(win);
@@ -87,10 +87,10 @@ void cursesWindow::resizeWin(winSize newSz)
         //        }
     }
 
-    win = newwin(newSz.row, newSz.col, newSz.begy, newSz.begx);
+    win = newwin(new_size.row, new_size.col, new_size.begy, new_size.begx);
 }
 
-void cursesWindow::printInMiddle(int starty, int startx, int width, std::string str, chtype color)
+void CursesWindow::printInMiddle(int starty, int startx, int width, std::string str, chtype color)
 {
     int length, x, y;
     float temp;
@@ -112,13 +112,13 @@ void cursesWindow::printInMiddle(int starty, int startx, int width, std::string 
     refresh();
 }
 
-void cursesWindow::printAtTop(int starty, int startx, int width, std::string str, chtype color)
+void CursesWindow::printAtTop(int starty, int startx, int width, std::string str, chtype color)
 {
 
 }
 
 /* TODO - pass pointers */
-point cursesWindow::getBegyx()
+point CursesWindow::getBegyx()
 {
     int by, bx;
     getbegyx(win, by, bx);
@@ -126,45 +126,45 @@ point cursesWindow::getBegyx()
 }
 
 /* TODO - pass pointers */
-point cursesWindow::getMaxyx()
+point CursesWindow::getMaxyx()
 {
     int my, mx;
     getmaxyx(win, my, mx);
     return point {.y = my, .x = mx};
 }
 
-void cursesWindow::addStr(int y, int x, std::string str)
+void CursesWindow::addStr(int y, int x, std::string str)
 {
     mvwaddstr(win, y, x, str.c_str());
 }
 
-void cursesWindow::drawBox(int y, int x)
+void CursesWindow::drawBox(int y, int x)
 {
     box(win, y, x);
 }
 
-void cursesWindow::keyPad(bool b)
+void CursesWindow::keyPad(bool b)
 {
     keypad(win, b);
 }
 
-void cursesWindow::wMove(int y, int x)
+void CursesWindow::wMove(int y, int x)
 {
     wmove(win, y, x);
     wrefresh(win);
 }
 
-void cursesWindow::clearToEOL()
+void CursesWindow::clearToEOL()
 {
     clrtoeol();
 }
 
-void cursesWindow::setDerwin(int nl, int nc, int by, int bx) 
+void CursesWindow::setDerwin(int nl, int nc, int by, int bx) 
 {
     der = derwin(win, nl, nc, by, bx);    
 }
 
-WINDOW * cursesWindow::getDerwin()
+WINDOW * CursesWindow::getDerwin()
 {
     return der;
 }

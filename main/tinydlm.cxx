@@ -4,16 +4,16 @@
  *  - Limit download speed 
  *  - Save downloads at exit and restore them on launch 
  */
-#include "../UI/include/dlManagerUI.hxx"
+#include "../UI/include/UI.hxx"
 #include "tinyDLM.hxx"
 
 /* Initialize our user interface and browse it */
 int main()
 {
-    std::unique_ptr<dlManagerUI> dlmc = std::make_unique<dlManagerUI>();
+    std::unique_ptr<UI> ui = std::make_unique<UI>();
     /* Display a message when starting the program. If the user exits while in firstStart(), terminate the 
      * program */
-    if (!dlmc->firstStart()) {
+    if (!ui->firstStart()) {
         return 1;
     }
 
@@ -33,9 +33,9 @@ int main()
                 case KEY_DOWN:
                     {
                         /* Make sure that the menu is not empty */
-                        if (dlmc->dlManagerControl->isActive()) {
-                            dlmc->menu->menuDriver(REQ_DOWN_ITEM);
-                            dlmc->statusDriver(KEY_DOWN);
+                        if (ui->controller->isActive()) {
+                            ui->menu->menuDriver(REQ_DOWN_ITEM);
+                            ui->statusDriver(KEY_DOWN);
                         }
                         break;
                     }
@@ -43,9 +43,9 @@ int main()
                 case KEY_UP:
                     {
                         /* Make sure that the menu is not empty */
-                        if (dlmc->dlManagerControl->isActive()) {
-                            dlmc->menu->menuDriver(REQ_UP_ITEM);
-                            dlmc->statusDriver(KEY_UP); 
+                        if (ui->controller->isActive()) {
+                            ui->menu->menuDriver(REQ_UP_ITEM);
+                            ui->statusDriver(KEY_UP); 
                         }
                         break;
                     }
@@ -55,129 +55,129 @@ int main()
                     {
 
                         /* Make sure that the menu is not empty */
-                        if (!dlmc->dlManagerControl->isActive()) {
+                        if (!ui->controller->isActive()) {
                             break;
                         }
-                        dlmc->stopStatusUpdate();
+                        ui->stopStatusUpdate();
 
                         /* showDetails returns true if the download was killed and that we should update the
                          * menu */
-                        if (dlmc->showDetails(dlmc->menu->getItemName())) {
-                            dlmc->updateDownloadsMenu();
-                            dlmc->resetStatusDriver();
-                            dlmc->mainWindows.at(dlmc->statusIdx)->resetWin();
+                        if (ui->showDownloadDetails(ui->menu->getItemName())) {
+                            ui->updateDownloadsMenu();
+                            ui->resetStatusDriver();
+                            ui->main_windows.at(ui->status_window_index)->resetWin();
                         }
 
-                        dlmc->startStatusUpdate(); 
+                        ui->startStatusUpdate(); 
                         break;
                     }
 
                 case 'a':
                     /* Opens a subwindow in which we'll enter the new download item info */
                     {
-                        dlmc->stopStatusUpdate();
-                        if (dlmc->addNewDl()) {
-                            dlmc->updateDownloadsMenu();
-                            dlmc->resetStatusDriver();
+                        ui->stopStatusUpdate();
+                        if (ui->addNewDownload()) {
+                            ui->updateDownloadsMenu();
+                            ui->resetStatusDriver();
                         }
-                        dlmc->startStatusUpdate();
+                        ui->startStatusUpdate();
                         break;
                     }
 
                 case 'h':
                     {
-                        dlmc->stopStatusUpdate();
-                        if (dlmc->showHelp()) {
-                            dlmc->updateDownloadsMenu();
-                            dlmc->resetStatusDriver();
+                        ui->stopStatusUpdate();
+                        if (ui->showHelp()) {
+                            ui->updateDownloadsMenu();
+                            ui->resetStatusDriver();
                         }
-                        dlmc->startStatusUpdate();
+                        ui->startStatusUpdate();
                         break;
                     }
 
                 case 'p':
                     /* Pause highlighted download */
                     {
-                        if (!dlmc->dlManagerControl->isActive()) {
+                        if (!ui->controller->isActive()) {
                             break;
                         }
-                        dlmc->dlManagerControl->pause(dlmc->menu->getItemName());
+                        ui->controller->pause(ui->menu->getItemName());
                         break;
                     }
 
                 case 'P':
                     /* Pause all active downloads */
                     {
-                        if (!dlmc->dlManagerControl->isActive()) {
+                        if (!ui->controller->isActive()) {
                             break;
                         }
-                        dlmc->stopStatusUpdate();
-                        dlmc->dlManagerControl->pauseAll();
-                        dlmc->startStatusUpdate();
+                        ui->stopStatusUpdate();
+                        ui->controller->pauseAll();
+                        ui->startStatusUpdate();
                         break;
                     }
 
                 case 'r':
                     {
-                        if (!dlmc->dlManagerControl->isActive()) {
+                        if (!ui->controller->isActive()) {
                             break;
                         }
-                        dlmc->stopStatusUpdate();
-                        dlmc->dlManagerControl->resume(dlmc->menu->getItemName());
-                        dlmc->startStatusUpdate();
+                        ui->stopStatusUpdate();
+                        ui->controller->resume(ui->menu->getItemName());
+                        ui->startStatusUpdate();
                         break;
                     }
                 case 'R':
                     {
-                        if (!dlmc->dlManagerControl->isActive()) {
+                        if (!ui->controller->isActive()) {
                             break;
                         }
-                        dlmc->stopStatusUpdate();
-                        dlmc->dlManagerControl->resumeAll();
-                        dlmc->startStatusUpdate();
+                        ui->stopStatusUpdate();
+                        ui->controller->resumeAll();
+                        ui->startStatusUpdate();
                         break;
                     }
 
                 case 'c':
                     {
-                        if (!dlmc->dlManagerControl->isActive()) {
+                        if (!ui->controller->isActive()) {
                             break;
                         }
-                        dlmc->stopStatusUpdate();
-                        dlmc->dlManagerControl->clearInactive();
-                        dlmc->mainWindows.at(dlmc->statusIdx)->resetWin();
-                        dlmc->updateDownloadsMenu();
-                        dlmc->resetStatusDriver();
-                        dlmc->startStatusUpdate();
+                        ui->stopStatusUpdate();
+                        ui->controller->clearInactive();
+                        ui->main_windows.at(ui->status_window_index)->resetWin();
+                        ui->updateDownloadsMenu();
+                        ui->resetStatusDriver();
+                        ui->startStatusUpdate();
                         break;
                     }
 
                 case 'k':
                     /* Kill selected download */
                     {
-                        if (!dlmc->dlManagerControl->isActive()) {
+                        if (!ui->controller->isActive()) {
                             break;
                         }
-                        dlmc->stopStatusUpdate();
-                        dlmc->dlManagerControl->stop(dlmc->menu->getItemName()); 
-                        dlmc->updateDownloadsMenu();
-                        dlmc->resetStatusDriver();
-                        dlmc->mainWindows.at(dlmc->statusIdx)->resetWin();
-                        dlmc->startStatusUpdate();
+                        ui->stopStatusUpdate();
+                        ui->controller->stop(ui->menu->getItemName()); 
+                        ui->updateDownloadsMenu();
+                        ui->resetStatusDriver();
+                        ui->main_windows.at(ui->status_window_index)->resetWin();
+                        ui->startStatusUpdate();
                         break;
                     }
 
                 case 'K':
                     /* Kill all downloads */
                     {
-                        if (!dlmc->dlManagerControl->isActive()) {
+                        if (!ui->controller->isActive()) {
                             break;
                         }
-                        dlmc->stopStatusUpdate();
-                        dlmc->dlManagerControl->killAll();
-                        dlmc->updateDownloadsMenu();
-                        dlmc->mainWindows.at(dlmc->statusIdx)->resetWin();
-                        dlmc->startStatusUpdate();
+                        ui->stopStatusUpdate();
+                        ui->controller->killAll();
+                        ui->updateDownloadsMenu();
+                        ui->main_windows.at(ui->status_window_index)->resetWin();
+                        ui->startStatusUpdate();
                         break;
                     }
 
@@ -193,18 +193,18 @@ int main()
                     }
             }
             if (resizeUI) {
-                dlmc->stopStatusUpdate();
-                dlmc->resizeUI();
-                dlmc->updateDownloadsMenu();
-                dlmc->resetStatusDriver();
-                dlmc->startStatusUpdate();
+                ui->stopStatusUpdate();
+                ui->resizeUI();
+                ui->updateDownloadsMenu();
+                ui->resetStatusDriver();
+                ui->startStatusUpdate();
                 resizeUI = false;
             }
 
             /* Consistantly update main windows */
             {
-                std::lock_guard<std::mutex> guard(dlmc->dlsInfoMutex);
-                dlmc->refreshMainWins();        
+                std::lock_guard<std::mutex> guard(ui->downloads_infos_window_mutex);
+                ui->refreshMainWindows();        
             }
         }
     }

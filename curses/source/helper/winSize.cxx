@@ -1,6 +1,6 @@
 #ifndef WINSIZE_CXX
 /* Struct holding window dimensions: begy, begx, row, col */
-struct winSize {
+struct WinSize {
     int row;
     int col;
     int begy;

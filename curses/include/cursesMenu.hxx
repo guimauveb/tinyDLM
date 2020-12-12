@@ -1,25 +1,25 @@
-#include "cursesForm.hxx"
+#include "CursesForm.hxx"
 #include <menu.h>
 
 #include <vector>
 #include <map>
 #include <cstring>
 
-class cursesMenu {
+class CursesMenu {
     public:
-        cursesMenu(std::vector<std::string> itemsData);
-        cursesMenu();
-        ~cursesMenu();
+        CursesMenu(std::vector<std::string> items_data);
+        CursesMenu();
+        ~CursesMenu();
 
         void newMenu();
         void menuOptsOff(Menu_Options);
         void menuOptsOn(Menu_Options);
 
-        /* We use unique_ptr references since we know the pointer will outlive the cursesMenu object */
-        void setMenuSubDer(std::unique_ptr<cursesWindow>& win, int a, int b, int c, int d);
-        void setMenuDer(std::unique_ptr<cursesWindow>& der);
-        void setMenuWin(std::unique_ptr<cursesWindow>& win);
-        void setMenuSub(std::unique_ptr<cursesWindow>& win);
+        /* We use unique_ptr references since we know the pointer will outlive the CursesMenu object */
+        void setMenuSubDer(std::unique_ptr<CursesWindow>& win, int a, int b, int c, int d);
+        void setMenuDer(std::unique_ptr<CursesWindow>& der);
+        void setMenuWin(std::unique_ptr<CursesWindow>& win);
+        void setMenuSub(std::unique_ptr<CursesWindow>& win);
 
         void setMenuFormat(int r, int c);
         void setMenuMark(const char *m);

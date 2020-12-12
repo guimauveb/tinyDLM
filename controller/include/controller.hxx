@@ -1,27 +1,27 @@
-/* Controls all dlManager instances */
+/* Controls all DownloadManager instances. */
 #include "../../helper/include/flipMap.hxx"
 #include "../../helper/include/stringify.hxx"
 #include "../../helper/include/userInputCheck.hxx"
 
-#include "../../dlManager/include/dlManager.hxx"
+#include "../../DownloaderCore/include/DownloaderCore.hxx"
 
-class dlManagerController 
+class Controller 
 {
     public:
-        dlManagerController();
-        ~dlManagerController();
+        Controller();
+        ~Controller();
 
         std::string createNewDl(std::string folder, std::string filename, const std::string url,
-                         const int lowSpeedLim, const int lowSpeedTim);
+                const int low_speed_limit, const int low_speed_time_limit);
         void removeDl();
 
-        void startDl(const std::vector<std::string>& dlsToStart);
-        void startDl(const std::string& dlToStart);
-        void resume(const std::string& dlToResume);
+        void startDl(const std::vector<std::string>& downloads_to_start);
+        void startDl(const std::string& download_to_start);
+        void resume(const std::string& download_to_resule);
         void resumeAll();
-        void pause(const std::string& dlToPause);
+        void pause(const std::string& download_to_pause);
         void pauseAll();
-        void stop(const std::string& dlToStop);
+        void stop(const std::string& download_to_stop);
         void stopAll();
         void clearInactive();
         void killAll();
@@ -43,14 +43,14 @@ class dlManagerController
 
     private:
         /* Keep track of the number of downloads */
-        int dlCounter;
-        
-        /* TODO - move outside */
+        int dl_counter;
+
         /* Struct storing filenames infos for every download. Allows to properly update filenamesRecord */
         /* E.g : archive(1)'s dlRecord = {origFilename: "archive", dupNum: 1} */
-        struct dlRecord {
-            const std::string origFilename;
-            int dupNum;
+        /* TODO - Move to its proper place */
+        struct DownloadRecord {
+            const std::string orig_filename;
+            int dup_num;
         };
 
         /* Access dlRecord struct for every download - Map key is the final filename */
@@ -58,23 +58,23 @@ class dlManagerController
          * dlRecs.find(archive(2)) -> returns its dlRecord struct with the following content: 
          * { origFilename: "archive", dupNum: 2 }. We then know that we can delete the value 2 from filenamesRecords
          * array for this original filename so it can be used again */
-        std::map<std::string, dlRecord> dlRecs;
+        std::map<std::string, DownloadRecord> dl_records;
 
         /* Store filenames and indexes of duplicates for each filenames to generate proper non-conflicting 
          * filenames */
         /* E.g: filenamesRecords[archive] = [1, 3, 4]. Allows us to know that this filename will be named
          * archive(2) where 2 is the smallest missing value in the array */
-        std::map<std::string, std::vector<int>> filenamesRecords;
-        
+        std::map<std::string, std::vector<int>> filenames_records;
+
         /* Manage duplicate filenames */
         std::string& recordDuplicate(std::string& f);
         void createNewRecord(std::string& f);
-        
+
         /* Maps filename to its unique id */
-        std::map<std::string, int> downloadsMap;
+        std::map<std::string, int> downloads_map;
         std::map<int, std::string> sortDownloadsMapByIds();
 
         /* dlManager instances are stored in a vector of unique_ptrs */
-        std::vector<std::unique_ptr<dlManager>> dlManagerVec;
+        std::vector<std::unique_ptr<DownloaderCore>> downloader_core_vec;
 };
 

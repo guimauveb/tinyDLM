@@ -1,9 +1,5 @@
 #include "../../helper/include/userInputCheck.hxx"
 
-//tmp
-#include <iostream>
-#include <ncurses.h>
-
 int checkURLlength(std::string& url)
 {
     /* Check if the url is at least 7 char long (https://...) */
@@ -16,7 +12,6 @@ int checkURLlength(std::string& url)
 int checkHttp(std::string& url)
 {
     const std::string http  = "http://";
-    /* Now that we checked for its length we can compare safely without risking a segfault */
     if (url.substr(0, 7) != http)
         return 1;
     return 0;
@@ -47,19 +42,19 @@ int checkFilename(std::string& filename)
 /* Append (n) to an already existing filename where n is equal to dlCounter */
 std::string& createDuplicate(std::string& str, const int& i)
 {
-    const std::string appendNum = "(" + std::to_string(i) + ")";
+    const std::string append_num = "(" + std::to_string(i) + ")";
     std::size_t found = str.find_last_of(".");
 
     str.erase(str.find('\0'));
     /* If no .extension found - simply append (n) */
     if (found == std::string::npos) {
-        str.append(appendNum);
+        str.append(append_num);
     }
     /* Append (n) to filename then append .extension back */
     else {
         std::string part1 = str.substr(0, found);
         std::string part2 = str.substr(found + 1);
-        str = part1 + appendNum;
+        str = part1 + append_num;
         str.push_back('.');
         str.append(part2);
     }
@@ -85,7 +80,6 @@ std::string& trimSpaces(std::string& str)
             j--;
         }
     } 
-    // string::substr(pos, len (num of char to include))
     return str = str.substr(i, j + 1);
 }
 

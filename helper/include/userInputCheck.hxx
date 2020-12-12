@@ -1,4 +1,4 @@
-#include "../../dlManager/include/download.hxx"
+#include "../../DownloaderCore/include/download.hxx"
 #include "../../dialogs/include/dialogs.hxx"
 
 #include <sstream>

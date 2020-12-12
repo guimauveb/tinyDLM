@@ -1,13 +1,13 @@
-#include "../include/cursesForm.hxx"
+#include "../include/CursesForm.hxx"
 
 /* Form is already declared as a private member variable - the constructor takes the number of fields we want
  * to create in the form */
-cursesForm::cursesForm(const size_t& numField)
+CursesForm::CursesForm(const size_t& num_of_fields)
 {
     /* TODO - init field then init and post form */
     fields.resize(2, nullptr);
-    nFields = numField;
-    for (size_t i = 0; i < numField; ++i)   {
+    number_of_fields = num_of_fields;
+    for (size_t i = 0; i < number_of_fields; ++i)   {
         fields.emplace_back();
     }
     /* Push back a null pointer - not elegant TODO */
@@ -16,53 +16,53 @@ cursesForm::cursesForm(const size_t& numField)
 }
 
 
-cursesForm::~cursesForm()
+CursesForm::~CursesForm()
 {
     clearForm();
 }
 
-void cursesForm::setField(size_t fieldIdx, int height, int width, int toprow, int leftcol, int offscreen,
+void CursesForm::setField(size_t field_index, int height, int width, int toprow, int leftcol, int offscreen,
         int nbuffers)
 {
-    fields.at(fieldIdx) = new_field(height, width, toprow, leftcol, offscreen, nbuffers);
+    fields.at(field_index) = new_field(height, width, toprow, leftcol, offscreen, nbuffers);
 }
 
 /* Init form once we got all infos about fields and their options */
-void cursesForm::initForm()
+void CursesForm::initForm()
 {
     form = new_form(fields.data());
 }
 
-void cursesForm::initField(const size_t& numFields) {}
+void CursesForm::initField(const size_t& number_of_fields) {}
 
-void cursesForm::setFieldBack(size_t fieldIdx, chtype attr)
+void CursesForm::setFieldBack(size_t field_index, chtype attr)
 {
-    set_field_back(fields.at(fieldIdx), attr);
+    set_field_back(fields.at(field_index), attr);
 }
 
-void cursesForm::fieldOptsOff(size_t fieldIdx, Field_Options opts)
+void CursesForm::fieldOptsOff(size_t field_index, Field_Options opts)
 {
-    field_opts_off(fields.at(fieldIdx), opts);
+    field_opts_off(fields.at(field_index), opts);
 }
 
-void cursesForm::fieldOptsOn(size_t fieldIdx, Field_Options opts)
+void CursesForm::fieldOptsOn(size_t field_index, Field_Options opts)
 {
-    field_opts_on(fields.at(fieldIdx), opts);
+    field_opts_on(fields.at(field_index), opts);
 }
 
 /* Doesn't work properly on Linux - use set_form_sub instead */
-void cursesForm::setFormWin(std::unique_ptr<cursesWindow>& win)
+void CursesForm::setFormWin(std::unique_ptr<CursesWindow>& win)
 {
     set_form_win(form, win->getRawPtr());
 }
 
-void cursesForm::setFormSubwin(std::unique_ptr<cursesWindow>& win)        
+void CursesForm::setFormSubwin(std::unique_ptr<CursesWindow>& win)        
 {
     set_form_sub(form, win->getRawPtr());
 }
 
 /* TODO - check errors */
-int cursesForm::formDriver(int c)
+int CursesForm::formDriver(int c)
 {
     int retCode = form_driver(form, c);
     if (retCode != E_OK) {
@@ -88,18 +88,18 @@ int cursesForm::formDriver(int c)
     return retCode;
 }
 
-void cursesForm::postForm()
+void CursesForm::postForm()
 {
     post_form(form);
 }
 
-std::string cursesForm::getFieldBuffer(size_t fieldIdx)
+std::string CursesForm::getFieldBuffer(size_t field_index)
 {
-    std::string str = field_buffer(fields.at(fieldIdx), 0);
+    std::string str = field_buffer(fields.at(field_index), 0);
     return str; 
 
 }
-void cursesForm::clearForm()
+void CursesForm::clearForm()
 {
     unpost_form(form);
     free_form(form);
@@ -111,7 +111,7 @@ void cursesForm::clearForm()
 }
 
 /* Save buffer content - useful when resizing the window */
-void cursesForm::saveFieldBuffer()
+void CursesForm::saveFieldBuffer()
 {
     form_driver(form, REQ_FIRST_FIELD);
     for (size_t i = 0; i < fields.size() - 1; ++i) {
@@ -121,15 +121,15 @@ void cursesForm::saveFieldBuffer()
     }
 }
 
-void cursesForm::populateField(size_t fieldIdx, const std::string str)
+void CursesForm::populateField(size_t field_index, const std::string str)
 {
-    form_driver(form, fieldIdx);
+    form_driver(form, field_index);
     for (size_t i = 0; i < str.length(); ++i) {
         form_driver(form, str[i]);
     }
 }
 
-int cursesForm::curFieldIdx()
+int CursesForm::curFieldIdx()
 {
     return field_index(current_field(form));
 }

@@ -58,7 +58,8 @@ extern const std::string statusStrEr;
 extern const std::string statusStrPe;
 extern const std::string statusStrUn;
 
-extern const std::string dlFolder;
+/* TODO - move to the proper place */
+extern const std::string downloads_folder;
 
 extern const std::string ERR_WIN_BEG;
 extern const std::string ERR_MAIN_WIN_0;

@@ -14,14 +14,14 @@
 #include <cmath>
 #include <cstring>
 
-class dlManager 
+class DownloaderCore 
 {
     public:
         /* Constructor */
-        dlManager(const int& dlid, const std::string& u, const std::string& f, const std::string& sa, const int& lsl, const int& lst);
+        DownloaderCore(const int& dlid, const std::string& u, const std::string& f, const std::string& sa, const int& lsl, const int& lst);
 
         /* Make sure threads are done executing when calling the destructor */
-        ~dlManager(); 
+        ~DownloaderCore(); 
 
         /* This function will take care of the transfer */
         int dlPerform();
@@ -111,7 +111,7 @@ class dlManager
 
     private:
         /* Ban default constructor */
-        dlManager();
+        DownloaderCore();
 
         /* Initialise our curlpp handle here so it can be accessed by any function */
         curlpp::Easy cleaner;

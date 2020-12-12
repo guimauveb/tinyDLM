@@ -59,13 +59,13 @@ const std::string statusStrUn = "  Unknown  ";
 
 /* TODO - make it selectionable by the user */
 /* TODO - move to the designated function */
-const std::string dlFolder = "downloads/";
+const std::string downloads_folder = "downloads/";
 
-const std::string ERR_WIN_BEG = "Unable to allocate memory for the '";
-const std::string ERR_MAIN_WIN_0 = "download list";
-const std::string ERR_MAIN_WIN_1 = "key actions";
-const std::string ERR_MAIN_WIN_2 = "download status";
-const std::string ERR_ADD_DL_WIN = "add a download";
-const std::string ERR_DETAILS_WIN = "details";
-const std::string ERR_PROGRESS_WIN = "progress";
-const std::string ERR_WIN_END = "' window. Exiting.";
+const std::string ERR_WIN_BEG       = "Unable to allocate memory for the '";
+const std::string ERR_MAIN_WIN_0    = "download list";
+const std::string ERR_MAIN_WIN_1    = "key actions";
+const std::string ERR_MAIN_WIN_2    = "download status";
+const std::string ERR_ADD_DL_WIN    = "add a download";
+const std::string ERR_DETAILS_WIN   = "details";
+const std::string ERR_PROGRESS_WIN  = "progress";
+const std::string ERR_WIN_END       = "' window. Exiting.";
