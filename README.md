@@ -17,7 +17,7 @@ I plan on adding some other useful features like limiting the number of simultan
 
 **NOTE**: install.sh doesn't work on Big Sur. I have to make a few changes in CMakeLists.txt. In the meantime use the command in **compileMacOs.txt** to compile.
 
-### Features:
+## Features:
     - Works on macOS (>= 10.14) and Linux Debian based distributions
     - Supports Direct Download Links
     - Supports simultaneous transfers (tested up to 32)
@@ -29,7 +29,7 @@ I plan on adding some other useful features like limiting the number of simultan
     - Very low CPU / memory consumption
     - (DOING) Partially supports adding multiple links at the same time
 
-### Installation 
+## Installation 
 
 Works on **Linux Debian based distributions** and **macOS (>= 10.14)**
     
@@ -46,21 +46,23 @@ Works on **Linux Debian based distributions** and **macOS (>= 10.14)**
 3. Run **install.sh**
 
 
-### Tested on: 
+## Tested on: 
 - **macOS Big Sur (>= 11.0)**
 - **macOS Mojave (10.14.6)** 
 - **Linux Ubuntu (20.04 LTS)**
 - **Kali Linux (20.03)**
 
-### Details about the code
+## Details about the code
 The code uses the following style convention:
+```
 - ProperCase class names.
 - camelCase functions (lower case initial letter).
 - snake_case variables.
+```
 
 **NOTE:** I'm still working on improving the code and code style.
 
-### Missing features coming soon 
+## Missing features coming soon 
     - [X] Duplicate filename checker 
     - [IN PROGRESS] Add multiple links at the same time 
     - [ ] Set the default number of simultaneous transfers to the number of CPU cores / threads
