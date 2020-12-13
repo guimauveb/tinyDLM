@@ -55,7 +55,7 @@ Works on **Linux Debian based distributions** and **macOS (>= 10.14)**
 ## Details about the code
 The code uses the following style convention:
 ```
-- ProperCase class names.
+- ProperCase class and struct names.
 - camelCase functions (lower case initial letter).
 - snake_case variables.
 ```
