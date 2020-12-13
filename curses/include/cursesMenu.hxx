@@ -38,8 +38,8 @@ class CursesMenu {
     private:
         bool itemsFreed = false;
         bool menuFreed = false;
-        std::vector<std::string> itemStrings;
-        std::map<std::string, int> itemsMap;
+        std::vector<std::string> items_strings;
+        std::map<std::string, int> items_map;
         std::vector<ITEM *> items;
         MENU *menu = nullptr;
 };

@@ -3,13 +3,13 @@
 /* Initialize a menu with items as strings corresponding to downloads filenames */
 CursesMenu::CursesMenu(std::vector<std::string> items_data)
 {
-    itemStrings = items_data;
+    items_strings = items_data;
     /* Push choices elements into a vector of ITEM * */
-    for (size_t i = 0; i < itemStrings.size(); ++i) {
+    for (size_t i = 0; i < items_strings.size(); ++i) {
         /* The filename of each download will be used as the item name */
-        items.push_back(new_item(itemStrings.at(i).c_str(), nullptr)); 
+        items.push_back(new_item(items_strings.at(i).c_str(), nullptr)); 
         /* Update map - each item has a corresponding id */
-        itemsMap[itemStrings.at(i)] = i;
+        items_map[items_strings.at(i)] = i;
     }
 
     /* Push back a null item */
@@ -27,8 +27,8 @@ int CursesMenu::getItemNum()
 int CursesMenu::getItemNo()
 {
     std::string tmp = getItemName();
-    std::map<std::string, int>::iterator it = itemsMap.find(tmp);
-    if (it != itemsMap.end()) {
+    std::map<std::string, int>::iterator it = items_map.find(tmp);
+    if (it != items_map.end()) {
         return it->second;
     }
     /* Should not happen */
@@ -61,7 +61,7 @@ void CursesMenu::clearItems()
         for(int i = 0; i < n; ++i)
             free_item(items[i]);
         items.clear();
-        itemStrings.clear();
+        items_strings.clear();
         itemsFreed = true;
     }
 

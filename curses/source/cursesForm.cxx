@@ -2,17 +2,12 @@
 
 /* Form is already declared as a private member variable - the constructor takes the number of fields we want
  * to create in the form */
-CursesForm::CursesForm(const size_t& num_of_fields)
+CursesForm::CursesForm(const size_t& number_of_fields)
 {
-    /* TODO - init field then init and post form */
-    fields.resize(2, nullptr);
-    number_of_fields = num_of_fields;
-    for (size_t i = 0; i < number_of_fields; ++i)   {
+    for (size_t i = 0; i < number_of_fields; ++i) {
         fields.emplace_back();
     }
-    /* Push back a null pointer - not elegant TODO */
-    fields.emplace_back();
-    fields.at(fields.size() - 1) = nullptr;
+    fields.push_back(nullptr);
 }
 
 
@@ -40,7 +35,7 @@ void CursesForm::setFieldBack(size_t field_index, chtype attr)
     set_field_back(fields.at(field_index), attr);
 }
 
-void CursesForm::fieldOptsOff(size_t field_index, Field_Options opts)
+void CursesForm::fieldOptsOff(const size_t field_index, Field_Options opts)
 {
     field_opts_off(fields.at(field_index), opts);
 }
@@ -117,7 +112,7 @@ void CursesForm::saveFieldBuffer()
     for (size_t i = 0; i < fields.size() - 1; ++i) {
         std::string tmp = field_buffer(fields.at(i), 0);
         tmp = trimSpaces(tmp);
-        fieldBuffers.push_back(tmp);
+        field_buffers.push_back(tmp);
     }
 }
 

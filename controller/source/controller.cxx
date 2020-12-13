@@ -9,7 +9,7 @@ Controller::~Controller() {}
 
 /* Initialize a new DownloaderCore object then place it in a vector */
 std::string Controller::createNewDl(std::string folder, std::string filename, const std::string url,  
-        const int low_speed_limit, const int low_speed_time_limit)
+                                    const int low_speed_limit, const int low_speed_time_limit)
 {
     std::string final_filename = filename;
     std::map<std::string, int>::iterator ita = downloads_map.find(filename);
@@ -32,7 +32,8 @@ std::string Controller::createNewDl(std::string folder, std::string filename, co
 
         const std::string saveAs = downloads_folder + final_filename;
         std::unique_ptr<DownloaderCore> dlm = std::make_unique<DownloaderCore>(dl_counter, url, final_filename, 
-                saveAs, low_speed_limit, low_speed_time_limit);
+                                                                               saveAs, low_speed_limit, 
+                                                                               low_speed_time_limit);
         downloader_core_vec.emplace_back(std::move(dlm));
 
         dl_counter++;
@@ -47,7 +48,8 @@ std::string Controller::createNewDl(std::string folder, std::string filename, co
 }
 
 /* Process the filename and find out what index must be appended according to records for this filename */
-std::string& Controller::recordDuplicate(std::string& f) {
+std::string& Controller::recordDuplicate(std::string& f) 
+{
     std::string original_filename = f;
     /* Duplicate number */
     int n = 1;
@@ -55,7 +57,9 @@ std::string& Controller::recordDuplicate(std::string& f) {
     bool found = false;
 
     /* TODO - Use a binary tree instead ! */
-
+    // Create a binary tree for each filename
+    // Store filename index in the binary tree
+    
     /* We suppose that the array minimum possible value is 1 */
     std::sort(filenames_records[f].begin(), filenames_records[f].end());
     /* If filename already has duplicates, append (n) to it where n is equal to the index of duplicates */
@@ -153,7 +157,7 @@ void Controller::clearInactive()
     std::vector<size_t> todel;
     for (size_t i = 0; i < downloader_core_vec.size(); ++i) {
         if((downloader_core_vec.at(i)->getDownloadInfos()->status == downloadStatus::ERROR) || 
-                (downloader_core_vec.at(i)->getDownloadInfos()->status == downloadStatus::COMPLETED)) {
+           (downloader_core_vec.at(i)->getDownloadInfos()->status == downloadStatus::COMPLETED)) {
             it = downloads_map.find(downloader_core_vec.at(i)->getDownloadInfos()->filename);
             if (it != downloads_map.end()) {
                 /* Decrement downloads ids above deleted item since they are used as 

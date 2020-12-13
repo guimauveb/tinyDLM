@@ -145,7 +145,6 @@ size_t DownloaderCore::HeaderCallbackFunctor::Write(curlpp::Easy *handle, char *
     return realsize;
 }
 
-/* Define our Write Callback functor */
 size_t DownloaderCore::WriteCallbackFunctor::Write(curlpp::Easy *handle, char *ptr, size_t size, size_t nmemb)
 {
     ++writeRound;
@@ -171,7 +170,6 @@ void DownloaderCore::runThread()
 /* Perform the download once we have all the info we need */
 int DownloaderCore::dlPerform()
 {
-    //std::cout << "Downloading '" << saveAs << "'..." << "\n";
     try {
         /* Initialise our output file stream before anything else so we don't try to download the file
          * if there was an error while opening a file stream */
@@ -253,7 +251,6 @@ int DownloaderCore::dlPerform()
             //do nothing since it means that we paused the transfer
         }
         else {
-            //write to log
             curlpp_ofstr.write(e.what(), size);
             {
                 std::lock_guard<std::mutex> guard(*dlMutPtr);
