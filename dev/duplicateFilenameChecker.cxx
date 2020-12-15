@@ -5,7 +5,7 @@
 
 #include "../helper/include/BinaryTree.hxx"
 
-void testDuplicateRoutine(std::map<std::string, BinaryTree*>& filenames_records, const std::string& filename)
+void testDuplicateRoutine(int key, std::map<std::string, BinaryTree*>& filenames_records, const std::string& filename)
 {
     // new url added:
     // check if there is an entry for the filename
@@ -17,7 +17,6 @@ void testDuplicateRoutine(std::map<std::string, BinaryTree*>& filenames_records,
         if (filenames_records[filename] == nullptr) {
             //   std::cout << "Creating a binary tree for " << filename << '\n';
             filenames_records[filename] = new BinaryTree;
-            filenames_records[filename]->insert(1);
             //  std::cout << "Duplicate index is " << filenames_records[filename]->getMaximumKey() << '\n';
         }
         //          else check what was the last_value_removed if last_value_removed is != 0
@@ -26,7 +25,9 @@ void testDuplicateRoutine(std::map<std::string, BinaryTree*>& filenames_records,
             // if last_value_removed != 0 
             // insert last_value_removed, set it to 0 and duplicate is == last_value_removed
             // else insert max_key and duplicate == max_key + 1
-            filenames_records[filename]->createDuplicate();
+            std::cout << "inserting key " << key << '\n';
+            filenames_records[filename]->insert(key);
+            //filenames_records[filename]->createDuplicate();
             //   std::cout << "New key == getMaxKey + 1\n" << filenames_records[filename]->getMaximumKey() << '\n';
         }
     }
@@ -40,7 +41,7 @@ void testDuplicateRoutine(std::map<std::string, BinaryTree*>& filenames_records,
 
 void deleteRecord(std::map<std::string, BinaryTree*>& filename_records, const std::string filename, int key)
 {
-    filename_records[filename]->removeKey(key);
+    //    filename_records[filename]->removeKey(key);
 }
 
 int main(int argc, char **argv)
@@ -51,22 +52,18 @@ int main(int argc, char **argv)
     std::vector<const std::string> str_vec = {"filename", "filename", "filename", "filename", "filename", "filename"};
 
     for (int i = 0; i < (int)str_vec.size(); ++i) {
-        testDuplicateRoutine(f_records, str_vec[i]);
+        testDuplicateRoutine(i, f_records, str_vec[i]);
     }
+    f_records["filename"]->preOrder();
+    f_records["filename"]->deleteNode(2);
+    f_records["filename"]->preOrder();
 
-    // Delete node
-    deleteRecord(f_records, "filename", 5);
-    testDuplicateRoutine(f_records, "filename");
-    testDuplicateRoutine(f_records, "filename");
-    testDuplicateRoutine(f_records, "filename");
-    deleteRecord(f_records, "filename", 7);
-    deleteRecord(f_records, "filename", 6);
     // Clean map
-    //auto it = f_records.find("filename");
-    //if (it != f_records.end()) {
-    //    it->second->destroyTree();
-    //    f_records.erase(it);
-    //} 
+    auto it = f_records.find("filename");
+    if (it != f_records.end()) {
+        delete it->second;
+        f_records.erase(it);
+    } 
 
     return 0;
 }
