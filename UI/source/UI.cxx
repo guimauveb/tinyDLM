@@ -93,7 +93,7 @@ void UI::setWindowsSize()
     window_size_map["pHelpSz"]    = {1, col / 2, row - 1, 0};
     window_size_map["infosSz"]    = {1, col / 2, row - 2, col / 2};
     window_size_map["addSz"]      = {row / 2 + 4, col - (col / 2), (row / 4) - 2, col / 4};
-    window_size_map["detSz"]      = {row / 2, col - (col / 2), (row / 4), col / 4};
+    window_size_map["detSz"]      = {row / 2 + 4, col - (col / 2), (row / 4) - 2, col / 4};
     window_size_map["progSz"]     = {4, (col - (col / 2)) -10, row / 2, col / 4 + 4};
     // TODO - Set settings window dimensions (same as help window for now)
     window_size_map["settingsSz"]  = {18, col - (col / 2), (row / 4), col / 4};
@@ -774,7 +774,7 @@ void UI::setDetForm()
     point maxyx = det_win->getMaxyx();
 
     /* Set field size and location */
-    det_form->setField(0, 1, maxyx.x - 10, 3, 4, 0, 0);
+    det_form->setField(0, 2, maxyx.x - 10, 3, 4, 0, 0);
     det_form->setField(1, 1, maxyx.x - 10, 6, 4, 0, 0);
 
     /* Set field options */
