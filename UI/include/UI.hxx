@@ -43,6 +43,9 @@ class UI
         int top_item;
         int bottom_item;
 
+        /* Enter settings menu */
+        int settings();
+
         /* Display help window */
         int showHelp();
         /* 'Add a new download' routine */
@@ -75,12 +78,16 @@ class UI
         void initStatusDriver();
 
         /* Display tinyDLM help */
-        std::unique_ptr<CursesWindow> initHelpWindow();
+        std::unique_ptr<CursesWindow> help_window;
         void paintHelpWindow(std::unique_ptr<CursesWindow>& win);
         int navigateHelpWindow();
 
+        /* Display settings */
+        std::unique_ptr<CursesWindow> settings_window;
+        void paintSettingsWindow();
+        int navigateSettings();
+
         /* Window holding the welcome message at first start */
-        std::unique_ptr<CursesWindow> help_window;
         void paintWelcomeWindow(std::unique_ptr<CursesWindow>& win);
 
         /* Initialize program's main windows */

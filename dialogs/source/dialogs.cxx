@@ -13,6 +13,7 @@ const std::string tinyHelp       = " Press 'a' to add a new download. ";
 //const std::string msgKeyInfoR  = " a: add  r: resume c: clear inactive  k: kill all " ;
 const std::string msgHelp               = " Press 'h' to show help ";
 const std::string msgHelpMenu           = " Help Menu ";
+const std::string msgSettings           = " s           :Settings ";
 const std::string msgHelpAdd            = " a           :Add a new download ";
 const std::string msgHelpArrowKeys      = " Arrow keys  :Navigate the downloads menu ";
 const std::string msgHelpReturn         = " Enter       :Show selected download details ";

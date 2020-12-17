@@ -13,6 +13,7 @@ extern const std::string madeBy;
 //extern const std::string msgKeyInfoR;
 extern const std::string msgHelp;
 extern const std::string msgHelpMenu      ;
+extern const std::string msgSettings      ;
 extern const std::string msgHelpAdd       ;
 extern const std::string msgHelpArrowKeys ; 
 extern const std::string msgHelpReturn    ; 

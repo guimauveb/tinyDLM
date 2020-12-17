@@ -56,6 +56,7 @@ std::string& Controller::recordDuplicate(std::string& f)
     auto it = filenames_records.find(f);
     bool found = false;
 
+    // TODO - getNextFilename() ?
     /* We suppose that the array minimum possible value is 1 */
     std::sort(filenames_records[f].begin(), filenames_records[f].end());
     /* If filename already has duplicates, append (n) to it where n is equal to the index of duplicates */
@@ -94,6 +95,7 @@ std::string& Controller::recordDuplicate(std::string& f)
     /* If not duplicates was found, n = 1 */
     /* Append duplicate value to filename vector of duplicates values */
     filenames_records[f].push_back(n);
+    // Appends filename + index (ignoring .extension)
     createDuplicate(f, n);
     /* Store original filename and duplicate value in dl_records and use final filename as key */
     dl_records.insert(dl_records.end(), std::pair<std::string, DownloadRecord>(f, {original_filename, n}));

@@ -95,8 +95,9 @@ void UI::setWindowsSize()
     window_size_map["addSz"]      = {row / 2 + 1, col - (col / 2), (row / 4), col / 4};
     window_size_map["detSz"]      = {row / 2, col - (col / 2), (row / 4), col / 4};
     window_size_map["progSz"]     = {4, (col - (col / 2)) -10, row / 2, col / 4 + 4};
-    // TODO - Set settings window dimensions
-    window_size_map["settingSz"]  = {4, (col - (col / 2)) -10, row / 2, col / 4 + 4};
+    // TODO - Set settings window dimensions (same as help window for now)
+    window_size_map["settingSz"]  = {18, col - (col / 2), (row / 4), col / 4};
+    window_size_map["helpSz"]     = {18, col - (col / 2), (row / 4), col / 4};
 }
 
 void UI::resetStatusDriver()
@@ -466,9 +467,18 @@ int UI::stopStatusUpdate()
     return 0;
 }
 
+int UI::settings()
+{
+    settings_window = initWin(window_size_map["settingsSz"], "help"); 
+    paintSettingsWindow();
+    navigateSettings();
+    // Return nav return code
+    return 0;
+}
+
 int UI::showHelp()
 {
-    help_window = initHelpWindow();
+    help_window = initWin(window_size_map["helpSz"], "help");
     paintHelpWindow(help_window);
     help_window->refreshWin();
     return navigateHelpWindow();
@@ -512,11 +522,6 @@ int UI::navigateHelpWindow()
     return update_menu;
 }
 
-std::unique_ptr<CursesWindow> UI::initHelpWindow()
-{
-    return std::make_unique<CursesWindow>(18, col - (col / 2), (row / 4), col / 4, "help");
-}
-
 void UI::paintHelpWindow(std::unique_ptr<CursesWindow>& win)
 {
     const int begy = 1;
@@ -531,9 +536,10 @@ void UI::paintHelpWindow(std::unique_ptr<CursesWindow>& win)
     win->addStr(begy + 8, 0, msgHelpResumeAll);
     win->addStr(begy + 9, 0, msgHelpClear);
     win->addStr(begy + 10, 0, msgHelpKill);
-    win->addStr(begy + 11, 0, msgHelpKillAll);
-    win->addStr(begy + 12, 0, msgHelpExit);
-    win->printInMiddle(begy + 14, 0, maxyx.x, msgHelpCloseWin, COLOR_PAIR(7));
+    win->addStr(begy + 11, 0, msgSettings);
+    win->addStr(begy + 12, 0, msgHelpKillAll);
+    win->addStr(begy + 13, 0, msgHelpExit);
+    win->printInMiddle(begy + 15, 0, maxyx.x, msgHelpCloseWin, COLOR_PAIR(7));
     win->drawBox(0, 0);
 }
 
