@@ -96,7 +96,7 @@ void UI::setWindowsSize()
     window_size_map["detSz"]      = {row / 2, col - (col / 2), (row / 4), col / 4};
     window_size_map["progSz"]     = {4, (col - (col / 2)) -10, row / 2, col / 4 + 4};
     // TODO - Set settings window dimensions (same as help window for now)
-    window_size_map["settingSz"]  = {18, col - (col / 2), (row / 4), col / 4};
+    window_size_map["settingsSz"]  = {18, col - (col / 2), (row / 4), col / 4};
     window_size_map["helpSz"]     = {18, col - (col / 2), (row / 4), col / 4};
 }
 
@@ -319,6 +319,14 @@ void UI::paintShowHelpWindow(std::unique_ptr<CursesWindow>& win)
 // TODO
 void UI::paintSettingsWindow(std::unique_ptr<CursesWindow>& win) 
 {
+    const int begy = 1;
+    const point maxyx = win->getMaxyx();
+    win->printInMiddle(begy, 0, maxyx.x, msgSettings, COLOR_PAIR(7));
+    win->addStr(begy + 4, 1, "Maximum number of simultaneous transfers ");
+    win->addStr(begy + 7, 1, "Maximum transfer speed ");
+    win->addStr(begy + 10, 1, "Downloads directory ");
+    //win->printInMiddle(begy + 15, 0, maxyx.x, msgHelpCloseWin, COLOR_PAIR(7));
+    win->drawBox(0, 0);
 }
 
 /* Populate the status window with downloads informations such as their status / speed / progress */
@@ -469,11 +477,84 @@ int UI::stopStatusUpdate()
 
 int UI::settings()
 {
+    settings_form = initForm(3);
     settings_window = initWin(window_size_map["settingsSz"], "help"); 
-    paintSettingsWindow();
-    navigateSettings();
-    // Return nav return code
-    return 0;
+
+    std::vector<std::string> tmp_items = {"Save", "Close"};
+    point p_max = settings_window->getMaxyx();
+    //point pBeg = settings_win->getBegyx();
+
+    // Init a subwin for the menu
+    settings_window->setDerwin(1, 20, p_max.y - 2, (p_max.x - 20) / 2);
+    // init downloads menu == init any menu. TODO - Create initMenu()
+    settings_menu = initMenu(tmp_items);
+
+    setSettingsForm();
+    setSettingsMenu();
+    paintSettingsWindow(settings_window);
+
+    settings_window->touchWin();
+    settings_window->refreshWin();
+
+    int r = navigateSettings();
+
+    settings_menu->clearMenu();
+    settings_menu->clearItems();
+
+    return r;
+}
+
+void UI::setSettingsMenu()
+{
+    //point p_max = add_dl_win->getMaxyx();
+    //point pBeg = add_dl_win->getBegyx();
+    settings_menu->menuOptsOn(O_SHOWDESC);
+    //settings_menu->setMenuWin(settings_win);
+    settings_menu->setMenuDer(settings_window);
+    //settings_menu->setMenuSubDer(settings_win, 1, 34, p_max.y - 2, (p_max.x - 34) / 2);
+
+    settings_menu->setMenuFormat(1, 2);
+    settings_menu->setMenuMark(" * ");
+    settings_menu->postMenu();
+}
+
+int UI::navigateSettings()
+{
+    int ch = 0;
+    bool done = false;
+    bool resize = false;
+    bool update_menu = false;
+
+    while ((ch = getch())) {
+        switch(ch) {
+            case KEY_RESIZE:
+                {
+                    update_menu = true;
+                    resize = true;
+                    break;
+                }
+            case 10:
+                {
+                    done = true;
+                    break;
+                }
+            default: 
+                {
+                    break;
+                }
+        }
+        if (done) {
+            break;
+        }
+        if (resize) {
+            resizeUI();
+            settings_window->resizeWin(window_size_map["settingsSz"]);
+            paintSettingsWindow(settings_window);
+            settings_window->refreshWin();
+            resize = false;
+        }
+    }
+    return update_menu;
 }
 
 int UI::showHelp()
@@ -536,8 +617,8 @@ void UI::paintHelpWindow(std::unique_ptr<CursesWindow>& win)
     win->addStr(begy + 8, 0, msgHelpResumeAll);
     win->addStr(begy + 9, 0, msgHelpClear);
     win->addStr(begy + 10, 0, msgHelpKill);
-    win->addStr(begy + 11, 0, msgSettings);
     win->addStr(begy + 12, 0, msgHelpKillAll);
+    win->addStr(begy + 11, 0, msgHelpSettings);
     win->addStr(begy + 13, 0, msgHelpExit);
     win->printInMiddle(begy + 15, 0, maxyx.x, msgHelpCloseWin, COLOR_PAIR(7));
     win->drawBox(0, 0);
@@ -644,7 +725,7 @@ void UI::paintAddDlWin()
     }
 
     add_dl_win->addStr(3, 3, addURL);
-    add_dl_win->addStr(7, 3, addSaveAs);
+    add_dl_win->addStr(10, 3, addSaveAs);
     add_dl_win->drawBox(0, 0);
 
     free(title_add);
@@ -653,6 +734,38 @@ void UI::paintAddDlWin()
 std::unique_ptr<CursesForm> UI::initForm(size_t numFields)
 {
     return std::make_unique<CursesForm>(numFields);
+}
+
+void UI::setSettingsForm()
+{
+    point maxyx = settings_window->getMaxyx();
+
+    /* Set field size and location */
+    settings_form->setField(0, 4, maxyx.x - 10, 6, 4, 0, 0);
+    settings_form->setField(1, 4, maxyx.x - 10, 9, 4, 0, 0);
+    settings_form->setField(2, 4, maxyx.x - 10, 12, 4, 0, 0);
+
+    /* Set field options */
+    settings_form->setFieldBack(0, A_UNDERLINE);
+    settings_form->setFieldBack(0, O_BLANK);
+    settings_form->setFieldBack(0, O_AUTOSKIP);
+    settings_form->fieldOptsOff(0, O_STATIC);
+
+    settings_form->setFieldBack(1, A_UNDERLINE);
+    settings_form->setFieldBack(1, O_BLANK);
+    settings_form->setFieldBack(1, O_AUTOSKIP);
+    settings_form->fieldOptsOff(1, O_STATIC);
+
+    settings_form->setFieldBack(2, A_UNDERLINE);
+    settings_form->setFieldBack(2, O_BLANK);
+    settings_form->setFieldBack(2, O_AUTOSKIP);
+    settings_form->fieldOptsOff(2, O_STATIC);
+
+    /* Initialize settings_form */
+    settings_form->initForm();
+    settings_form->setFormSubwin(settings_window);
+
+    settings_form->postForm();
 }
 
 /* Init details window form in order to populate */
@@ -684,8 +797,8 @@ void UI::setAddDlForm()
     point maxyx = add_dl_win->getMaxyx();
 
     /* Set field size and location */
-    add_dl_form->setField(0, 1, maxyx.x - 10, 4, 4, 0, 0);
-    add_dl_form->setField(1, 1, maxyx.x - 10, 8, 4, 0, 0);
+    add_dl_form->setField(0, 4, maxyx.x - 10, 4, 4, 0, 0);
+    add_dl_form->setField(1, 1, maxyx.x - 10, 11, 4, 0, 0);
 
     /* Set field options */
     add_dl_form->setFieldBack(0, A_UNDERLINE);
@@ -924,23 +1037,23 @@ int UI::navigateAddDownloadWindow()
 
                             /* Must be at least 7 char long -> http:// */
                             if (checkURL(url)) {
-                                add_dl_win->printInMiddle(6, 0, maxyx.x, msgInvalidURL, COLOR_PAIR(1));
+                                add_dl_win->printInMiddle(9, 0, maxyx.x, msgInvalidURL, COLOR_PAIR(1));
                                 urlErr = true;
                             }
                             else {
                                 /* Erase error msg -> fill with white space */
-                                add_dl_win->printInMiddle(6, 0, maxyx.x, "                   ", COLOR_PAIR(7));
+                                add_dl_win->printInMiddle(9, 0, maxyx.x, "                   ", COLOR_PAIR(7));
                                 url.push_back('\0');
                                 urlErr = false;
                             }
 
                             if (!checkFilename(filename)){
-                                add_dl_win->printInMiddle(10, 0, maxyx.x, msgInvalidFilename, COLOR_PAIR(1));
+                                add_dl_win->printInMiddle(13, 0, maxyx.x, msgInvalidFilename, COLOR_PAIR(1));
                                 fileErr = true;
                             }
                             else {
                                 /* Erase error msg -> fill with white space */
-                                add_dl_win->printInMiddle(10, 0, maxyx.x, "                        ", COLOR_PAIR(7));
+                                add_dl_win->printInMiddle(13, 0, maxyx.x, "                        ", COLOR_PAIR(7));
                                 filename.push_back('\0');
                                 fileErr = false;
                             }
@@ -1023,10 +1136,10 @@ int UI::navigateAddDownloadWindow()
             resizeAddDownloadWindow(add_dl_form->getFieldBuffer(0), add_dl_form->getFieldBuffer(1));
             /* Restore errors */
             if (fileErr) {
-                add_dl_win->printInMiddle(10, 0, maxyx.x, msgInvalidFilename, COLOR_PAIR(1));
+                add_dl_win->printInMiddle(13, 0, maxyx.x, msgInvalidFilename, COLOR_PAIR(1));
             }
             if (urlErr) {
-                add_dl_win->printInMiddle(6, 0, maxyx.x, msgInvalidURL, COLOR_PAIR(1));
+                add_dl_win->printInMiddle(9, 0, maxyx.x, msgInvalidURL, COLOR_PAIR(1));
             }
             /* Restore cursor position */
             add_dl_form->formDriver(currField); 

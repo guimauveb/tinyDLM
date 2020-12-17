@@ -17,7 +17,7 @@ int main()
         return 1;
     }
 
-    /* Navigate through the tinyDLM UI */
+    /* Navigate through tinyDLM UI */
     {
         int ch = 0;
         bool resizeUI = false;
@@ -95,6 +95,16 @@ int main()
                         break;
                     }
 
+                case 's':
+                    {
+                        ui->stopStatusUpdate();
+                        if (ui->settings()) {
+                            ui->updateDownloadsMenu();
+                            ui->resetStatusDriver();
+                        }
+                        ui->startStatusUpdate();
+                        break;
+                    }
                 case 'p':
                     /* Pause highlighted download */
                     {

@@ -30,6 +30,8 @@ extern const std::string msgHelpCloseWin  ;
 extern const std::string addURL;
 extern const std::string addSaveAs;
 
+extern const std::string msgHelpSettings;
+
 extern const std::string msgClose;
 extern const std::string msgPause;
 extern const std::string msgResume;

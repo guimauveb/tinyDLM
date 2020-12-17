@@ -84,8 +84,11 @@ class UI
 
         /* Display settings */
         std::unique_ptr<CursesWindow> settings_window;
-        void paintSettingsWindow();
+        std::unique_ptr<CursesForm> settings_form;
+        std::unique_ptr<CursesMenu> settings_menu;
         int navigateSettings();
+        void setSettingsForm();
+        void setSettingsMenu();
 
         /* Window holding the welcome message at first start */
         void paintWelcomeWindow(std::unique_ptr<CursesWindow>& win);
