@@ -122,11 +122,13 @@ void Controller::startDl(const std::vector<std::string>& downloads_to_start) {}
 
 void Controller::resume(const std::string& dlToResume)
 {
+    // TODO - Check max_transfer_number
     downloader_core_vec.at(downloads_map[dlToResume])->resume();
 }
 
 void Controller::resumeAll()
 {
+    // TODO - Check max_transfer_number
     for (size_t i = 0; i < downloader_core_vec.size(); ++i) {
         downloader_core_vec.at(i)->resume();
     }
@@ -134,11 +136,13 @@ void Controller::resumeAll()
 
 void Controller::pause(const std::string& dlToPause)
 {
+    // TODO - Update max_transfer_number
     downloader_core_vec.at(downloads_map[dlToPause])->pause();
 }
 
 void Controller::pauseAll()
 {
+    // TODO - Update max_transfer_number
     for (size_t i = 0; i < downloader_core_vec.size(); ++i) {
         if (downloader_core_vec.at(i)->getDownloadInfos()->status == downloadStatus::DOWNLOADING)
             downloader_core_vec.at(i)->pause();
@@ -158,7 +162,6 @@ void Controller::clearInactive()
                 /* Decrement downloads ids above deleted item since they are used as 
                  * indexes to access downloader_core_vec */
                 /* TODO - could we start iterating by ref at some index instead of map::begin ? */
-                /* TODO - resizedownloadsmap ? */
                 for (auto& el : downloads_map) {
                     if (el.second > it->second) {
                         --el.second;
@@ -299,4 +302,5 @@ std::vector<std::string> Controller::getDownloadsList()
     }
     return vec;
 }
+
 

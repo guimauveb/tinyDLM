@@ -93,6 +93,7 @@ class UI
         void paintLabelsWindow(std::unique_ptr<CursesWindow>& win);
         //void paintMainWindow(std::unique_ptr<CursesWindow>& win);
         void paintShowHelpWindow(std::unique_ptr<CursesWindow>& win);
+        void paintSettingsWindow(std::unique_ptr<CursesWindow>& win);
         //void paintDownloadsInfosWindow(std::unique_ptr<CursesWindow>& win);
 
         std::unique_ptr<CursesMenu> initMenu(std::vector<std::string> items_data);

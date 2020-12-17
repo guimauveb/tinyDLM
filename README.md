@@ -65,12 +65,14 @@ The code uses the following style convention:
 ## Missing features coming soon 
     - [X] Duplicate filename checker 
     - [IN PROGRESS] Add multiple links at the same time 
-    - [ ] Set the default number of simultaneous transfers to the number of CPU cores / threads
-    - [ ] Set the number of max simultaneous transfers  
+    - [DOING] Create a "settings" window
+    - [DOING] Set download directory (transfers are stored in 'downloads') 
+    - [DOING] Set the default number of simultaneous transfers to the number of CPU cores / threads
+    - [DOING] Set the number of max simultaneous transfers  
+    - [DOING] Set maximum download speed
+    - [ ] Limit download speed  
     - [ ] Schedule download start  
     - [ ] Compute / Display ETA  
-    - [ ] Limit download speed  
-    - [ ] Select download directory (transfers are stored in 'downloads') by creating a file explorer 
     - [ ] Save downloads on exit and restore them on the next launch  
 
 

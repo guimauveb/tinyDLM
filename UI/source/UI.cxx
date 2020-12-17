@@ -69,7 +69,8 @@ void UI::setWindowsSize()
     int nrow = 0, ncol = 0;
 
     getmaxyx(stdscr, nrow, ncol);
-    /* Program min diemnsions */
+
+    /* Program mininum diemnsions */
     if (nrow >= 26) {
         row = nrow;
     }
@@ -94,7 +95,8 @@ void UI::setWindowsSize()
     window_size_map["addSz"]      = {row / 2 + 1, col - (col / 2), (row / 4), col / 4};
     window_size_map["detSz"]      = {row / 2, col - (col / 2), (row / 4), col / 4};
     window_size_map["progSz"]     = {4, (col - (col / 2)) -10, row / 2, col / 4 + 4};
-
+    // TODO - Set settings window dimensions
+    window_size_map["settingSz"]  = {4, (col - (col / 2)) -10, row / 2, col / 4 + 4};
 }
 
 void UI::resetStatusDriver()
@@ -311,6 +313,11 @@ void UI::paintShowHelpWindow(std::unique_ptr<CursesWindow>& win)
 {
     /* Display keys and their associated functions at the bottom of the window */
     win->printInMiddle(0, 0, col / 4, msgHelp, COLOR_PAIR(7));
+}
+
+// TODO
+void UI::paintSettingsWindow(std::unique_ptr<CursesWindow>& win) 
+{
 }
 
 /* Populate the status window with downloads informations such as their status / speed / progress */
