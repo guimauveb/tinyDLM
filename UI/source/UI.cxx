@@ -181,6 +181,12 @@ int UI::firstStart()
                     done = true;
                     break;
                 }
+            case 's':
+                {
+                    settings();
+                    done = true;
+                    break;
+                }
             default:
                 {
                     break;
@@ -322,9 +328,9 @@ void UI::paintSettingsWindow(std::unique_ptr<CursesWindow>& win)
     const int begy = 1;
     const point maxyx = win->getMaxyx();
     win->printInMiddle(begy, 0, maxyx.x, msgSettings, COLOR_PAIR(7));
-    win->addStr(begy + 4, 1, "Maximum number of simultaneous transfers ");
-    win->addStr(begy + 7, 1, "Maximum transfer speed ");
-    win->addStr(begy + 10, 1, "Downloads directory ");
+    win->addStr(begy + 3, 1, "Maximum number of simultaneous transfers ");
+    win->addStr(begy + 5, 1, "Maximum transfer speed ");
+    win->addStr(begy + 7, 1, "Downloads directory ");
     //win->printInMiddle(begy + 15, 0, maxyx.x, msgHelpCloseWin, COLOR_PAIR(7));
     win->drawBox(0, 0);
 }
@@ -741,9 +747,9 @@ void UI::setSettingsForm()
     point maxyx = settings_window->getMaxyx();
 
     /* Set field size and location */
-    settings_form->setField(0, 4, maxyx.x - 10, 6, 4, 0, 0);
-    settings_form->setField(1, 4, maxyx.x - 10, 9, 4, 0, 0);
-    settings_form->setField(2, 4, maxyx.x - 10, 12, 4, 0, 0);
+    settings_form->setField(0, 1, 6, 4, maxyx.x - 10, 0, 0);
+    settings_form->setField(1, 1, 6, 6, maxyx.x - 10, 0, 0);
+    settings_form->setField(2, 1, maxyx.x - 26, 8, 22, 0, 0);
 
     /* Set field options */
     settings_form->setFieldBack(0, A_UNDERLINE);
@@ -1108,20 +1114,6 @@ int UI::navigateAddDownloadWindow()
             case KEY_DC:
                 {
                     add_dl_form->formDriver(REQ_DEL_CHAR);
-                    break;
-                }
-
-            case CTRL('x'):
-                {
-                    /* Close add_dl_window */
-                    done = true;
-                    break;
-                }
-
-            case CTRL('l'):
-                {
-                    /* TODO - schedule ! */
-                    done = true;
                     break;
                 }
 
