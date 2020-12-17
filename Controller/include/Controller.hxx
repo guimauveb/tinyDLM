@@ -3,8 +3,6 @@
 #include "../../helper/include/stringify.hxx"
 #include "../../helper/include/userInputCheck.hxx"
 
-#include "../../helper/include/BinaryTree.hxx"
-
 #include "../../DownloaderCore/include/DownloaderCore.hxx"
 
 class Controller 

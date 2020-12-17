@@ -9,7 +9,7 @@ Controller::~Controller() {}
 
 /* Initialize a new DownloaderCore object then place it in a vector */
 std::string Controller::createNewDl(std::string folder, std::string filename, const std::string url,  
-                                    const int low_speed_limit, const int low_speed_time_limit)
+        const int low_speed_limit, const int low_speed_time_limit)
 {
     std::string final_filename = filename;
     std::map<std::string, int>::iterator ita = downloads_map.find(filename);
@@ -32,8 +32,8 @@ std::string Controller::createNewDl(std::string folder, std::string filename, co
 
         const std::string saveAs = downloads_folder + final_filename;
         std::unique_ptr<DownloaderCore> dlm = std::make_unique<DownloaderCore>(dl_counter, url, final_filename, 
-                                                                               saveAs, low_speed_limit, 
-                                                                               low_speed_time_limit);
+                saveAs, low_speed_limit, 
+                low_speed_time_limit);
         downloader_core_vec.emplace_back(std::move(dlm));
 
         dl_counter++;
@@ -50,22 +50,18 @@ std::string Controller::createNewDl(std::string folder, std::string filename, co
 /* Process the filename and find out what index must be appended according to records for this filename */
 std::string& Controller::recordDuplicate(std::string& f) 
 {
-    std::string original_filename = f;
     /* Duplicate number */
+    std::string original_filename = f;
     int n = 1;
-    std::map<std::string, std::vector<int>>::iterator it = filenames_records.find(f);
+    auto it = filenames_records.find(f);
     bool found = false;
 
-    /* TODO - Use a binary tree instead ! */
-    // Create a binary tree for each filename
-    // Store filename index in the binary tree
-    
     /* We suppose that the array minimum possible value is 1 */
     std::sort(filenames_records[f].begin(), filenames_records[f].end());
     /* If filename already has duplicates, append (n) to it where n is equal to the index of duplicates */
     if (it != filenames_records.end()) {
         /* If vector size == 0, duplicate value = 1 */
-        if (filenames_records[f].size() == 0) {
+        if ((int)filenames_records[f].size() == 0) {
             found = true;
             n = 1;
         }
@@ -75,10 +71,9 @@ std::string& Controller::recordDuplicate(std::string& f)
             found = true;
         }
         else {
-
-            for (int i = 0; i < filenames_records[f].size(); ++i) {
+            for (int i = 0; i < (int)filenames_records[f].size(); ++i) {
                 /* Check if next element exists */
-                if (i + 1 < filenames_records[f].size()) {
+                if (i + 1 < (int)filenames_records[f].size()) {
                     int j = i + 1;
                     /* If the difference between the next element and the current element is not one, then there 
                      * is a gap meaning that the min missing value is equal to current element + 1 */
@@ -157,7 +152,7 @@ void Controller::clearInactive()
     std::vector<size_t> todel;
     for (size_t i = 0; i < downloader_core_vec.size(); ++i) {
         if((downloader_core_vec.at(i)->getDownloadInfos()->status == downloadStatus::ERROR) || 
-           (downloader_core_vec.at(i)->getDownloadInfos()->status == downloadStatus::COMPLETED)) {
+                (downloader_core_vec.at(i)->getDownloadInfos()->status == downloadStatus::COMPLETED)) {
             it = downloads_map.find(downloader_core_vec.at(i)->getDownloadInfos()->filename);
             if (it != downloads_map.end()) {
                 /* Decrement downloads ids above deleted item since they are used as 
@@ -189,7 +184,7 @@ void Controller::stop(const std::string& dlToStop)
     /* downloads_map item returns an int corresponding to the index of the item in the vec */
     downloader_core_vec.erase(downloader_core_vec.begin() + downloads_map[dlToStop]);
 
-    std::map<std::string, int>::iterator it = downloads_map.find(dlToStop);
+    auto it = downloads_map.find(dlToStop);
     if (it != downloads_map.end()) {
         /* Decrement downloads ids above deleted item since they are used as 
          * indexes to access downloader_core_vec */
@@ -200,7 +195,7 @@ void Controller::stop(const std::string& dlToStop)
         }   
         downloads_map.erase(it);
     }
-    std::map<std::string, DownloadRecord>::iterator itb = dl_records.find(dlToStop);
+    auto itb = dl_records.find(dlToStop);
     /* If dl to stop is actually a duplicate */
     if (itb != dl_records.end()) {
         /* Remove filename's duplicate number from filenames_records */

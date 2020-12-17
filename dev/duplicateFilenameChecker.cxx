@@ -39,11 +39,6 @@ void testDuplicateRoutine(int key, std::map<std::string, BinaryTree*>& filenames
 
 }
 
-void deleteRecord(std::map<std::string, BinaryTree*>& filename_records, const std::string filename, int key)
-{
-    //    filename_records[filename]->removeKey(key);
-}
-
 int main(int argc, char **argv)
 {
     // Store duplicate filenames into a binary tree
@@ -51,19 +46,27 @@ int main(int argc, char **argv)
 
     std::vector<const std::string> str_vec = {"filename", "filename", "filename", "filename", "filename", "filename"};
 
-    for (int i = 0; i < (int)str_vec.size(); ++i) {
+    for (int i = 1; i < (int)str_vec.size(); ++i) {
         testDuplicateRoutine(i, f_records, str_vec[i]);
     }
-    f_records["filename"]->preOrder();
-    f_records["filename"]->deleteNode(2);
-    f_records["filename"]->preOrder();
+    std::cout << f_records["filename"]->createDuplicate() << '\n';
+    std::cout << f_records["filename"]->createDuplicate() << '\n';
+    std::cout << f_records["filename"]->createDuplicate() << '\n';
+    std::cout << f_records["filename"]->createDuplicate() << '\n';
+    std::cout << f_records["filename"]->createDuplicate() << '\n';
+    std::cout << f_records["filename"]->createDuplicate() << '\n';
 
-    // Clean map
-    auto it = f_records.find("filename");
-    if (it != f_records.end()) {
-        delete it->second;
-        f_records.erase(it);
-    } 
+    f_records["filename"]->deleteNode(2);
+    f_records["filename"]->deleteNode(3);
+    f_records["filename"]->deleteNode(5);
+
+    std::cout << f_records["filename"]->createDuplicate() << '\n';
+    std::cout << f_records["filename"]->createDuplicate() << '\n';
+    std::cout << f_records["filename"]->createDuplicate() << '\n';
+
+
+
 
     return 0;
 }
+

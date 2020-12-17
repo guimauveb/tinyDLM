@@ -1,5 +1,6 @@
 struct Node {
-    int key_value;
+    int key;
     Node *left;
     Node *right;
+    int height;
 };

@@ -91,13 +91,13 @@ class UI
 
         void paintTopWindow(std::unique_ptr<CursesWindow>& win);
         void paintLabelsWindow(std::unique_ptr<CursesWindow>& win);
-        void paintMainWindow(std::unique_ptr<CursesWindow>& win);
+        //void paintMainWindow(std::unique_ptr<CursesWindow>& win);
         void paintShowHelpWindow(std::unique_ptr<CursesWindow>& win);
-        void paintDownloadsInfosWindow(std::unique_ptr<CursesWindow>& win);
+        //void paintDownloadsInfosWindow(std::unique_ptr<CursesWindow>& win);
 
         std::unique_ptr<CursesMenu> initMenu(std::vector<std::string> items_data);
         void setDownloadsMenu();
-        void paintDlsStatusWin(std::unique_ptr<CursesWindow>& win);
+        //void paintDlsStatusWin(std::unique_ptr<CursesWindow>& win);
         void populateStatusWin(const std::vector<downloadWinInfo>& vec);
         /* Update status window in a designated thread */
         void updateDownloadsStatusWindow();

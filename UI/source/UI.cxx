@@ -237,16 +237,13 @@ void UI::resizeUI()
     menu->clearMenu();
     menu->clearItems();
     main_windows.at(main_window_index)->resizeWin(window_size_map["mainWinSz"]);
-    paintMainWindow(main_windows.at(main_window_index));
 
     main_windows.at(status_window_index)->resizeWin(window_size_map["statusSz"]);
-    paintDlsStatusWin(main_windows.at(status_window_index));
 
     main_windows.at(show_help_window_index)->resizeWin(window_size_map["pHelpSz"]);
     paintShowHelpWindow(main_windows.at(show_help_window_index));
 
     main_windows.at(infos_window_index)->resizeWin(window_size_map["infosSz"]);
-    paintDownloadsInfosWindow(main_windows.at(infos_window_index));
 
     refreshMainWindows();
 }
@@ -256,9 +253,9 @@ void UI::paintTopWindow(std::unique_ptr<CursesWindow>& topWin)
     /* Print a whole black on white row at the top of the main window that will be the size of the terminal
      * window width */
     char *titleMain = (char*)malloc((col + 1)*sizeof(char));
-    size_t i = 0;
+    int i = 0;
 
-    for (i = 0; i < liteDL_label.length(); ++i) {
+    for (i = 0; i < (int)liteDL_label.length(); ++i) {
         titleMain[i] = liteDL_label.at(i);
     }
     for (; i < col; ++i) {
@@ -285,11 +282,9 @@ void UI::initMainWindows()
 
     /* Window containing downloads list as a menu */
     main_windows.emplace_back(initWin(window_size_map["mainWinSz"], "main"));
-    paintMainWindow(main_windows.at(main_window_index));
 
     /* Window containing ownloads statuses - updated in a separate thread and connected to mainWin */
     main_windows.emplace_back(initWin(window_size_map["statusSz"], "status"));
-    paintDlsStatusWin(main_windows.at(status_window_index));
 
     /* Winodow displaying help message */ 
     main_windows.emplace_back(initWin(window_size_map["pHelpSz"], "help"));
@@ -308,19 +303,15 @@ void UI::paintLabelsWindow(std::unique_ptr<CursesWindow>& win)
     win->printInMiddle(0, 7 * col / 8, col / 8, labelStatus, COLOR_PAIR(7));
 }
 
-void UI::paintMainWindow(std::unique_ptr<CursesWindow>& win)
-{
-    //    mainWinWin->drawBox(0, 0);
-}
+//void UI::paintMainWindow(std::unique_ptr<CursesWindow>& win) {}
+//void UI::paintDlsStatusWin(std::unique_ptr<CursesWindow>& win) {}
+//void UI::paintDownloadsInfosWindow(std::unique_ptr<CursesWindow>& win) {}
 
 void UI::paintShowHelpWindow(std::unique_ptr<CursesWindow>& win)
 {
     /* Display keys and their associated functions at the bottom of the window */
     win->printInMiddle(0, 0, col / 4, msgHelp, COLOR_PAIR(7));
 }
-
-void UI::paintDlsStatusWin(std::unique_ptr<CursesWindow>& win) {}
-void UI::paintDownloadsInfosWindow(std::unique_ptr<CursesWindow>& win) {}
 
 /* Populate the status window with downloads informations such as their status / speed / progress */
 void UI::populateStatusWin(const std::vector<downloadWinInfo>& vec)
