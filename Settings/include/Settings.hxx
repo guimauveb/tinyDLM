@@ -20,11 +20,11 @@ class Settings {
 
     private:
         /* Defaults:
-         *      - Downloads directory: app/downloads
+         *      - Downloads directory: /User/<username>/Downloads
          *      - Maximum transfer speed: no limit
          *      - Maximum simultaneous transfers: number of cpu's
          */
-        /* Obtained from Environment */
+        /* Defaults are obtained from Environment */
         void setDefaults();
         std::string generateDefaultDownloadsFolder(const std::string& username);
 
