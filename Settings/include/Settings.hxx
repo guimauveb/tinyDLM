@@ -20,7 +20,7 @@ class Settings {
 
     private:
         /* Defaults:
-         *      - Downloads directory: /User/<username>/Downloads
+         *      - Downloads directory: /Users/<username>/Downloads
          *      - Maximum transfer speed: no limit
          *      - Maximum simultaneous transfers: number of cpu's
          */
