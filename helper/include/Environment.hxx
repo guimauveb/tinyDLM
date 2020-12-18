@@ -13,8 +13,9 @@ class Environment {
             }
             return {};
         }
+        // TODO
         static int getCPUNumber()
         {
-            return 6;
+            return 777;
         }
 };
