@@ -1,15 +1,10 @@
 #include "../include/Controller.hxx"
 
-Controller::Controller()
-{
-    dl_counter = 0;
-}
-
 Controller::~Controller() {}
 
 /* Initialize a new DownloaderCore object then place it in a vector */
-std::string Controller::createNewDl(std::string folder, std::string filename, const std::string url,  
-        const int low_speed_limit, const int low_speed_time_limit)
+std::string Controller::createNewDownload(std::string folder, std::string filename, const std::string url,  
+                                          const int low_speed_limit, const int low_speed_time_limit)
 {
     std::string final_filename = filename;
     std::map<std::string, int>::iterator ita = downloads_map.find(filename);
@@ -109,7 +104,7 @@ void Controller::createNewRecord(std::string& f)
 }
 
 /* Start one dl */
-void Controller::startDl(const std::string& download_to_start)
+void Controller::startDownload(const std::string& download_to_start)
 {
     try {
         downloader_core_vec.at(downloads_map[download_to_start])->runThread();
@@ -120,7 +115,7 @@ void Controller::startDl(const std::string& download_to_start)
 }
 
 /* TODO - Start multiple downloads at the same time */
-void Controller::startDl(const std::vector<std::string>& downloads_to_start) {}
+void Controller::startDownload(const std::vector<std::string>& downloads_to_start) {}
 
 void Controller::resume(const std::string& dlToResume)
 {
@@ -151,7 +146,7 @@ void Controller::pauseAll()
     }
 }
 
-void Controller::clearInactive()
+void Controller::clearInactives()
 {
     assert(downloader_core_vec.size() == downloads_map.size());
     std::map<std::string, int>::iterator it;
@@ -220,7 +215,7 @@ void Controller::stopAll()
 }
 
 /* Stops all ongoing transfers - clear downloads menu, downloads list and filenames records - reset download counter 
- * Sets activeDls to false. Does not delete already downloaded bytes from the hard drive */
+ * Sets activeDownloads to false. Does not delete already downloaded bytes from the hard drive */
 void Controller::killAll()
 {
     stopAll();
@@ -260,6 +255,7 @@ downloadStatus Controller::getStatus(const std::string& filename)
 std::vector<downloadWinInfo> Controller::getAllDownloadsInfos() 
 {
     std::vector<downloadWinInfo> vec;
+
     /* Loop over all downloads sorted by id */
     std::map<int, std::string> dlsSorted = sortDownloadsMapByIds();
     for (auto &dl: dlsSorted) {

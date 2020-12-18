@@ -108,7 +108,7 @@ class UI
 
         std::unique_ptr<CursesMenu> initMenu(std::vector<std::string> items_data);
         void setDownloadsMenu();
-        //void paintDlsStatusWin(std::unique_ptr<CursesWindow>& win);
+        //void paintDownloadsStatusWin(std::unique_ptr<CursesWindow>& win);
         void populateStatusWin(const std::vector<downloadWinInfo>& vec);
         /* Update status window in a designated thread */
         void updateDownloadsStatusWindow();
@@ -128,9 +128,9 @@ class UI
         std::unique_ptr<CursesWindow> add_dl_menu_win;
         std::unique_ptr<CursesForm> add_dl_form;
         std::unique_ptr<CursesMenu> add_dl_menu;
-        void paintAddDlWin();
-        void setAddDlForm();
-        void setAddDlMenu();
+        void paintAddDownloadWin();
+        void setAddDownloadForm();
+        void setAddDownloadMenu();
 
         /* Navigate through the 'Add a download' subwindow */
         int navigateAddDownloadWindow();

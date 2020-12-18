@@ -3,6 +3,8 @@
 UI::UI()
     :controller{std::make_unique<Controller>()}
 {
+    //initController();
+
     initCurses();
     initColors();
     setWindowsSize();
@@ -313,7 +315,7 @@ void UI::paintLabelsWindow(std::unique_ptr<CursesWindow>& win)
 }
 
 //void UI::paintMainWindow(std::unique_ptr<CursesWindow>& win) {}
-//void UI::paintDlsStatusWin(std::unique_ptr<CursesWindow>& win) {}
+//void UI::paintDownloadsStatusWin(std::unique_ptr<CursesWindow>& win) {}
 //void UI::paintDownloadsInfosWindow(std::unique_ptr<CursesWindow>& win) {}
 
 void UI::paintShowHelpWindow(std::unique_ptr<CursesWindow>& win)
@@ -673,9 +675,9 @@ int UI::addNewDownload()
     // init downloads menu == init any menu. TODO - Create initMenu() 
     add_dl_menu = initMenu(tmp_items);
 
-    setAddDlForm();
-    setAddDlMenu();
-    paintAddDlWin();
+    setAddDownloadForm();
+    setAddDownloadMenu();
+    paintAddDownloadWin();
 
     add_dl_win->touchWin();
     add_dl_win->refreshWin();
@@ -689,7 +691,7 @@ int UI::addNewDownload()
 }
 
 /* Remark: */ 
-void UI::setAddDlMenu()
+void UI::setAddDownloadMenu()
 {
     //point p_max = add_dl_win->getMaxyx();
     //point pBeg = add_dl_win->getBegyx();
@@ -703,7 +705,7 @@ void UI::setAddDlMenu()
     add_dl_menu->postMenu();
 }
 
-void UI::paintAddDlWin()
+void UI::paintAddDownloadWin()
 {
     char *title_add = (char*)malloc(((col / 2) + 1)*sizeof(char));
     title_add[col / 2] = '\0';
@@ -798,7 +800,7 @@ void UI::setDetForm()
     det_form->postForm();
 }
 
-void UI::setAddDlForm()
+void UI::setAddDownloadForm()
 {
     point maxyx = add_dl_win->getMaxyx();
 
@@ -858,9 +860,9 @@ void UI::resizeAddDownloadWindow(std::string url, std::string filename)
     // init downloads menu == init any menu 
     add_dl_menu = initMenu(tmp_items);
 
-    setAddDlForm();
-    setAddDlMenu();
-    paintAddDlWin();
+    setAddDownloadForm();
+    setAddDownloadMenu();
+    paintAddDownloadWin();
 
     url.push_back('\0');
     filename.push_back('\0');
@@ -1081,10 +1083,10 @@ int UI::navigateAddDownloadWindow()
 
                             for (auto el : urls) {
                                 /* controller returns the final filename after verifying there wasn't a duplicate.*/
-                                std::string f = controller->createNewDl(downloads_folder, filename, el,  0, 0);
+                                std::string f = controller->createNewDownload(downloads_folder, filename, el,  0, 0);
                                 if (f != "NULL") {
                                     /* Start dl if everything ok */
-                                    controller->startDl(f);
+                                    controller->startDownload(f);
                                     /* Update downloads list in the menu */
                                 }
                             }

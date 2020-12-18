@@ -1,16 +1,18 @@
 /* TODO in version 1.2:
  *  - Adding multiple downloads at the same time DOING
+ *  - Modify some settings (among them what follows)
  *  - Chose number of simultaneous downloads (default to number of cores / threads ) 
+ *  - Select downloads directory
  *  - Limit download speed 
- *  - Save downloads at exit and restore them on launch 
  */
-#include "../UI/include/UI.hxx"
 #include "tinyDLM.hxx"
 
 /* Initialize our user interface and browse it */
 int main()
 {
+    /* TODO - Load settings */
     std::unique_ptr<UI> ui = std::make_unique<UI>();
+
     /* Display a message when starting the program. If the user exits while in firstStart(), terminate the 
      * program */
     if (!ui->firstStart()) {
@@ -154,7 +156,7 @@ int main()
                             break;
                         }
                         ui->stopStatusUpdate();
-                        ui->controller->clearInactive();
+                        ui->controller->clearInactives();
                         ui->main_windows.at(ui->status_window_index)->resetWin();
                         ui->updateDownloadsMenu();
                         ui->resetStatusDriver();

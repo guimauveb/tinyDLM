@@ -62,7 +62,7 @@ const std::string statusStrUn = "  Unknown  ";
 
 /* TODO - make it selectionable by the user */
 /* TODO - move to the designated function */
-const std::string downloads_folder = "downloads/";
+const std::string downloads_folder = "/Users/guimauve/Downloads/";
 
 const std::string ERR_WIN_BEG       = "Unable to allocate memory for the '";
 const std::string ERR_MAIN_WIN_0    = "download list";

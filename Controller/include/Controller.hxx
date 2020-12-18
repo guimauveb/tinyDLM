@@ -3,27 +3,26 @@
 #include "../../helper/include/stringify.hxx"
 #include "../../helper/include/userInputCheck.hxx"
 
+#include "../../Settings/include/Settings.hxx"
+
 #include "../../DownloaderCore/include/DownloaderCore.hxx"
 
 class Controller 
 {
     public:
-        Controller();
         ~Controller();
 
-        std::string createNewDl(std::string folder, std::string filename, const std::string url,
-                const int low_speed_limit, const int low_speed_time_limit);
-        void removeDl();
-
-        void startDl(const std::vector<std::string>& downloads_to_start);
-        void startDl(const std::string& download_to_start);
+        std::string createNewDownload(std::string folder, std::string filename, const std::string url,
+                                      const int low_speed_limit, const int low_speed_time_limit);
+        void startDownload(const std::vector<std::string>& downloads_to_start);
+        void startDownload(const std::string& download_to_start);
         void resume(const std::string& download_to_resule);
         void resumeAll();
         void pause(const std::string& download_to_pause);
         void pauseAll();
         void stop(const std::string& download_to_stop);
         void stopAll();
-        void clearInactive();
+        void clearInactives();
         void killAll();
 
         /* TODO */
@@ -35,15 +34,14 @@ class Controller
         double getProgress(const std::string& filename);
         double getSpeed(const std::string& filename);
         downloadStatus getStatus(const std::string& filename);
-
         std::vector<downloadWinInfo> getAllDownloadsInfos();
-        /* Returns false if there's 0 download */
-        bool isActive();
         std::vector<std::string> getDownloadsList();
+        /* Returns false if there's no active download */
+        bool isActive();
 
     private:
         /* Keep track of the number of downloads */
-        int dl_counter;
+        int dl_counter = 0;
 
         /* Struct storing filenames infos for every download. Allows to properly update filenamesRecord */
         /* E.g : archive(1)'s dlRecord = {origFilename: "archive", dupNum: 1} */
