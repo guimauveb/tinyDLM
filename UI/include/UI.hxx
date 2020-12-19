@@ -93,6 +93,7 @@ class UI
         int navigateSettings();
         void setSettingsForm();
         void setSettingsMenu();
+        void resizeSettingsWindow(std::string max_speed, std::string max_sim_transfers, std::string dir);
 
         /* Window holding the welcome message at first start */
         void paintWelcomeWindow(std::unique_ptr<CursesWindow>& win);

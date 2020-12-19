@@ -711,7 +711,8 @@ int UI::navigateSettings()
         }
 
         if (resize) {
-            //resizeDownloadWindow(settings_form->getFieldBuffer(0), settings_form->getFieldBuffer(1));
+            resizeSettingsWindow(settings_form->getFieldBuffer(0), settings_form->getFieldBuffer(1),
+                    settings_form->getFieldBuffer(2));
             /* Restore errors */
             if (dir_err) {
                 //settings_window->printInMiddle(13, 0, maxyx.x, msgInvalidFilename, COLOR_PAIR(1));
@@ -730,8 +731,8 @@ int UI::navigateSettings()
         }
         settings_window->touchWin();
         settings_window->refreshWin();
-        //addMenuWin->touchWin();
-        //addMenuWin->refreshWin();
+        //settings_window->touchWin();
+        //settings_window->refreshWin();
     }
     curs_set(0);
 
@@ -995,6 +996,42 @@ void UI::setAddDownloadForm()
     add_dl_form->setFormSubwin(add_dl_win);
 
     add_dl_form->postForm();
+}
+
+void UI::resizeSettingsWindow(std::string max_speed, std::string max_sim_transfers, std::string dir)
+{
+    refresh();
+    resizeUI();
+
+    settings_form = initForm(3);
+    settings_window = initWin(window_size_map["settingsSz"], "settings");
+
+    std::vector<std::string> tmp_items = {"Save", "Close"};
+    point p_max = settings_window->getMaxyx();
+    //point pBeg = settings_win->getBegyx();
+
+    // Init a subwin for the menu
+    settings_window->setDerwin(1, 20, p_max.y - 2, (p_max.x - 20) / 2);
+    // init downloads menu == init any menu 
+    settings_menu = initMenu(tmp_items);
+
+    setSettingsForm();
+    setSettingsMenu();
+    paintSettingsWindow(settings_window);
+
+    max_speed.push_back('\0');
+    max_sim_transfers.push_back('\0');
+    dir.push_back('\0');
+    max_speed = trimSpaces(max_speed);
+    max_sim_transfers = trimSpaces(max_sim_transfers);
+    dir = trimSpaces(dir);
+
+    settings_form->populateField(REQ_FIRST_FIELD, max_speed);
+    settings_form->populateField(REQ_NEXT_FIELD, max_sim_transfers);
+    settings_form->populateField(REQ_NEXT_FIELD, dir);
+
+    settings_window->touchWin();
+    settings_window->refreshWin();
 }
 
 int UI::resizeDownloadDetailsWindow(const std::string& filename)
