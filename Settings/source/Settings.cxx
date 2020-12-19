@@ -11,6 +11,7 @@ void Settings::loadSettings()
 {
     username  = Environment::getUsername();
     cpu_count = Environment::getCPUCount();
+    home_dir = "/Users/" + username + "/";
 
     /* TODO - 
      *      Check if .conf exists in config/
@@ -90,4 +91,5 @@ int Settings::getMaximumSimultaneousTransfers()
     return max_simultaneous_transfers;
 }
 
-
+// TODO - move to helper functions
+// /Users/<username>/ to ~

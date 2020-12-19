@@ -34,6 +34,7 @@ class Settings {
         bool directoryExists(const std::filesystem::path& p, std::filesystem::file_status s = std::filesystem::file_status{});
 
         std::string username;
+        std::string home_dir;
         std::string downloads_dir;
         std::string downloads_dir_abs_path;
         uint64_t max_transfer_speed;

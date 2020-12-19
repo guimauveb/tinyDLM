@@ -3,7 +3,6 @@
 UI::UI()
     :controller{std::make_unique<Controller>()}
 {
-    //initController();
     initSettings();
     initCurses();
     initColors();
@@ -495,7 +494,7 @@ int UI::showSettings()
 
     std::vector<std::string> tmp_items = {"Save", "Close"};
     point p_max = settings_window->getMaxyx();
-    //point pBeg = settings_win->getBegyx();
+    //point pBeg = settings_window->getBegyx();
 
     // Init a subwin for the menu
     settings_window->setDerwin(1, 20, p_max.y - 2, (p_max.x - 20) / 2);
@@ -527,9 +526,9 @@ void UI::setSettingsMenu()
     //point p_max = add_dl_win->getMaxyx();
     //point pBeg = add_dl_win->getBegyx();
     settings_menu->menuOptsOn(O_SHOWDESC);
-    //settings_menu->setMenuWin(settings_win);
+    //settings_menu->setMenuWin(settings_window);
     settings_menu->setMenuDer(settings_window);
-    //settings_menu->setMenuSubDer(settings_win, 1, 34, p_max.y - 2, (p_max.x - 34) / 2);
+    //settings_menu->setMenuSubDer(settings_window, 1, 34, p_max.y - 2, (p_max.x - 34) / 2);
 
     settings_menu->setMenuFormat(1, 2);
     settings_menu->setMenuMark(" * ");
@@ -539,39 +538,203 @@ void UI::setSettingsMenu()
 int UI::navigateSettings()
 {
     int ch = 0;
+
     bool done = false;
-    bool resize = false;
     bool update_menu = false;
+    bool resize = false;
+
+    bool dir_err = false;
+    bool speed_err = false;
+    //    bool simultaneous_transfers_err = false;
+
+    int currField = 0;
+
+    // TODO - cursor pos
+    int curPos = 0;
+    // curPos 0 -> Maximum number of simultaneous transfers
+    // curPos 1 -> Maximum transfer speed
+    // curPos 2 -> Downloads directory
+    // curPos 3 -> Save button
+    // curPos 4 -> Close button
+
+    point maxyx = settings_window->getMaxyx();
+
+    curs_set(1);   
+    settings_window->wMove(4, maxyx.x - 10);
+    settings_window->refreshWin();
+    settings_form->formDriver(REQ_FIRST_FIELD);
 
     while ((ch = getch())) {
-        switch(ch) {
+
+        switch (ch) {
             case KEY_RESIZE:
                 {
-                    update_menu = true;
+                    if (settings_form->formDriver(REQ_VALIDATION) != E_OK) {
+                        ;
+                    }
+                    /* currField == first_field (518) + offset */
+                    currField = settings_form->curFieldIdx();
                     resize = true;
+                    update_menu = true;
+                    break;
+                }
+
+            case KEY_UP:
+                {
+                    // first field  
+                    if (curPos == 0) {
+                        curs_set(0);
+                        settings_menu->menuDriver(REQ_LAST_ITEM);
+                        curPos = 4;
+                    }
+                    // second field
+                    else if (curPos == 1) {
+                        settings_form->formDriver(REQ_PREV_FIELD);
+                        settings_form->formDriver(REQ_END_LINE);
+                        curPos = 0;
+                    } 
+                    else if (curPos == 2) {
+                        settings_form->formDriver(REQ_PREV_FIELD);
+                        settings_form->formDriver(REQ_END_LINE);
+                        curPos = 1;
+                    }
+                    // any menu item
+                    else {
+                        curs_set(1);
+                        settings_form->formDriver(REQ_LAST_FIELD);
+                        settings_form->formDriver(REQ_END_LINE);
+                        curPos = 2;
+                    }
+                    break;
+                }
+
+            case KEY_DOWN:
+                {
+                    // first field
+                    if (curPos == 0) {
+                        settings_form->formDriver(REQ_NEXT_FIELD);
+                        settings_form->formDriver(REQ_END_LINE);
+                        curPos = 1;
+                    }
+                    // second field
+                    else if (curPos == 1) {
+                        settings_form->formDriver(REQ_NEXT_FIELD);
+                        settings_form->formDriver(REQ_END_LINE);
+                        curPos = 2;
+                    }
+                    else if (curPos == 2) {
+                        curs_set(0);
+                        settings_menu->menuDriver(REQ_FIRST_ITEM);
+                        curPos = 3;
+                    }
+                    // any menu item -> return to top form field
+                    else {
+                        curs_set(1);
+                        settings_form->formDriver(REQ_FIRST_FIELD);
+                        settings_form->formDriver(REQ_END_LINE);
+                        curPos = 0;
+                    }
+                    break;
+                }
+            case KEY_LEFT:
+                {
+                    // any field
+                    if (curPos == 0 || curPos == 1 || curPos == 2) {
+                        settings_form->formDriver(REQ_PREV_CHAR);
+                    }
+                    // Move to the right
+                    else if (curPos == 3) {
+                        settings_menu->menuDriver(REQ_LAST_ITEM);
+                        curPos = 4;
+                    }
+                    else {
+                        settings_menu->menuDriver(REQ_PREV_ITEM);
+                        curPos -= 1;
+                    }
+                    break;
+                }
+
+            case KEY_RIGHT:
+                {
+                    // any field
+                    if (curPos == 0 || curPos == 1 || curPos == 2) {
+                        settings_form->formDriver(REQ_NEXT_CHAR);
+                    }
+                    // Move to the left
+                    else if (curPos == 4) {
+                        settings_menu->menuDriver(REQ_FIRST_ITEM);
+                        curPos = 3;
+                    }
+                    else {
+                        settings_menu->menuDriver(REQ_NEXT_ITEM);
+                        curPos += 1;
+                    }
                     break;
                 }
             case 10:
                 {
-                    done = true;
+                    // add a space to the current field
+                    if (curPos == 0 || curPos == 1) {
+                        settings_form->formDriver(' ');
+                    }
+                    else if (curPos == 3) {
+                        // TODO - save
+                    }
+                    else if (curPos == 4) {
+                        done = true;
+                    }
+                }
+            case 127:
+                {
+                    settings_form->formDriver(REQ_DEL_PREV);
                     break;
                 }
-            default: 
+
+                /* ASCII backspace (Linux) */
+            case 8:
                 {
+                    settings_form->formDriver(REQ_DEL_PREV);
+                    break;
+                }
+
+            case KEY_DC:
+                {
+                    settings_form->formDriver(REQ_DEL_CHAR);
+                    break;
+                }
+
+            default:
+                {
+                    settings_form->formDriver(ch);
                     break;
                 }
         }
+
+        if (resize) {
+            //resizeDownloadWindow(settings_form->getFieldBuffer(0), settings_form->getFieldBuffer(1));
+            /* Restore errors */
+            if (dir_err) {
+                //settings_window->printInMiddle(13, 0, maxyx.x, msgInvalidFilename, COLOR_PAIR(1));
+            }
+            if (speed_err) {
+                //settings_window->printInMiddle(9, 0, maxyx.x, msgInvalidURL, COLOR_PAIR(1));
+            }
+            /* Restore cursor position */
+            settings_form->formDriver(currField); 
+            settings_form->formDriver(REQ_END_LINE); 
+            resize = false;
+        }
+
         if (done) {
             break;
         }
-        if (resize) {
-            resizeUI();
-            settings_window->resizeWin(window_size_map["settingsSz"]);
-            paintSettingsWindow(settings_window);
-            settings_window->refreshWin();
-            resize = false;
-        }
+        settings_window->touchWin();
+        settings_window->refreshWin();
+        //addMenuWin->touchWin();
+        //addMenuWin->refreshWin();
     }
+    curs_set(0);
+
     return update_menu;
 }
 
@@ -602,6 +765,7 @@ int UI::navigateHelpWindow()
                     done = true;
                     break;
                 }
+
             default: 
                 {
                     break;
@@ -920,7 +1084,7 @@ int UI::navigateAddDownloadWindow()
                         ;
                     }
                     /* currField == first_field (518) + offset */
-                    currField = REQ_FIRST_FIELD + add_dl_form->curFieldIdx();
+                    currField = add_dl_form->curFieldIdx();
                     resizeAdd = true;
                     update_menu = true;
                     break;
@@ -940,7 +1104,7 @@ int UI::navigateAddDownloadWindow()
                         add_dl_form->formDriver(REQ_END_LINE);
                         curPos = 0;
                     } 
-                    // any menu itme
+                    // any menu item
                     else {
                         curs_set(1);
                         add_dl_form->formDriver(REQ_LAST_FIELD);
@@ -964,7 +1128,7 @@ int UI::navigateAddDownloadWindow()
                         add_dl_menu->menuDriver(REQ_FIRST_ITEM);
                         curPos = 2;
                     }
-                    // any menu items
+                    // any menu item
                     else {
                         curs_set(1);
                         add_dl_form->formDriver(REQ_FIRST_FIELD);
