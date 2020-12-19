@@ -67,16 +67,20 @@ std::string& trimSpaces(std::string& str)
     int i = 0, j = str.length() - 1;
     {
         /* Parse until '\0' or a alphanumeric char */
-        while (str[i] && (!isalpha(str[i]) && !isdigit(str[i]))) {
+        while (str[i] && (!isalpha(str[i]) && !isdigit(str[i]) && 
+                    (str[i] != '/') && (str[i] != ':') &&
+                    (str[i] != '-') && (str[i] != '_') &&
+                    (str[i] != '.') && (str[i] != '~') &&
+                    (str[i] != ')') && (str[i] != '('))) {
             i++;
         }
         /* Move from the end till first char - using isspace() seems to cause trouble in the curses field 
          * but would definetly be better to use here */
-        while(j > 0 && !isalpha(str[j]) && !isdigit(str[j]) && 
-                (str[j] != '/') && (str[j] != ':') &&
-                (str[j] != '-') && (str[j] != '_') &&
-                (str[j] != '.') && (str[j] != '~') &&
-                (str[j] != ')') && (str[j] != '(')) {
+        while(j > 0 && (!isalpha(str[j]) && !isdigit(str[j]) && 
+                    (str[j] != '/') && (str[j] != ':') &&
+                    (str[j] != '-') && (str[j] != '_') &&
+                    (str[j] != '.') && (str[j] != '~') &&
+                    (str[j] != ')') && (str[j] != '('))) {
             j--;
         }
     } 

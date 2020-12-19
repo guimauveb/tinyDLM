@@ -712,7 +712,7 @@ int UI::navigateSettings()
 
         if (resize) {
             resizeSettingsWindow(settings_form->getFieldBuffer(0), settings_form->getFieldBuffer(1),
-                    settings_form->getFieldBuffer(2));
+                                 settings_form->getFieldBuffer(2));
             /* Restore errors */
             if (dir_err) {
                 //settings_window->printInMiddle(13, 0, maxyx.x, msgInvalidFilename, COLOR_PAIR(1));
