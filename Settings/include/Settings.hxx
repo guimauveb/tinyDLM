@@ -28,7 +28,9 @@ class Settings {
         void setDefaults();
         std::string generateDefaultDownloadsFolder(const std::string& username);
 
+        std::string username;
         std::string downloads_dir;
         double max_transfer_speed;
-        int max_transfers_num;
+        int max_simultaneous_transfers;
+        int cpu_count;
 };

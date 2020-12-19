@@ -4,7 +4,7 @@
 
 Settings::Settings()
 {
-    std::cout << Environment::getUsername() << '\n';
+    
     loadSettings();
 }
 
@@ -15,9 +15,6 @@ void Settings::loadSettings()
      *      If .conf -> read settings and copy them into the variables 
      *      Else create default values using system information.
      */
-    downloads_dir = "";
-    max_transfer_speed = 0;
-    max_transfers_num = 0;
 }
 
 void Settings::setDownloadsDirectory(const std::string& path)
@@ -53,13 +50,9 @@ int Settings::getMaximumSimultaneousTransfers(const int& number)
 // TODO - Use Environment class
 void Settings::setDefaults()
 {
-    /* TODO - Get cpu number
-     *      - Get username to set the default downloads folder to /Users/<username>/Downloads
-     *      - Other infos ? 
-     */
+    username = Environment::getUsername();
+    downloads_dir = "/Users/" + username + "/Downloads";
+    cpu_count = Environment::getCPUCount();
+    max_simultaneous_transfers = cpu_count;
 }
 
-std::string Settings::generateDefaultDownloadsFolder(const std::string& username)
-{
-    return "/Users/<username>/Downloads";
-}

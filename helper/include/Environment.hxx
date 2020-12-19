@@ -1,9 +1,11 @@
 #include <unistd.h>
 #include <pwd.h>
+#include <thread>
 #include <string>
 
 class Environment {
     public:
+        /* whoami */
         static std::string getUsername()
         {
             uid_t uid = geteuid();
@@ -13,9 +15,8 @@ class Environment {
             }
             return {};
         }
-        // TODO
-        static int getCPUNumber()
+        static int getCPUCount()
         {
-            return 777;
+            return (int)std::thread::hardware_concurrency();
         }
 };
