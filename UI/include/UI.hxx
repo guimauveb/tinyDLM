@@ -19,6 +19,7 @@ class UI
 
         /* Initialized by the constructor */
         std::unique_ptr<Controller> controller;
+        std::unique_ptr<Settings> settings;
 
         /* Main windows are stored into a vector */
         std::vector<std::unique_ptr<CursesWindow>> main_windows;
@@ -44,7 +45,7 @@ class UI
         int bottom_item;
 
         /* Enter settings menu */
-        int settings();
+        int showSettings();
 
         /* Display help window */
         int showHelp();
@@ -72,6 +73,9 @@ class UI
         std::mutex y_offset_mutex;
 
     private:
+        /* Initialize user settings */
+        void initSettings();
+
         /* Set the ground for curses */
         void initCurses();
         void initColors();
@@ -109,7 +113,7 @@ class UI
         std::unique_ptr<CursesMenu> initMenu(std::vector<std::string> items_data);
         void setDownloadsMenu();
         //void paintDownloadsStatusWin(std::unique_ptr<CursesWindow>& win);
-        void populateStatusWin(const std::vector<downloadWinInfo>& vec);
+        void populateStatusWin(const std::vector<DownloadWinInfo>& vec);
         /* Update status window in a designated thread */
         void updateDownloadsStatusWindow();
         /* Bool signaling if the status window should be updated -> set to true when naviagating the download

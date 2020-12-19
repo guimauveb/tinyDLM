@@ -11,8 +11,6 @@
 int main()
 {
     /* TODO - Load settings */
-    Settings s;
-    return 0;
     std::unique_ptr<UI> ui = std::make_unique<UI>();
 
     /* Display a message when starting the program. If the user exits while in firstStart(), terminate the 
@@ -102,7 +100,7 @@ int main()
                 case 's':
                     {
                         ui->stopStatusUpdate();
-                        if (ui->settings()) {
+                        if (ui->showSettings()) {
                             ui->updateDownloadsMenu();
                             ui->resetStatusDriver();
                         }

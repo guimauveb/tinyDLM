@@ -1,3 +1,4 @@
+#include <sys/stat.h>
 #include "../../helper/include/Environment.hxx"
 
 /* Settings are modified through the UI "Settings" window */
@@ -14,9 +15,11 @@ class Settings {
         void setMaximumTransferSpeed(const double& speed);
         void setMaximumSimultaneousTransfers(const int& number);
 
-        std::string getDownloadsDirectory(const std::string& path);
-        double getMaximumTransferSpeed(const double& speed);
-        int getMaximumSimultaneousTransfers(const int& number);
+        std::string getDownloadsDirectory();
+        std::string getDownloadsDirAbsPath();
+        /* TODO - use an unsigned 64 bit here */
+        double getMaximumTransferSpeed();
+        int getMaximumSimultaneousTransfers();
 
     private:
         /* Defaults:
@@ -30,7 +33,8 @@ class Settings {
 
         std::string username;
         std::string downloads_dir;
-        double max_transfer_speed;
+        std::string downloads_dir_abs_path;
+        uint64_t max_transfer_speed;
         int max_simultaneous_transfers;
         int cpu_count;
 };

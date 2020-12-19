@@ -3,8 +3,7 @@
 Controller::~Controller() {}
 
 /* Initialize a new DownloaderCore object then place it in a vector */
-std::string Controller::createNewDownload(std::string folder, std::string filename, const std::string url,  
-                                          const int low_speed_limit, const int low_speed_time_limit)
+std::string Controller::createNewDownload(const std::string folder, std::string filename, const std::string url)
 {
     std::string final_filename = filename;
     std::map<std::string, int>::iterator ita = downloads_map.find(filename);
@@ -25,10 +24,10 @@ std::string Controller::createNewDownload(std::string folder, std::string filena
     if (itb == downloads_map.end()) {
         downloads_map.insert(itb, std::pair<std::string, int>(final_filename, dl_counter));
 
-        const std::string saveAs = downloads_folder + final_filename;
+        const std::string saveAs = folder + final_filename;
         std::unique_ptr<DownloaderCore> dlm = std::make_unique<DownloaderCore>(dl_counter, url, final_filename, 
-                saveAs, low_speed_limit, 
-                low_speed_time_limit);
+                saveAs);
+
         downloader_core_vec.emplace_back(std::move(dlm));
 
         dl_counter++;
@@ -252,9 +251,9 @@ downloadStatus Controller::getStatus(const std::string& filename)
 }
 
 /* Get all downloads statuses infos */
-std::vector<downloadWinInfo> Controller::getAllDownloadsInfos() 
+std::vector<DownloadWinInfo> Controller::getAllDownloadsInfos() 
 {
-    std::vector<downloadWinInfo> vec;
+    std::vector<DownloadWinInfo> vec;
 
     /* Loop over all downloads sorted by id */
     std::map<int, std::string> dlsSorted = sortDownloadsMapByIds();

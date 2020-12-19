@@ -18,7 +18,7 @@ class DownloaderCore
 {
     public:
         /* Constructor */
-        DownloaderCore(const int& dlid, const std::string& u, const std::string& f, const std::string& sa, const int& lsl, const int& lst);
+        DownloaderCore(const int& dlid, const std::string& u, const std::string& f, const std::string& sa);
 
         /* Make sure threads are done executing when calling the destructor */
         ~DownloaderCore(); 
@@ -67,7 +67,7 @@ class DownloaderCore
         struct ProgressCallbackFunctor
         {
             public:
-                ProgressCallbackFunctor(std::shared_ptr<std::mutex> dmutp, std::shared_ptr<download> dp, std::shared_ptr<bool> pp, std::shared_ptr<bool> rp)
+                ProgressCallbackFunctor(std::shared_ptr<std::mutex> dmutp, std::shared_ptr<Download> dp, std::shared_ptr<bool> pp, std::shared_ptr<bool> rp)
                     :mutPtr{dmutp}, dlPtr{dp}, pPtr{pp}, rPtr{rp}
                 {}
                 int Progress(curlpp::Easy *handle, double dltotal, double dlnow, double ultotal, double ulnow);
@@ -79,7 +79,7 @@ class DownloaderCore
                 /* Shared pointer pointing to the mutex protecting the download object */
                 std::shared_ptr<std::mutex> mutPtr;
                 /* Shared pointer pointing to the download struct */
-                std::shared_ptr<download> dlPtr;
+                std::shared_ptr<Download> dlPtr;
                 /* Shared pointer pointing to the 'PAUSE' bool */ 
                 std::shared_ptr<bool> pPtr;
                 /* Shared pointer pointing to the 'RESUME' bool */ 
@@ -97,7 +97,7 @@ class DownloaderCore
 
         /* Returns a reference to the download object pointed by a shared ptr*/
         /* A const ref for performance reasons since main the ui will call it consistanly */
-        const std::shared_ptr<download>& getDownloadInfos();
+        const std::shared_ptr<Download>& getDownloadInfos();
 
         //void setLowSpeedLimit(int lowSpeedLim);
         //void setLowSpeedTime(int lowSpeedTim);
@@ -119,7 +119,7 @@ class DownloaderCore
 
         /* Initialize a download struct that will hold all download informations - initialized by the 
          * constructor */
-        std::shared_ptr<download> downloadPtr = std::make_shared<download>();
+        std::shared_ptr<Download> downloadPtr = std::make_shared<Download>();
 
         /* Some websites require a valid user agent */
         static const std::string USER_AGENT; 

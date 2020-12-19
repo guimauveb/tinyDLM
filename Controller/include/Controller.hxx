@@ -12,8 +12,7 @@ class Controller
     public:
         ~Controller();
 
-        std::string createNewDownload(std::string folder, std::string filename, const std::string url,
-                                      const int low_speed_limit, const int low_speed_time_limit);
+        std::string createNewDownload(const std::string folder, std::string filename, const std::string url);
         void startDownload(const std::vector<std::string>& downloads_to_start);
         void startDownload(const std::string& download_to_start);
         void resume(const std::string& download_to_resule);
@@ -34,7 +33,7 @@ class Controller
         double getProgress(const std::string& filename);
         double getSpeed(const std::string& filename);
         downloadStatus getStatus(const std::string& filename);
-        std::vector<downloadWinInfo> getAllDownloadsInfos();
+        std::vector<DownloadWinInfo> getAllDownloadsInfos();
         std::vector<std::string> getDownloadsList();
         /* Returns false if there's no active download */
         bool isActive();
@@ -42,14 +41,6 @@ class Controller
     private:
         /* Keep track of the number of downloads */
         int dl_counter = 0;
-
-        /* Struct storing filenames infos for every download. Allows to properly update filenamesRecord */
-        /* E.g : archive(1)'s dlRecord = {origFilename: "archive", dupNum: 1} */
-        /* TODO - Move to its proper place */
-        struct DownloadRecord {
-            const std::string orig_filename;
-            int dup_num;
-        };
 
         /* Access dlRecord struct for every download - Map key is the final filename */
         /* E.g: User deletes archive(2), we retreive its dlRecord file with the following code:

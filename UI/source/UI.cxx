@@ -4,7 +4,7 @@ UI::UI()
     :controller{std::make_unique<Controller>()}
 {
     //initController();
-
+    initSettings();
     initCurses();
     initColors();
     setWindowsSize();
@@ -26,6 +26,11 @@ UI::~UI()
     main_windows.clear();
     /* TODO - save downloads list */
     endwin();
+}
+
+void UI::initSettings()
+{
+    settings = std::make_unique<Settings>();
 }
 
 /* Initialize curses */
@@ -185,7 +190,7 @@ int UI::firstStart()
                 }
             case 's':
                 {
-                    settings();
+                    showSettings();
                     done = true;
                     break;
                 }
@@ -338,7 +343,7 @@ void UI::paintSettingsWindow(std::unique_ptr<CursesWindow>& win)
 }
 
 /* Populate the status window with downloads informations such as their status / speed / progress */
-void UI::populateStatusWin(const std::vector<downloadWinInfo>& vec)
+void UI::populateStatusWin(const std::vector<DownloadWinInfo>& vec)
 {
     int y = 1;
     size_t offset;
@@ -483,7 +488,7 @@ int UI::stopStatusUpdate()
     return 0;
 }
 
-int UI::settings()
+int UI::showSettings()
 {
     settings_form = initForm(3);
     settings_window = initWin(window_size_map["settingsSz"], "help"); 
@@ -500,6 +505,11 @@ int UI::settings()
     setSettingsForm();
     setSettingsMenu();
     paintSettingsWindow(settings_window);
+
+    /* TODO - Implicit cast */
+    settings_form->populateField(REQ_FIRST_FIELD, stringifyNumber(settings->getMaximumTransferSpeed(), 1));
+    settings_form->populateField(REQ_NEXT_FIELD, stringifyNumber(settings->getMaximumTransferSpeed(), 1));
+    settings_form->populateField(REQ_NEXT_FIELD, settings->getDownloadsDirectory());
 
     settings_window->touchWin();
     settings_window->refreshWin();
@@ -1083,7 +1093,7 @@ int UI::navigateAddDownloadWindow()
 
                             for (auto el : urls) {
                                 /* controller returns the final filename after verifying there wasn't a duplicate.*/
-                                std::string f = controller->createNewDownload(downloads_folder, filename, el,  0, 0);
+                                std::string f = controller->createNewDownload(settings->getDownloadsDirAbsPath(), filename, el);
                                 if (f != "NULL") {
                                     /* Start dl if everything ok */
                                     controller->startDownload(f);

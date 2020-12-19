@@ -1,34 +1,32 @@
 #include "../include/DownloaderCore.hxx"
 
 /* Initialize the DownloaderCore object with all the need infos to processs the download */
-DownloaderCore::DownloaderCore(const int& dlid, const std::string& u, const std::string& f, const std::string& sa, 
-        const int& lsl = 0, const int& lst = 0)
+DownloaderCore::DownloaderCore(const int& dlid, const std::string& u, const std::string& f, const std::string& sa)
 {
     /* Inetialize our download object- partial initializion but all non set values should be set to 0 or null */
     downloadPtr->id = dlid;
     downloadPtr->url = u;
     downloadPtr->filename = f;
     downloadPtr->saveAs = sa;
-    downloadPtr->lowSpeedLimit = lsl;
-    downloadPtr->lowSpeedTime = lst;
 
     downloadPtr->status = downloadStatus::PENDING;                     
     downloadPtr->progress = 0;
     downloadPtr->downloaded = 0;
     downloadPtr->speed = 0;
+
     /* TODO - calculate estimated time remaining */
     downloadPtr->eta = "";                       
 
     /* TODO - parse response header */
-    downloadPtr->canResume = 0;                  /* Set if download can resume */
+    downloadPtr->can_resume = 0;                  /* Set if download can resume */
     downloadPtr->invalid = 0;                    /* Set if error encountered during download */
-    downloadPtr->httpCode = 0;                   /* http return code */
+    downloadPtr->http_code = 0;                   /* http return code */
     downloadPtr->unescaped = "";
     downloadPtr->referer = "";
     downloadPtr->cookie = "";
 }
 
-const std::shared_ptr<download>& DownloaderCore::getDownloadInfos()
+const std::shared_ptr<Download>& DownloaderCore::getDownloadInfos()
 {
     std::lock_guard<std::mutex> guard(*dlMutPtr);
     return downloadPtr;
@@ -50,7 +48,7 @@ void DownloaderCore::downloadSpeed()
     std::vector<std::pair<double, double>> tmp;
     {
         std::lock_guard<std::mutex> guard(*dlMutPtr);
-        tmp = downloadPtr->durationAndDl;
+        tmp = downloadPtr->duration_and_dl;
     }
     /* Reverse the values so the most recent ones are at the begining */
     std::reverse(tmp.begin(), tmp.end());
@@ -117,7 +115,7 @@ int DownloaderCore::ProgressCallbackFunctor::Progress(curlpp::Easy *handle, doub
         double downloadedAtThisCall = dlnow - dlold;
         {
             std::lock_guard<std::mutex> guard(*mutPtr);
-            dlPtr->durationAndDl.push_back(std::pair<double, double>(duration, downloadedAtThisCall));
+            dlPtr->duration_and_dl.push_back(std::pair<double, double>(duration, downloadedAtThisCall));
         }
     }
 
@@ -221,9 +219,6 @@ int DownloaderCore::dlPerform()
         /* Set CURLOPT_NOPROGRESS to 0 to make the progress function called */
         request.setOpt(new curlpp::options::NoProgress(0));
 
-        /* If the transfer is slower than a user defined value and for a certain amount of time, abort it */
-        request.setOpt(new curlpp::options::LowSpeedTime(downloadPtr->lowSpeedTime));
-        request.setOpt(new curlpp::options::LowSpeedLimit(downloadPtr->lowSpeedLimit));
         request.setOpt(new curlpp::options::UserAgent(USER_AGENT.c_str()));
         request.setOpt(new curlpp::options::Url(downloadPtr->url));
         request.setOpt(new curlpp::options::Verbose(false));

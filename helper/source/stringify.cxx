@@ -4,6 +4,7 @@
 
 #include <sstream>
 
+/* Use a template here */
 std::string stringifyNumber(const double val, const int n)
 {
     std::ostringstream out;
