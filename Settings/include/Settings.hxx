@@ -1,4 +1,4 @@
-#include <sys/stat.h>
+#include <filesystem>
 #include "../../helper/include/Environment.hxx"
 
 /* Settings are modified through the UI "Settings" window */
