@@ -339,6 +339,33 @@ void UI::paintSettingsWindow(std::unique_ptr<CursesWindow>& win)
     win->addStr(begy + 7, 1, "Downloads directory ");
     //win->printInMiddle(begy + 15, 0, maxyx.x, msgHelpCloseWin, COLOR_PAIR(7));
     win->drawBox(0, 0);
+
+    /* TODO - Painting title with white bg */
+    char *title_settings = (char*)malloc(((col / 2) + 1)*sizeof(char));
+    title_settings[col / 2] = '\0';
+
+    std::string settings_nl = settingsLabel;
+
+    int i = 0;
+    for (i = 0; i < (col / 2 - 10) / 2; ++i)
+        title_settings[i] = ' ';
+
+    if (settings_nl.length() >= strlen(title_settings)) {
+        ;
+    }
+    else {
+
+        for (size_t j = 0; j < settings_nl.length(); ++j) {
+            title_settings[i++] = settings_nl[j];
+        }
+        for (; i < col / 2 ; ++i) {
+            title_settings[i] = ' ';
+        }
+        win->printInMiddle(1, 0, maxyx.x , title_settings, COLOR_PAIR(8));
+
+    }
+
+    free(title_settings);
 }
 
 /* Populate the status window with downloads informations such as their status / speed / progress */
@@ -545,7 +572,7 @@ int UI::navigateSettings()
 
     bool dir_err = false;
     bool speed_err = false;
-    //    bool simultaneous_transfers_err = false;
+    bool simultaneous_transfers_err = false;
 
     int currField = 0;
 
@@ -715,10 +742,13 @@ int UI::navigateSettings()
                                  settings_form->getFieldBuffer(2));
             /* Restore errors */
             if (dir_err) {
-                //settings_window->printInMiddle(13, 0, maxyx.x, msgInvalidFilename, COLOR_PAIR(1));
+                //settings_window->printInMiddle(9, 0, maxyx.x, msg_err, COLOR_PAIR(1));
             }
             if (speed_err) {
-                //settings_window->printInMiddle(9, 0, maxyx.x, msgInvalidURL, COLOR_PAIR(1));
+                //settings_window->printInMiddle(9, 0, maxyx.x, msg_err, COLOR_PAIR(1));
+            }
+            if (simultaneous_transfers_err) {
+                //settings_window->printInMiddle(9, 0, maxyx.x, msg_err, COLOR_PAIR(1));
             }
             /* Restore cursor position */
             settings_form->formDriver(currField); 

@@ -37,6 +37,7 @@ extern const std::string msgPause;
 extern const std::string msgResume;
 extern const std::string msgKill;
 
+extern const std::string settingsLabel;       
 extern const std::string addNewLabel;       
 extern const std::string msgStart;          
 extern const std::string msgScheduleCtrl;

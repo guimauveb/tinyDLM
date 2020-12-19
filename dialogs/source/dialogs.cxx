@@ -34,6 +34,7 @@ const std::string msgKill   = " k: kill ";
 
 const std::string msgSettings = " Settings ";
 
+const std::string settingsLabel     = "Settings";
 const std::string addNewLabel       = "Add a new download";
 const std::string addURL            = " URL(s) ";
 const std::string addSaveAs         = " Save as ";
