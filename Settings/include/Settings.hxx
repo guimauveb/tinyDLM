@@ -11,9 +11,9 @@ class Settings {
         void loadSettings();
 
         /* Setters and getters */
-        void setDownloadsDirectory(const std::string& path);
-        void setMaximumTransferSpeed(const double& speed);
-        void setMaximumSimultaneousTransfers(const int& number);
+        bool setDownloadsDirectory(const std::string& path);
+        bool setMaximumTransferSpeed(const double& speed);
+        bool setMaximumSimultaneousTransfers(const int& number);
 
         std::string getDownloadsDirectory();
         std::string getDownloadsDirAbsPath();
@@ -30,6 +30,8 @@ class Settings {
         /* Defaults are obtained from Environment */
         void setDefaults();
         std::string generateDefaultDownloadsFolder(const std::string& username);
+        bool createDirectory(const std::filesystem::path& p);
+        bool directoryExists(const std::filesystem::path& p, std::filesystem::file_status s = std::filesystem::file_status{});
 
         std::string username;
         std::string downloads_dir;
