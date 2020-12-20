@@ -552,12 +552,8 @@ int UI::showSettings()
 
 void UI::setSettingsMenu()
 {
-    //point p_max = add_dl_win->getMaxyx();
-    //point pBeg = add_dl_win->getBegyx();
     settings_menu->menuOptsOn(O_SHOWDESC);
-    //settings_menu->setMenuWin(settings_window);
     settings_menu->setMenuDer(settings_window);
-    //settings_menu->setMenuSubDer(settings_window, 1, 34, p_max.y - 2, (p_max.x - 34) / 2);
 
     settings_menu->setMenuFormat(1, 2);
     settings_menu->setMenuMark(" * ");
@@ -711,19 +707,39 @@ int UI::navigateSettings()
                             ;
                         }
                         else {
+                            // TODO - check each value modified
                             std::string max_speed = settings_form->getFieldBuffer(0);
                             std::string max_trans = settings_form->getFieldBuffer(1);
                             std::string d_dir = settings_form->getFieldBuffer(2);
 
-                            // TODO - only test d_dir for now
+                            // TODO - Testing max_speed
+                            // convert to int
+                            // throw error if incorrect value
+
+                            // TODO - Testing max_trans
+                            // convert to int
+                            // throw error if incorrect value
+
+                            // TODO - Testing d_dir
                             d_dir = trimSpaces(d_dir);
                             d_dir.push_back('\0');
-                            bool r = settings->setDownloadsDirectory(d_dir);
-                            if (!r) {
-                                // TODO - using a dedicated strut for error handling
+                            Error e = settings->setDownloadsDirectory(d_dir);
+
+                            // Error.code is set to 0 unless something went wrong.
+                            if (!e.code) {
+                                settings_window->addStr(12, 1, "Settings succesfully modified.");
                             }
+                            else {
+                                settings_window->addStr(12, 1, e.message);
+                            }
+
+                            // TODO - Signal controller that settings were changed
+
+                            // TODO - Erase error message on next iteration
+
                         }
                     }
+                    // Close settings window
                     else if (curPos == 4) {
                         done = true;
                     }
@@ -745,8 +761,7 @@ int UI::navigateSettings()
             case KEY_DC:
                 {
                     settings_form->formDriver(REQ_DEL_CHAR);
-                    break;
-                }
+                    break; }
 
             default:
                 {
@@ -779,8 +794,6 @@ int UI::navigateSettings()
         }
         settings_window->touchWin();
         settings_window->refreshWin();
-        //settings_window->touchWin();
-        //settings_window->refreshWin();
     }
     curs_set(0);
 

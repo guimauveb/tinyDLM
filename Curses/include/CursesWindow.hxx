@@ -48,8 +48,9 @@ class CursesWindow
     private:
         /* We'll use the same pointer every time the window is resized (deleted then init) */
         WINDOW *win = nullptr;
+        // TODO - Use a vector of derwins if needed  
         /* Derwin that can be used for a menu */
-        WINDOW * der;
+        WINDOW * der = nullptr;
         /* Save all parameters we got from the initialisation so we can resize it */
         int row, col, begy, begx;
         std::string winName;

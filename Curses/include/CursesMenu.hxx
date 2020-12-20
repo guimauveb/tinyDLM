@@ -17,7 +17,7 @@ class CursesMenu {
 
         /* We use unique_ptr references since we know the pointer will outlive the CursesMenu object */
         void setMenuSubDer(std::unique_ptr<CursesWindow>& win, int a, int b, int c, int d);
-        void setMenuDer(std::unique_ptr<CursesWindow>& der);
+        void setMenuDer(std::unique_ptr<CursesWindow>& win);
         void setMenuWin(std::unique_ptr<CursesWindow>& win);
         void setMenuSub(std::unique_ptr<CursesWindow>& win);
 

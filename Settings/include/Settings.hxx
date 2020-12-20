@@ -1,5 +1,7 @@
 #include <filesystem>
+
 #include "../../helper/include/Environment.hxx"
+#include "../../Error/include/Error.hxx"
 
 /* Settings are modified through the UI "Settings" window */
 class Settings {
@@ -8,12 +10,12 @@ class Settings {
          * and use these values. */
         Settings();
 
-        bool loadSettings();
+        Error loadSettings();
 
         /* Setters and getters */
-        bool setDownloadsDirectory(const std::string& p);
-        bool setMaximumTransferSpeed(const double& speed);
-        bool setMaximumSimultaneousTransfers(const int& number);
+        Error setDownloadsDirectory(const std::string& p);
+        Error setMaximumTransferSpeed(const double& speed);
+        Error setMaximumSimultaneousTransfers(const int& number);
 
         std::string getDownloadsDirectory();
         std::string getDownloadsDirAbsPath();
@@ -28,10 +30,10 @@ class Settings {
          *      - Maximum simultaneous transfers: number of cpu's
          */
         /* Defaults are obtained from Environment */
-        bool setDefaults();
-        std::string generateDefaultDownloadsFolder(const std::string& username);
-        bool createDirectory(const std::filesystem::path& p);
+        Error setDefaults();
+        Error createDirectory(const std::filesystem::path& p);
         bool directoryExists(const std::filesystem::path& p, std::filesystem::file_status s = std::filesystem::file_status{});
+        std::string generateDefaultDownloadsFolder(const std::string& username);
 
         std::string username;
         std::string home_dir;

@@ -7,7 +7,7 @@ Settings::Settings()
     loadSettings();
 }
 
-bool Settings::loadSettings()
+Error Settings::loadSettings()
 {
     username  = Environment::getUsername();
     cpu_count = Environment::getCPUCount();
@@ -23,12 +23,12 @@ bool Settings::loadSettings()
     return setDefaults();
 }
 
-bool Settings::setDefaults()
+Error Settings::setDefaults()
 {
-    bool err = false;
+    Error err;
     downloads_dir = "~/Downloads/tinyDownloads/";
     downloads_dir_abs_path = "/Users/" + username + "/Downloads/tinyDownloads/";
-    err = createDirectory(downloads_dir_abs_path);
+    //err = createDirectory(downloads_dir_abs_path);
 
     max_simultaneous_transfers = cpu_count;
     max_transfer_speed = 0;
@@ -36,31 +36,30 @@ bool Settings::setDefaults()
     return err;
 }
 
-bool Settings::createDirectory(const std::filesystem::path& p)
+Error Settings::createDirectory(const std::filesystem::path& p)
 {
-    // TODO - ErrorMessage err_msg;
-    bool exists = false;
+    Error err;
     try {
-        if (directoryExists(p)) {
-            exists = true;
-        }
-        else {
+        /* Try to create the directory if not already existing. */
+        if (!directoryExists(p)) {
             std::filesystem::create_directories(p);
             std::filesystem::permissions(p,
                     std::filesystem::perms::owner_all  |
                     std::filesystem::perms::group_read | 
                     std::filesystem::perms::group_exec |
                     std::filesystem::perms::others_read); 
-            exists = directoryExists(p);
+        }
+        else {
+
         }
     }
+    /* Error will travel back to the settings window */
     catch (const std::filesystem::filesystem_error& e) {
-        // TODO - print error msg
+        err.code = e.code().value();
+        err.message = e.what();
     }
 
-    // TODO - better error checking
-
-    return exists;
+    return err;
 }
 
 // Return false if directory does not exist. Keep from saving the settings if this is the case.
@@ -70,25 +69,32 @@ bool Settings::directoryExists(const std::filesystem::path& p, std::filesystem::
 }
 
 // Returns true if the path returned a valid directory. Else signal error in settings window.
-bool Settings::setDownloadsDirectory(const std::string& p)
+Error Settings::setDownloadsDirectory(const std::string& p)
 {
-    bool exists = createDirectory(p);
+    Error err;
 
-    if (exists) {
+    if (directoryExists(p)) {
+        err.code = 1;
+        err.message = "Directory already exists.";
+    }
+    else {
+        err = createDirectory(p);
         downloads_dir_abs_path = p;
     }
 
-    return exists;
+    return err;
 }
 
-bool Settings::setMaximumTransferSpeed(const double& speed)
+Error Settings::setMaximumTransferSpeed(const double& speed)
 {
-    return false;
+    Error err;
+    return err;
 }
 
-bool Settings::setMaximumSimultaneousTransfers(const int& number) 
+Error Settings::setMaximumSimultaneousTransfers(const int& number) 
 {
-    return false;
+    Error err;
+    return err;
 }
 
 std::string Settings::getDownloadsDirectory()

@@ -94,9 +94,9 @@ void CursesMenu::setMenuSub(std::unique_ptr<CursesWindow>& win)
     set_menu_sub(menu, win->getRawPtr());
 }
 
-void CursesMenu::setMenuDer(std::unique_ptr<CursesWindow>& der)
+void CursesMenu::setMenuDer(std::unique_ptr<CursesWindow>& win)
 {
-    set_menu_sub(menu, der->getDerwin());
+    set_menu_sub(menu, win->getDerwin());
 }
 
 /* Set the number of elements to fit the screen size */
