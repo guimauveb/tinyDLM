@@ -38,15 +38,27 @@ bool Settings::setDefaults()
 
 bool Settings::createDirectory(const std::filesystem::path& p)
 {
-    std::filesystem::create_directories(downloads_dir_abs_path);
-    std::filesystem::permissions(downloads_dir_abs_path,
-            std::filesystem::perms::owner_all  |
-            std::filesystem::perms::group_read | 
-            std::filesystem::perms::group_exec |
-            std::filesystem::perms::others_read); 
+    // TODO - ErrorMessage err_msg;
+    bool exists = false;
+    try {
+        if (directoryExists(p)) {
+            exists = true;
+        }
+        else {
+            std::filesystem::create_directories(p);
+            std::filesystem::permissions(p,
+                    std::filesystem::perms::owner_all  |
+                    std::filesystem::perms::group_read | 
+                    std::filesystem::perms::group_exec |
+                    std::filesystem::perms::others_read); 
+            exists = directoryExists(p);
+        }
+    }
+    catch (const std::filesystem::filesystem_error& e) {
+        // TODO - print error msg
+    }
 
     // TODO - better error checking
-    bool exists = directoryExists(downloads_dir_abs_path);
 
     return exists;
 }
@@ -58,12 +70,12 @@ bool Settings::directoryExists(const std::filesystem::path& p, std::filesystem::
 }
 
 // Returns true if the path returned a valid directory. Else signal error in settings window.
-bool Settings::setDownloadsDirectory(const std::string& path)
+bool Settings::setDownloadsDirectory(const std::string& p)
 {
-    bool exists = createDirectory(path);
+    bool exists = createDirectory(p);
 
     if (exists) {
-        downloads_dir_abs_path = path;
+        downloads_dir_abs_path = p;
     }
 
     return exists;
@@ -101,4 +113,4 @@ int Settings::getMaximumSimultaneousTransfers()
 }
 
 // TODO - move to helper functions
-// /Users/<username>/ to ~
+// Convert absolute path to ~ path if path is in $HOME

@@ -11,7 +11,7 @@ class Settings {
         bool loadSettings();
 
         /* Setters and getters */
-        bool setDownloadsDirectory(const std::string& path);
+        bool setDownloadsDirectory(const std::string& p);
         bool setMaximumTransferSpeed(const double& speed);
         bool setMaximumSimultaneousTransfers(const int& number);
 

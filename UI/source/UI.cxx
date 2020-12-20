@@ -627,8 +627,7 @@ int UI::navigateSettings()
                         settings_form->formDriver(REQ_END_LINE);
                         curPos = 1;
                     }
-                    // any menu item
-                    else {
+                    else if (curPos == 3 || curPos == 4) {
                         curs_set(1);
                         settings_form->formDriver(REQ_LAST_FIELD);
                         settings_form->formDriver(REQ_END_LINE);
@@ -657,7 +656,7 @@ int UI::navigateSettings()
                         curPos = 3;
                     }
                     // any menu item -> return to top form field
-                    else {
+                    else if (curPos == 3 || curPos == 4) {
                         curs_set(1);
                         settings_form->formDriver(REQ_FIRST_FIELD);
                         settings_form->formDriver(REQ_END_LINE);
@@ -671,14 +670,13 @@ int UI::navigateSettings()
                     if (curPos == 0 || curPos == 1 || curPos == 2) {
                         settings_form->formDriver(REQ_PREV_CHAR);
                     }
-                    // Move to the right
                     else if (curPos == 3) {
                         settings_menu->menuDriver(REQ_LAST_ITEM);
                         curPos = 4;
                     }
-                    else {
+                    else if (curPos == 4) {
                         settings_menu->menuDriver(REQ_PREV_ITEM);
-                        curPos -= 1;
+                        curPos = 3;
                     }
                     break;
                 }
@@ -689,33 +687,47 @@ int UI::navigateSettings()
                     if (curPos == 0 || curPos == 1 || curPos == 2) {
                         settings_form->formDriver(REQ_NEXT_CHAR);
                     }
-                    // Move to the left
+                    else if (curPos == 3) {
+                        settings_menu->menuDriver(REQ_NEXT_ITEM);
+                        curPos = 4;
+                    }
+                    // Return left
                     else if (curPos == 4) {
                         settings_menu->menuDriver(REQ_FIRST_ITEM);
                         curPos = 3;
                     }
-                    else {
-                        settings_menu->menuDriver(REQ_NEXT_ITEM);
-                        curPos += 1;
-                    }
                     break;
                 }
-            // TODO - helper function, clean input
+                // TODO - helper function, clean input
             case 10:
                 {
-                    // add a space to the current field
                     if (curPos == 0 || curPos == 1 || curPos == 2) {
                         settings_form->formDriver(' ');
                     }
                     // TODO - DOING - Save settings
                     else if (curPos == 3) {
-                        std::string max_speed = settings_form->getFieldBuffer(0);
-                        std::string max_trans = settings_form->getFieldBuffer(1);
-                        std::string d_dir = settings_form->getFieldBuffer(2);
+                        if (settings_form->formDriver(REQ_VALIDATION) != E_OK) {
+                            //check error 
+                            ;
+                        }
+                        else {
+                            std::string max_speed = settings_form->getFieldBuffer(0);
+                            std::string max_trans = settings_form->getFieldBuffer(1);
+                            std::string d_dir = settings_form->getFieldBuffer(2);
+
+                            // TODO - only test d_dir for now
+                            d_dir = trimSpaces(d_dir);
+                            d_dir.push_back('\0');
+                            bool r = settings->setDownloadsDirectory(d_dir);
+                            if (!r) {
+                                // TODO - using a dedicated strut for error handling
+                            }
+                        }
                     }
                     else if (curPos == 4) {
                         done = true;
                     }
+                    break;
                 }
             case 127:
                 {
