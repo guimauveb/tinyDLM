@@ -338,7 +338,6 @@ void UI::paintSettingsWindow(std::unique_ptr<CursesWindow>& win)
     win->addStr(begy + 5, 1, "Maximum transfer speed ");
     win->addStr(begy + 7, 1, "Downloads directory ");
     //win->printInMiddle(begy + 15, 0, maxyx.x, msgHelpCloseWin, COLOR_PAIR(7));
-    win->drawBox(0, 0);
 
     /* TODO - Painting title with white bg */
     char *title_settings = (char*)malloc(((col / 2) + 1)*sizeof(char));
@@ -347,7 +346,8 @@ void UI::paintSettingsWindow(std::unique_ptr<CursesWindow>& win)
     std::string settings_nl = settingsLabel;
 
     int i = 0;
-    for (i = 0; i < (col / 2 - 10) / 2; ++i)
+    // col / 2 - strlen()
+    for (i = 0; i < (col / 2 - 8) / 2; ++i)
         title_settings[i] = ' ';
 
     if (settings_nl.length() >= strlen(title_settings)) {
@@ -365,6 +365,7 @@ void UI::paintSettingsWindow(std::unique_ptr<CursesWindow>& win)
 
     }
 
+    win->drawBox(0, 0);
     free(title_settings);
 }
 
@@ -739,7 +740,7 @@ int UI::navigateSettings()
 
         if (resize) {
             resizeSettingsWindow(settings_form->getFieldBuffer(0), settings_form->getFieldBuffer(1),
-                                 settings_form->getFieldBuffer(2));
+                    settings_form->getFieldBuffer(2));
             /* Restore errors */
             if (dir_err) {
                 //settings_window->printInMiddle(9, 0, maxyx.x, msg_err, COLOR_PAIR(1));
@@ -818,9 +819,35 @@ int UI::navigateHelpWindow()
 
 void UI::paintHelpWindow(std::unique_ptr<CursesWindow>& win)
 {
+    /* TODO - paint white background title */
     const int begy = 1;
     const point maxyx = win->getMaxyx();
-    win->printInMiddle(begy, 0, maxyx.x, msgHelpMenu, COLOR_PAIR(7));
+    char *title_help = (char*)malloc(((col / 2) + 1)*sizeof(char));
+
+    title_help[col / 2] = '\0';
+
+    std::string title_nl = msgHelpMenu;
+
+    int i = 0;
+    // col / 2 - strlen char*
+    for (i = 0; i < (col / 2 - 10) / 2; ++i)
+        title_help[i] = ' ';
+
+    if (title_nl.length() >= strlen(title_help)) {
+        ;
+    }
+    else {
+
+        for (size_t j = 0; j < title_nl.length(); ++j) {
+            title_help[i++] = title_nl[j];
+        }
+        for (; i < col / 2 ; ++i) {
+            title_help[i] = ' ';
+        }
+        win->printInMiddle(1, 0, maxyx.x , title_help, COLOR_PAIR(8));
+
+    }
+
     win->addStr(begy + 2, 0, msgHelpAdd);
     win->addStr(begy + 3, 0, msgHelpArrowKeys);
     win->addStr(begy + 4, 0, msgHelpReturn);
@@ -834,7 +861,9 @@ void UI::paintHelpWindow(std::unique_ptr<CursesWindow>& win)
     win->addStr(begy + 11, 0, msgHelpSettings);
     win->addStr(begy + 13, 0, msgHelpExit);
     win->printInMiddle(begy + 15, 0, maxyx.x, msgHelpCloseWin, COLOR_PAIR(7));
+
     win->drawBox(0, 0);
+    free(title_help);
 }
 
 /* Init a subwindow containg infos about the selected download */
