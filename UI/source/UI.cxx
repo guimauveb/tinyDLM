@@ -27,6 +27,7 @@ UI::~UI()
     endwin();
 }
 
+// Return something from settings. Print info to info window.
 void UI::initSettings()
 {
     settings = std::make_unique<Settings>();
@@ -39,7 +40,7 @@ void UI::initCurses()
     initscr();
     cbreak();
     noecho();
-    keypad(stdscr, TRUE);
+    keypad(stdscr, true);
     curs_set(0);
 }
 
@@ -98,12 +99,12 @@ void UI::setWindowsSize()
     window_size_map["statusSz"]   = {row - 5, col / 2, 3, col / 2};
     window_size_map["pHelpSz"]    = {1, col / 2, row - 1, 0};
     window_size_map["infosSz"]    = {1, col / 2, row - 2, col / 2};
-    window_size_map["addSz"]      = {row / 2 + 4, col - (col / 2), (row / 4) - 2, col / 4};
-    window_size_map["detSz"]      = {row / 2 + 4, col - (col / 2), (row / 4) - 2, col / 4};
+    window_size_map["addSz"]      = {18, col - (col / 2), (row / 4) - 2, col / 4};
+    window_size_map["detSz"]      = {18, col - (col / 2), (row / 4) - 2, col / 4};
     window_size_map["progSz"]     = {4, (col - (col / 2)) -10, row / 2, col / 4 + 4};
     // TODO - Set settings window dimensions (same as help window for now)
-    window_size_map["settingsSz"]  = {18, col - (col / 2), (row / 4), col / 4};
-    window_size_map["helpSz"]     = {18, col - (col / 2), (row / 4), col / 4};
+    window_size_map["settingsSz"]  = {18, col - (col / 2), (row / 4) - 2, col / 4};
+    window_size_map["helpSz"]     = {18, col - (col / 2), (row / 4) - 2, col / 4};
 }
 
 void UI::resetStatusDriver()
@@ -699,14 +700,18 @@ int UI::navigateSettings()
                     }
                     break;
                 }
+            // TODO - helper function, clean input
             case 10:
                 {
                     // add a space to the current field
-                    if (curPos == 0 || curPos == 1) {
+                    if (curPos == 0 || curPos == 1 || curPos == 2) {
                         settings_form->formDriver(' ');
                     }
+                    // TODO - DOING - Save settings
                     else if (curPos == 3) {
-                        // TODO - save
+                        std::string max_speed = settings_form->getFieldBuffer(0);
+                        std::string max_trans = settings_form->getFieldBuffer(1);
+                        std::string d_dir = settings_form->getFieldBuffer(2);
                     }
                     else if (curPos == 4) {
                         done = true;
@@ -1283,6 +1288,7 @@ int UI::navigateAddDownloadWindow()
 
                     // Start button
                     // TODO - Split all this into functions
+                    // TODO - Helper functions
                     else if (curPos == 2) {
                         if (add_dl_form->formDriver(REQ_VALIDATION) != E_OK) {
                             //check error 
