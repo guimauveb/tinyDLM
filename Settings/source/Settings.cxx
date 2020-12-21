@@ -18,6 +18,8 @@ Error Settings::load()
     return setDefaults();
 }
 
+/* If everything went fine, create .conf file in ~/.tinyDLM and signal to UI to display new user window
+ * with default info. */
 Error Settings::setDefaults()
 {
     Error err;
@@ -29,11 +31,12 @@ Error Settings::setDefaults()
     downloads_dir_abs_path = home_dir + "Downloads/tinyDownloads/";
 
     Error dir_err = setDownloadsDirectory(downloads_dir_abs_path);
-    /* If everything went fine, create .conf file in ~/.tinyDLM and signal to UI to display new user window
-     * with default info. */
+
     if (dir_err.code != ErrorCode::dir_creat_err) {
-        // TODO - Write .conf file with default values.
-        FileIO(home_dir + ".tinyDLM") << "Test.";
+        FileIO(home_dir + ".tinyDLM") << "downloads_directory=" << downloads_dir_abs_path <<
+            "\nmax_download_speed=" << std::to_string(max_transfer_speed) << 
+            "\nmax_simultaneous_transfers=" << std::to_string(max_simultaneous_transfers);
+
         err.code = ErrorCode::first_start_ok;
         err.message = msgNewUserOk; 
     }
