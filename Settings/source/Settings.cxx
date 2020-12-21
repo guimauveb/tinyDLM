@@ -20,16 +20,12 @@ Error Settings::load()
 Error Settings::setDefaults()
 {
     Error err;
-
-    // Get basic system information
-    username  = Environment::getUsername();
-    max_simultaneous_transfers = Environment::getCPUCount();
-    // 0 means no limit
+    max_simultaneous_transfers = cpu_count;
     max_transfer_speed = 0;
 
-    home_dir = "/Users/" + username + "/";
+    // TODO - Use ~ to display path if dir in $HOME
     downloads_dir = "~/Downloads/tinyDownloads/";
-    downloads_dir_abs_path = "/Users/" + username + "/Downloads/tinyDownloads/";
+    downloads_dir_abs_path = home_dir + "Downloads/tinyDownloads/";
 
     Error dir_err = setDownloadsDirectory(downloads_dir_abs_path);
     /* If everything went fine, create .conf file in ~/.tinyDLM and signal to UI to display new user window
@@ -39,15 +35,11 @@ Error Settings::setDefaults()
 
         // TODO - create new_user_code
         err.code = 1;
-        // TODO - create const string with default welcome message.
-        err.message = "Thank you for using tinyDLM. Configuration files have been written to ~/.tinyDLM/. \
-                       You can change the settings by pressing 's'. Enjoy!";
+        err.message = msgNewUserOk; 
     }
     else {
-        // TODO - create first_start_error_code
         err.code = 2;
-        err.message = "There was an error when initializing tinyDLM configuration files. Check syslog using the \
-                       following command for more informations.\nlog show --predicate \"process == 'tinyDLM'\"";
+        err.message = msgNewUserErr;
     }
 
     return err;
@@ -70,7 +62,7 @@ Error Settings::createDirectory(const std::filesystem::path& p)
         // Write original error code to syslog.
         Log() << e.what();
 
-        // Return a readable error to UI.
+        // Return a readable error to the user.
         err.code = 1;
         err.message = "Error when creating directory. Check error logs."; 
     }

@@ -9,8 +9,13 @@ const std::string madeBy         = " by guimauve ";
 const std::string tinyHelp       = " Press 'a' to add a new download. ";
 
 /* Display keys and their associated functions at the bottom of the window */
-//const std::string msgKeyInfoP  = " a: add  p: pause  c: clear inactive  k: kill all " ;
-//const std::string msgKeyInfoR  = " a: add  r: resume c: clear inactive  k: kill all " ;
+const std::string msgNewUserOk  = "Thank you for using tinyDLM. Configuration files have been written\
+                                   to ~/.tinyDLM/. You can change the settings by pressing 's'. Enjoy!";
+
+const std::string msgNewUserErr = "There was an error when initializing tinyDLM configuration files.\
+                                   Check syslog using the following command for more informations:\
+                                   \nlog show --predicate \"process == 'tinyDLM'\"";
+
 const std::string msgHelp               = " Press 'h' to show help ";
 const std::string msgHelpMenu           = " Help Menu ";
 const std::string msgHelpSettings       = " s           :Settings ";
@@ -60,10 +65,6 @@ const std::string statusStrCd = " Complete  ";
 const std::string statusStrEr = "   Error   ";
 const std::string statusStrPe = "  Pending  ";
 const std::string statusStrUn = "  Unknown  ";
-
-/* TODO - make it selectionable by the user */
-/* TODO - move to the designated function */
-const std::string downloads_folder = "/Users/guimauve/Downloads/";
 
 const std::string ERR_WIN_BEG       = "Unable to allocate memory for the '";
 const std::string ERR_MAIN_WIN_0    = "download list";

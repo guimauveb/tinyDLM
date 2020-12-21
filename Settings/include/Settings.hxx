@@ -1,5 +1,6 @@
 #include <filesystem>
 
+#include "../../dialogs/include/dialogs.hxx"
 #include "../../helper/include/Environment.hxx"
 #include "../../Error/include/Error.hxx"
 #include "../../Log/include/Log.hxx"
@@ -7,7 +8,7 @@
 /* Settings are modified through the UI "Settings" window */
 class Settings {
     public:
-        /* Ran on launch - check if a .conf file is present, otherwise create one with defaults values
+        /* Ran on tinyDLM initialization - check if a .conf file is present, otherwise create one with defaults values
          * and use these values. */
         Settings();
 
