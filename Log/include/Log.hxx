@@ -11,6 +11,7 @@ class Log {
         Log(int e_level) 
             :error_level(e_level)
         {}
+        // Initialize Log with filename
 
         void writeToSyslog(const std::string& fs, int err_level = LOG_ERR) {
             openlog("tinyDLM",  LOG_PID, LOG_USER);
@@ -27,5 +28,5 @@ class Log {
             }
 
     private:
-        int error_level;
+        int error_level = 0;
 };

@@ -33,8 +33,10 @@ class Settings {
          */
         /* Defaults are obtained from Environment */
         Error setDefaults();
+        // TODO - move to helper
         Error createDirectory(const std::filesystem::path& p);
         bool directoryExists(const std::filesystem::path& p, std::filesystem::file_status s = std::filesystem::file_status{});
+        // TODO
         std::string generateDefaultDownloadsFolder(const std::string& username);
 
         std::string username;
