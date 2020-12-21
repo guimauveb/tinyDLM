@@ -3,7 +3,7 @@
 #include "../../dialogs/include/dialogs.hxx"
 #include "../../helper/include/Environment.hxx"
 #include "../../Error/include/Error.hxx"
-#include "../../Log/include/Log.hxx"
+#include "../../helper/include/FileIO.hxx"
 
 /* Settings are modified through the UI "Settings" window */
 class Settings {

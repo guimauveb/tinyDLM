@@ -734,7 +734,7 @@ int UI::navigateSettings()
                             Error e = settings->setDownloadsDirectory(d_dir);
 
                             // Error.code is set to 0 unless something went wrong.
-                            if (!e.code) {
+                            if (e.code == ErrorCode::err_ok) {
                                 settings_window->addStr(12, 1, "Settings succesfully modified.");
                             }
                             else {

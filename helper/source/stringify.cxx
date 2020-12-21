@@ -46,6 +46,3 @@ std::string stringifyStatus(const downloadStatus& status)
 }
 
 
-
-
-

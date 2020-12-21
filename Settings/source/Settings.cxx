@@ -31,10 +31,9 @@ Error Settings::setDefaults()
     Error dir_err = setDownloadsDirectory(downloads_dir_abs_path);
     /* If everything went fine, create .conf file in ~/.tinyDLM and signal to UI to display new user window
      * with default info. */
-    if (dir_err.code != ErrorCode::err_ok) {
+    if (dir_err.code != ErrorCode::dir_creat_err) {
         // TODO - Write .conf file with default values.
-
-        // TODO - create new_user_code
+        FileIO(home_dir + ".tinyDLM") << "Test.";
         err.code = ErrorCode::first_start_ok;
         err.message = msgNewUserOk; 
     }
