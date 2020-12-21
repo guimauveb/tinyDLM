@@ -1,6 +1,5 @@
 #include <syslog.h>
-
-#include "../../helper/include/Environment.hxx"
+#include <string>
 
 class Log {
     public:
