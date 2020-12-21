@@ -27,10 +27,18 @@ UI::~UI()
     endwin();
 }
 
-// Return something from settings. Print info to info window.
+// Read settings from existing .conf file or initialize one with default values using system information.
 void UI::initSettings()
 {
     settings = std::make_unique<Settings>();
+    // If settings returns a first_start error code, print the new user welcome window
+    if (settings->load().code) {
+        /* TODO - initNewUserWin()
+         * paint new_user_win with default values + .config file location */
+    }
+    else {
+        // signal that there was an error
+    }
 }
 
 /* Initialize curses */
@@ -430,7 +438,6 @@ void UI::populateStatusWin(const std::vector<DownloadWinInfo>& vec)
         }    
 
         main_windows.at(status_window_index)->printInMiddle(y, 0, p.x / 4, vec.at(offset).progress, color);
-        /* Display percent sign */
         main_windows.at(status_window_index)->printInMiddle(y, 0, p.x / 4 + vec.at(offset).progress.length() + 1," %", color);
         main_windows.at(status_window_index)->printInMiddle(y, p.x / 4, p.x / 4, vec.at(offset).speed, color);
         main_windows.at(status_window_index)->printInMiddle(y, p.x / 4, p.x / 4 + vec.at(offset).speed.length() + 2," MBs", color);

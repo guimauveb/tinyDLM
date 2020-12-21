@@ -1,5 +1,6 @@
 #include <filesystem>
 
+#include "../../helper/include/Environment.hxx"
 #include "../../Error/include/Error.hxx"
 #include "../../Log/include/Log.hxx"
 
@@ -10,7 +11,7 @@ class Settings {
          * and use these values. */
         Settings();
 
-        Error loadSettings();
+        Error load();
 
         /* Setters and getters */
         Error setDownloadsDirectory(const std::string& p);
