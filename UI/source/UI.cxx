@@ -707,6 +707,7 @@ int UI::navigateSettings()
                             ;
                         }
                         else {
+                            // TODO - Create error checking functions
                             // TODO - check each value modified
                             std::string max_speed = settings_form->getFieldBuffer(0);
                             std::string max_trans = settings_form->getFieldBuffer(1);

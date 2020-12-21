@@ -228,9 +228,9 @@ int DownloaderCore::dlPerform()
     }
     catch (curlpp::LogicError & e) {
         std::ofstream curlpp_ofstr;
-        curlpp_ofstr.open("logs/curlpp/curlpp_logic_error.txt", std::ofstream::out);
-        long size = strlen(e.what());
-        curlpp_ofstr.write(e.what(), size);
+        // TODO - Use Log class
+        curlpp_ofstr.open("logs/runtime_errors.txt", std::ofstream::out);
+        curlpp_ofstr << e.what();
         {
             std::lock_guard<std::mutex> guard(*dlMutPtr);
             downloadPtr->status = downloadStatus::ERROR;

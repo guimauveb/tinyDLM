@@ -1,7 +1,5 @@
 #include "../include/Settings.hxx"
 
-#include <iostream>
-
 Settings::Settings()
 {
     loadSettings();
@@ -28,7 +26,7 @@ Error Settings::setDefaults()
     Error err;
     downloads_dir = "~/Downloads/tinyDownloads/";
     downloads_dir_abs_path = "/Users/" + username + "/Downloads/tinyDownloads/";
-    //err = createDirectory(downloads_dir_abs_path);
+    err = createDirectory(downloads_dir_abs_path);
 
     max_simultaneous_transfers = cpu_count;
     max_transfer_speed = 0;
@@ -39,24 +37,23 @@ Error Settings::setDefaults()
 Error Settings::createDirectory(const std::filesystem::path& p)
 {
     Error err;
-    try {
-        /* Try to create the directory if not already existing. */
-        if (!directoryExists(p)) {
-            std::filesystem::create_directories(p);
-            std::filesystem::permissions(p,
-                    std::filesystem::perms::owner_all  |
-                    std::filesystem::perms::group_read | 
-                    std::filesystem::perms::group_exec |
-                    std::filesystem::perms::others_read); 
-        }
-        else {
 
-        }
+    try {
+        std::filesystem::create_directories(p);
+        std::filesystem::permissions(p,
+                std::filesystem::perms::owner_all  |
+                std::filesystem::perms::group_read | 
+                std::filesystem::perms::group_exec |
+                std::filesystem::perms::others_read); 
     }
     /* Error will travel back to the settings window */
     catch (const std::filesystem::filesystem_error& e) {
-        err.code = e.code().value();
-        err.message = e.what();
+        // Write original error code to syslog.
+        Log() << e.what();
+
+        // Return a readable error to UI.
+        err.code = 1;
+        err.message = "Error when creating directory. Check error logs."; 
     }
 
     return err;

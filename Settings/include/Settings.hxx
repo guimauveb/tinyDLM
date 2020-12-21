@@ -1,7 +1,7 @@
 #include <filesystem>
 
-#include "../../helper/include/Environment.hxx"
 #include "../../Error/include/Error.hxx"
+#include "../../Log/include/Log.hxx"
 
 /* Settings are modified through the UI "Settings" window */
 class Settings {
