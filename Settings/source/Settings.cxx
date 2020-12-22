@@ -26,12 +26,14 @@ Error Settings::setDefaults()
 
     max_simultaneous_transfers = cpu_count;
     max_transfer_speed = 0;
-    // TODO - Use ~ to display path if dir in $HOME
+    /* TODO - Use ~ to display path if dir in $HOME
+     * Something like str::replace('~', home_dir) */
     downloads_dir = "~/Downloads/tinyDownloads/";
     downloads_dir_abs_path = home_dir + "Downloads/tinyDownloads/";
 
     Error dir_err = setDownloadsDirectory(downloads_dir_abs_path);
 
+    // TODO - writeConfig()
     if (dir_err.code != ErrorCode::dir_creat_err) {
         FileIO(home_dir + ".tinyDLM") << "downloads_directory=" << downloads_dir_abs_path <<
             "\nmax_download_speed=" << std::to_string(max_transfer_speed) << 

@@ -3,6 +3,7 @@
 
 #include <string>
 
+// TODO - Add error codes
 enum class ErrorCode {
     err_ok, 
     first_start_ok,
