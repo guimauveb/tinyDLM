@@ -38,6 +38,7 @@ class Settings {
         bool directoryExists(const std::filesystem::path& p, std::filesystem::file_status s = std::filesystem::file_status{});
         // TODO
         std::string generateDefaultDownloadsFolder(const std::string& username);
+        void writeConfigFile(const std::string& dir, const std::string& max_speed, const std::string& max_sim_trans);
 
         std::string username;
         std::string home_dir;

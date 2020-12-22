@@ -6,7 +6,7 @@
 enum class ErrorCode {
     err_ok, 
     first_start_ok,
-    new_user_err,
+    first_start_err,
     dir_creat_ok,
     dir_creat_err,
     dir_exists_err

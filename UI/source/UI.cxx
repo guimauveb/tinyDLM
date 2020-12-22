@@ -31,13 +31,15 @@ UI::~UI()
 void UI::initSettings()
 {
     settings = std::make_unique<Settings>();
+    // Check first start
     // If settings returns a first_start error code, print the new user welcome window
     if (settings->load().code == ErrorCode::first_start_ok) {
         /* TODO - initNewUserWin()
          * paint new_user_win with default values + .config file location */
     }
-    else {
-        // signal that there was an error
+    else if (settings->load().code == ErrorCode::first_start_err){
+        // TODO - initNewUserWin()
+        // paint new_user_wn with error message 
     }
 }
 
@@ -272,25 +274,7 @@ void UI::resizeUI()
     refreshMainWindows();
 }
 
-void UI::paintTopWindow(std::unique_ptr<CursesWindow>& topWin)
-{
-    /* Print a whole black on white row at the top of the main window that will be the size of the terminal
-     * window width */
-    char *titleMain = (char*)malloc((col + 1)*sizeof(char));
-    int i = 0;
 
-    for (i = 0; i < (int)liteDL_label.length(); ++i) {
-        titleMain[i] = liteDL_label.at(i);
-    }
-    for (; i < col; ++i) {
-        titleMain[i] = ' ';
-    }
-    titleMain[i] = '\0';
-
-    topWin->printInMiddle(0, 0, col, titleMain, COLOR_PAIR(8));
-
-    free(titleMain);
-}
 
 /* Init main windows */
 void UI::initMainWindows()
@@ -337,7 +321,76 @@ void UI::paintShowHelpWindow(std::unique_ptr<CursesWindow>& win)
     win->printInMiddle(0, 0, col / 4, msgHelp, COLOR_PAIR(7));
 }
 
-// TODO
+void UI::paintHelpWindow(std::unique_ptr<CursesWindow>& win)
+{
+    /* TODO - paint white background title */
+    const int begy = 1;
+    const point maxyx = win->getMaxyx();
+    char *title_help = (char*)malloc(((col / 2) + 1)*sizeof(char));
+
+    title_help[col / 2] = '\0';
+
+    std::string title_nl = msgHelpMenu;
+
+    int i = 0;
+    // col / 2 - strlen char*
+    for (i = 0; i < (col / 2 - 10) / 2; ++i)
+        title_help[i] = ' ';
+
+    if (title_nl.length() >= strlen(title_help)) {
+        ;
+    }
+    else {
+
+        for (size_t j = 0; j < title_nl.length(); ++j) {
+            title_help[i++] = title_nl[j];
+        }
+        for (; i < col / 2 ; ++i) {
+            title_help[i] = ' ';
+        }
+        win->printInMiddle(1, 0, maxyx.x , title_help, COLOR_PAIR(8));
+
+    }
+
+    win->addStr(begy + 2, 0, msgHelpAdd);
+    win->addStr(begy + 3, 0, msgHelpArrowKeys);
+    win->addStr(begy + 4, 0, msgHelpReturn);
+    win->addStr(begy + 5, 0, msgHelpPause);
+    win->addStr(begy + 6, 0, msgHelpPauseAll);
+    win->addStr(begy + 7, 0, msgHelpResume);
+    win->addStr(begy + 8, 0, msgHelpResumeAll);
+    win->addStr(begy + 9, 0, msgHelpClear);
+    win->addStr(begy + 10, 0, msgHelpKill);
+    win->addStr(begy + 12, 0, msgHelpKillAll);
+    win->addStr(begy + 11, 0, msgHelpSettings);
+    win->addStr(begy + 13, 0, msgHelpExit);
+    win->printInMiddle(begy + 15, 0, maxyx.x, msgHelpCloseWin, COLOR_PAIR(7));
+
+    win->drawBox(0, 0);
+    free(title_help);
+}
+
+// TODO - abstract out the two following functions
+void UI::paintTopWindow(std::unique_ptr<CursesWindow>& topWin)
+{
+    /* Print a whole black on white row at the top of the main window that will be the size of the terminal
+     * window width */
+    char *titleMain = (char*)malloc((col + 1)*sizeof(char));
+    int i = 0;
+
+    for (i = 0; i < (int)liteDL_label.length(); ++i) {
+        titleMain[i] = liteDL_label.at(i);
+    }
+    for (; i < col; ++i) {
+        titleMain[i] = ' ';
+    }
+    titleMain[i] = '\0';
+
+    topWin->printInMiddle(0, 0, col, titleMain, COLOR_PAIR(8));
+
+    free(titleMain);
+}
+
 void UI::paintSettingsWindow(std::unique_ptr<CursesWindow>& win) 
 {
     const int begy = 1;
@@ -853,55 +906,6 @@ int UI::navigateHelpWindow()
         }
     }
     return update_menu;
-}
-
-void UI::paintHelpWindow(std::unique_ptr<CursesWindow>& win)
-{
-    /* TODO - paint white background title */
-    const int begy = 1;
-    const point maxyx = win->getMaxyx();
-    char *title_help = (char*)malloc(((col / 2) + 1)*sizeof(char));
-
-    title_help[col / 2] = '\0';
-
-    std::string title_nl = msgHelpMenu;
-
-    int i = 0;
-    // col / 2 - strlen char*
-    for (i = 0; i < (col / 2 - 10) / 2; ++i)
-        title_help[i] = ' ';
-
-    if (title_nl.length() >= strlen(title_help)) {
-        ;
-    }
-    else {
-
-        for (size_t j = 0; j < title_nl.length(); ++j) {
-            title_help[i++] = title_nl[j];
-        }
-        for (; i < col / 2 ; ++i) {
-            title_help[i] = ' ';
-        }
-        win->printInMiddle(1, 0, maxyx.x , title_help, COLOR_PAIR(8));
-
-    }
-
-    win->addStr(begy + 2, 0, msgHelpAdd);
-    win->addStr(begy + 3, 0, msgHelpArrowKeys);
-    win->addStr(begy + 4, 0, msgHelpReturn);
-    win->addStr(begy + 5, 0, msgHelpPause);
-    win->addStr(begy + 6, 0, msgHelpPauseAll);
-    win->addStr(begy + 7, 0, msgHelpResume);
-    win->addStr(begy + 8, 0, msgHelpResumeAll);
-    win->addStr(begy + 9, 0, msgHelpClear);
-    win->addStr(begy + 10, 0, msgHelpKill);
-    win->addStr(begy + 12, 0, msgHelpKillAll);
-    win->addStr(begy + 11, 0, msgHelpSettings);
-    win->addStr(begy + 13, 0, msgHelpExit);
-    win->printInMiddle(begy + 15, 0, maxyx.x, msgHelpCloseWin, COLOR_PAIR(7));
-
-    win->drawBox(0, 0);
-    free(title_help);
 }
 
 /* Init a subwindow containg infos about the selected download */

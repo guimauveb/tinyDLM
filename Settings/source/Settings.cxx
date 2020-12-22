@@ -41,7 +41,7 @@ Error Settings::setDefaults()
         err.message = msgNewUserOk; 
     }
     else {
-        err.code = ErrorCode::new_user_err;
+        err.code = ErrorCode::first_start_err;
         err.message = msgNewUserErr;
     }
 
@@ -131,6 +131,11 @@ double Settings::getMaximumTransferSpeed()
 int Settings::getMaximumSimultaneousTransfers()
 {
     return max_simultaneous_transfers;
+}
+
+void Settings::writeConfigFile(const std::string& dir, const std::string& max_speed, const std::string& max_sim_trans)
+{
+
 }
 
 // TODO - move to helper functions
