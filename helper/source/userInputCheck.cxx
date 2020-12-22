@@ -1,3 +1,6 @@
+#ifndef USER_INPUT_CHECK_HXX
+#define USER_INPUT_CHECK_HXX
+
 #include "../../helper/include/userInputCheck.hxx"
 
 int checkURLlength(std::string& url)
@@ -86,5 +89,4 @@ std::string& trimSpaces(std::string& str)
     } 
     return str = str.substr(i, j + 1);
 }
-
-
+#endif

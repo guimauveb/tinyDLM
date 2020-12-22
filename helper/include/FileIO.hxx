@@ -1,3 +1,7 @@
+/* I/O operations on files using << and >> operators */
+#ifndef FILE_IO
+#define FILE_IO
+
 #include <fstream>
 #include <sstream>
 
@@ -49,3 +53,4 @@ class FileIO {
         std::stringstream out_buffer;
         bool write = false;
 };
+#endif

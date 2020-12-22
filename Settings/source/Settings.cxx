@@ -33,11 +33,8 @@ Error Settings::setDefaults()
 
     Error dir_err = setDownloadsDirectory(downloads_dir_abs_path);
 
-    // TODO - writeConfig()
     if (dir_err.code != ErrorCode::dir_creat_err) {
-        FileIO(home_dir + ".tinyDLM") << "downloads_directory=" << downloads_dir_abs_path <<
-            "\nmax_download_speed=" << std::to_string(max_transfer_speed) << 
-            "\nmax_simultaneous_transfers=" << std::to_string(max_simultaneous_transfers);
+        writeConfigFile(home_dir, downloads_dir_abs_path, std::to_string(max_transfer_speed), std::to_string(max_simultaneous_transfers));
 
         err.code = ErrorCode::first_start_ok;
         err.message = msgNewUserOk; 
@@ -50,37 +47,12 @@ Error Settings::setDefaults()
     return err;
 }
 
-// TODO - Move to helper
-Error Settings::createDirectory(const std::filesystem::path& p)
+void Settings::writeConfigFile(const std::string& h_dir, const std::string& dir, const std::string& max_speed, const std::string& max_sim_trans)
 {
-    Error err;
-
-    try {
-        std::filesystem::create_directories(p);
-        std::filesystem::permissions(p,
-                std::filesystem::perms::owner_all  |
-                std::filesystem::perms::group_read | 
-                std::filesystem::perms::group_exec |
-                std::filesystem::perms::others_read); 
-    }
-    /* Error will travel back to the settings window */
-    catch (const std::filesystem::filesystem_error& e) {
-        // Write original error code to syslog.
-        Log() << e.what();
-
-        // Return a readable error to the user.
-        err.code = ErrorCode::dir_creat_err;
-        err.message = "Error when creating directory. Check error logs."; 
-    }
-
-    return err;
-}
-
-// TODO - Move to helper
-// Return false if directory does not exist. Keep from saving the settings if this is the case.
-bool Settings::directoryExists(const std::filesystem::path& p, std::filesystem::file_status s)
-{
-    return std::filesystem::status_known(s) ? std::filesystem::exists(s) : std::filesystem::exists(p);
+    const std::string conf_file_path = h_dir + ".tinyDLM";
+    FileIO(conf_file_path) << "downloads_directory=" << dir <<
+        "\nmax_download_speed=" << max_speed << 
+        "\nmax_simultaneous_transfers=" << max_sim_trans;
 }
 
 // Returns true if the path returned a valid directory. Else signal error in settings window.
@@ -93,7 +65,7 @@ Error Settings::setDownloadsDirectory(const std::string& p)
         err.message = "Directory already exists.";
     }
     else {
-        err = createDirectory(p);
+        err = Environment::createDirectory(p);
         if (err.code == ErrorCode::dir_creat_ok) {
             downloads_dir_abs_path = p;
         }
@@ -135,11 +107,8 @@ int Settings::getMaximumSimultaneousTransfers()
     return max_simultaneous_transfers;
 }
 
-void Settings::writeConfigFile(const std::string& dir, const std::string& max_speed, const std::string& max_sim_trans)
-{
-
-}
 
 // TODO - move to helper functions
 // Convert absolute path to ~ path if path is in $HOME
+
 

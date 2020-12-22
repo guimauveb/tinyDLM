@@ -1,4 +1,6 @@
 #ifndef DIALOGS_HXX
+#define DIALOGS_HXX
+
 #include <string>
 
 extern const std::string liteDL_label;

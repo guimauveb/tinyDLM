@@ -1,3 +1,6 @@
+#ifndef LOG_HXX
+#define LOG_HXX
+
 #include <syslog.h>
 #include <string>
 
@@ -30,3 +33,4 @@ class Log {
     private:
         int error_level = 0;
 };
+#endif

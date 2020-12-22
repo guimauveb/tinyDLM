@@ -1,3 +1,6 @@
+#ifndef STRINGIFY_HXX
+#define STRINGIFY_HXX
+
 #include "../include/stringify.hxx"
 #include "../../DownloaderCore/include/download.hxx"
 #include "../../dialogs/include/dialogs.hxx"
@@ -44,5 +47,4 @@ std::string stringifyStatus(const downloadStatus& status)
             break;
     }
 }
-
-
+#endif
