@@ -22,14 +22,13 @@ class Log {
             writeToSyslog(buffer.str(), error_level);    
         }
 
-        // Store message into buffer
         void writeToSyslog(const std::string& fs, int err_level = LOG_ERR) {
             openlog("tinyDLM",  LOG_PID, LOG_USER);
             syslog(err_level, "%s", fs.c_str());
             closelog();
         }
 
-        // Write to syslog using << operator. 
+        // Store message into buffer
         template <typename T>
             Log& operator<<(const T& p_value)
             {

@@ -31,8 +31,7 @@ UI::~UI()
 void UI::initSettings()
 {
     settings = std::make_unique<Settings>();
-    // Check first start
-    // If settings returns a first_start error code, print the new user welcome window
+    // If settings returns a first_start error code, print the new_user_welcome_window
     if (settings->load().code == ErrorCode::first_start_ok) {
         /* TODO - initNewUserWin()
          * paint new_user_win with default values + .config file location */
