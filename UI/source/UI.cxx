@@ -3,11 +3,11 @@
 UI::UI()
     :settings{std::make_unique<Settings>()}, controller{std::make_unique<Controller>()}
 {
-    initSettings();
     initCurses();
     initColors();
     setWindowsSize();
     initMainWindows();
+    initSettings();
     updateDownloadsMenu();
     initStatusDriver();
     refreshMainWindows();        

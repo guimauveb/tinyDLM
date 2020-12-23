@@ -66,7 +66,7 @@ The code uses the following style convention:
     - [X] Duplicate filename checker 
     - [IN PROGRESS] Add multiple links at the same time 
     - [DOING] Create a "settings" window
-    - [X] Set download directory (transfers are stored in 'downloads') 
+    - [X] Set download directory (transfers are stored by default in ~/Downloads/tinyDownload/) 
     - [X] Set the default number of simultaneous transfers to the number of CPU cores / threads
     - [DOING] Set the number of max simultaneous transfers  
     - [DOING] Set maximum download speed

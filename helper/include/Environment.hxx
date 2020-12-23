@@ -44,10 +44,7 @@ class Environment {
             }
             /* Error will travel back to the settings window */
             catch (const std::filesystem::filesystem_error& e) {
-                // Write original error code to syslog.
                 Log() << e.what();
-
-                // Return a readable error to the user.
                 err.code = ErrorCode::dir_creat_err;
                 err.message = "Error when creating directory. Check error logs."; 
             }
@@ -68,7 +65,6 @@ class Environment {
 
             try {
                 if (p.at(0) == '~') {
-                    // Check if next char is '/' to know if we can discard it
                     if (p.at(1) == '/') {
                         expanded = h_dir + p.substr(2, p.length());
                     }
