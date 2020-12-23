@@ -1,6 +1,7 @@
 #ifndef DOWNLOAD_HXX
 #define DOWNLOAD_HXX
 
+#include "../../Log/include/Log.hxx"
 #include <string>
 #include <vector>
 

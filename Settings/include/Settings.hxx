@@ -19,8 +19,8 @@ class Settings {
         Error setMaximumTransferSpeed(const double& speed);
         Error setMaximumSimultaneousTransfers(const int& number);
 
+        std::string getDisplayedDownloadsDirectory();
         std::string getDownloadsDirectory();
-        std::string getDownloadsDirAbsPath();
         /* TODO - use an unsigned 64 bit here */
         double getMaximumTransferSpeed();
         int getMaximumSimultaneousTransfers();
@@ -30,21 +30,15 @@ class Settings {
          *      - Downloads directory: /Users/<username>/Downloads
          *      - Maximum transfer speed: no limit
          *      - Maximum simultaneous transfers: number of cpu's
-         */
-        /* Defaults are obtained from Environment */
+         * Defaults are obtained from Environment */
         Error setDefaults();
-        // TODO - move to helper
-        Error createDirectory(const std::filesystem::path& p);
-        bool directoryExists(const std::filesystem::path& p, std::filesystem::file_status s = std::filesystem::file_status{});
-        // TODO
         std::string generateDefaultDownloadsFolder(const std::string& username);
         void writeConfigFile(const std::string& h_dir,const std::string& dir, const std::string& max_speed, const std::string& max_sim_trans);
-
 
         std::string username;
         std::string home_dir;
         std::string downloads_dir;
-        std::string downloads_dir_abs_path;
+        std::string displayed_downloads_dir;
         uint64_t max_transfer_speed;
         int max_simultaneous_transfers;
         int cpu_count;

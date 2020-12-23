@@ -5,8 +5,9 @@ Controller::~Controller() {}
 /* Initialize a new DownloaderCore object then place it in a vector */
 std::string Controller::createNewDownload(const std::string folder, std::string filename, const std::string url)
 {
-    std::string final_filename = filename;
+    Log() << "filename passed as arg " << filename;
     std::map<std::string, int>::iterator ita = downloads_map.find(filename);
+    std::string final_filename = filename;
 
     /* If filename exists create a duplicate according to the records for this filename. Returns the proper
      * duplicate filename */ 
@@ -22,18 +23,18 @@ std::string Controller::createNewDownload(const std::string folder, std::string 
     /* Then leave the download using the same filename untouched and return without doing anything */
     std::map<std::string, int>::iterator itb = downloads_map.find(final_filename);
     if (itb == downloads_map.end()) {
-        downloads_map.insert(itb, std::pair<std::string, int>(final_filename, dl_counter));
+        const std::string saveAs(folder + final_filename);
 
-        const std::string saveAs = folder + final_filename;
+        downloads_map.insert(itb, std::pair<std::string, int>(final_filename, dl_counter));
         std::unique_ptr<DownloaderCore> dlm = std::make_unique<DownloaderCore>(dl_counter, url, final_filename, 
                 saveAs);
 
         downloader_core_vec.emplace_back(std::move(dlm));
-
         dl_counter++;
 
         assert(downloader_core_vec.size() == downloads_map.size());
     }
+
     else {
         final_filename = "NULL";
     }
@@ -51,17 +52,18 @@ std::string& Controller::recordDuplicate(std::string& f)
     bool found = false;
 
     // TODO - getNextFilename() ?
+    // TODO - try / catch
     /* We suppose that the array minimum possible value is 1 */
     std::sort(filenames_records[f].begin(), filenames_records[f].end());
     /* If filename already has duplicates, append (n) to it where n is equal to the index of duplicates */
     if (it != filenames_records.end()) {
         /* If vector size == 0, duplicate value = 1 */
         if ((int)filenames_records[f].size() == 0) {
-            found = true;
             n = 1;
+            found = true;
         }
         /* If the first value is not 1 we can conclude 1 is the minimum missing value */
-        else if (filenames_records[f].at(0) != 1) {
+        else if ((int)filenames_records[f].at(0) != 1) {
             n = 1;
             found = true;
         }

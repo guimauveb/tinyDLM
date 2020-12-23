@@ -66,8 +66,8 @@ The code uses the following style convention:
     - [X] Duplicate filename checker 
     - [IN PROGRESS] Add multiple links at the same time 
     - [DOING] Create a "settings" window
-    - [DOING] Set download directory (transfers are stored in 'downloads') 
-    - [DOING] Set the default number of simultaneous transfers to the number of CPU cores / threads
+    - [X] Set download directory (transfers are stored in 'downloads') 
+    - [X] Set the default number of simultaneous transfers to the number of CPU cores / threads
     - [DOING] Set the number of max simultaneous transfers  
     - [DOING] Set maximum download speed
     - [ ] Limit download speed in DownloaderCore 

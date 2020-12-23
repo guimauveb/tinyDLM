@@ -597,7 +597,7 @@ int UI::showSettings()
     /* TODO - Implicit cast */
     settings_form->populateField(REQ_FIRST_FIELD, stringifyNumber(settings->getMaximumTransferSpeed(), 1));
     settings_form->populateField(REQ_NEXT_FIELD, stringifyNumber(settings->getMaximumTransferSpeed(), 1));
-    settings_form->populateField(REQ_NEXT_FIELD, settings->getDownloadsDirectory());
+    settings_form->populateField(REQ_NEXT_FIELD, settings->getDisplayedDownloadsDirectory());
 
     settings_window->touchWin();
     settings_window->refreshWin();
@@ -783,7 +783,7 @@ int UI::navigateSettings()
 
                             // TODO - Testing d_dir
                             d_dir = trimSpaces(d_dir);
-                            d_dir.push_back('\0');
+                            //d_dir.push_back('\0');
                             Error e = settings->setDownloadsDirectory(d_dir);
 
                             // Error.code is set to 0 unless something went wrong.
@@ -1396,7 +1396,7 @@ int UI::navigateAddDownloadWindow()
 
                             for (auto el : urls) {
                                 /* controller returns the final filename after verifying there wasn't a duplicate.*/
-                                std::string f = controller->createNewDownload(settings->getDownloadsDirAbsPath(), filename, el);
+                                std::string f = controller->createNewDownload(settings->getDownloadsDirectory(), filename, el);
                                 if (f != "NULL") {
                                     /* Start dl if everything ok */
                                     controller->startDownload(f);

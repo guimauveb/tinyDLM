@@ -2,7 +2,7 @@
 #define LOG_HXX
 
 #include <syslog.h>
-#include <string>
+#include <sstream>
 
 class Log {
     public:
@@ -10,12 +10,19 @@ class Log {
         Log()
             :error_level(LOG_ERR)
         {}
+
         // Initialize Log with an error level. 
         Log(int e_level) 
             :error_level(e_level)
         {}
-        // Initialize Log with filename
+        
+        // Write buffer content on destruction
+        ~Log()
+        {
+            writeToSyslog(buffer.str(), error_level);    
+        }
 
+        // Store message into buffer
         void writeToSyslog(const std::string& fs, int err_level = LOG_ERR) {
             openlog("tinyDLM",  LOG_PID, LOG_USER);
             syslog(err_level, "%s", fs.c_str());
@@ -26,11 +33,12 @@ class Log {
         template <typename T>
             Log& operator<<(const T& p_value)
             {
-                writeToSyslog(p_value, error_level);
+                buffer << p_value;
                 return *this;
             }
 
     private:
         int error_level = 0;
+        std::stringstream buffer;
 };
 #endif

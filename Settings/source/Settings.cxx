@@ -1,4 +1,5 @@
 #include "../include/Settings.hxx"
+#include <iostream>
 
 // Load system info from Environment.
 Settings::Settings()
@@ -26,15 +27,14 @@ Error Settings::setDefaults()
 
     max_simultaneous_transfers = cpu_count;
     max_transfer_speed = 0;
-    /* TODO - Use ~ to display path if dir in $HOME
-     * Something like str::replace('~', home_dir) */
-    downloads_dir = "~/Downloads/tinyDownloads/";
-    downloads_dir_abs_path = home_dir + "Downloads/tinyDownloads/";
+    downloads_dir = home_dir + "Downloads/tinyDownloads/";
+    // Directory path displayed in UI uses ~ notation if possible
+    displayed_downloads_dir = Environment::tildefyPath(home_dir, downloads_dir);
 
-    Error dir_err = setDownloadsDirectory(downloads_dir_abs_path);
+    Error dir_err = setDownloadsDirectory(downloads_dir);
 
     if (dir_err.code != ErrorCode::dir_creat_err) {
-        writeConfigFile(home_dir, downloads_dir_abs_path, std::to_string(max_transfer_speed), std::to_string(max_simultaneous_transfers));
+        writeConfigFile(home_dir, downloads_dir, std::to_string(max_transfer_speed), std::to_string(max_simultaneous_transfers));
 
         err.code = ErrorCode::first_start_ok;
         err.message = msgNewUserOk; 
@@ -47,6 +47,8 @@ Error Settings::setDefaults()
     return err;
 }
 
+// TODO - readConfigFile()
+// Write config file to ~
 void Settings::writeConfigFile(const std::string& h_dir, const std::string& dir, const std::string& max_speed, const std::string& max_sim_trans)
 {
     const std::string conf_file_path = h_dir + ".tinyDLM";
@@ -60,16 +62,22 @@ Error Settings::setDownloadsDirectory(const std::string& p)
 {
     Error err;
 
-    if (directoryExists(p)) {
+    const std::string full_path = Environment::expandTilde(home_dir, p);
+
+    if (Environment::directoryExists(full_path)) {
         err.code = ErrorCode::dir_exists_err;
         err.message = "Directory already exists.";
+        downloads_dir = full_path;
     }
     else {
-        err = Environment::createDirectory(p);
+        err = Environment::createDirectory(full_path);
         if (err.code == ErrorCode::dir_creat_ok) {
-            downloads_dir_abs_path = p;
+            err.code = ErrorCode::err_ok;
+            downloads_dir = full_path;
         }
     }
+
+    displayed_downloads_dir = Environment::tildefyPath(home_dir, downloads_dir);
 
     return err;
 }
@@ -86,14 +94,14 @@ Error Settings::setMaximumSimultaneousTransfers(const int& number)
     return err;
 }
 
+std::string Settings::getDisplayedDownloadsDirectory()
+{
+    return displayed_downloads_dir;
+}
+
 std::string Settings::getDownloadsDirectory()
 {
     return downloads_dir;
-}
-
-std::string Settings::getDownloadsDirAbsPath()
-{
-    return downloads_dir_abs_path;
 }
 
 /* TODO - use an unsigned 64 bit here */

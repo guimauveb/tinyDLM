@@ -14,13 +14,13 @@ DownloaderCore::DownloaderCore(const int& dlid, const std::string& u, const std:
     downloadPtr->downloaded = 0;
     downloadPtr->speed = 0;
 
-    /* TODO - calculate estimated time remaining */
+    /* TODO - Calculate estimated time remaining */
     downloadPtr->eta = "";                       
 
-    /* TODO - parse response header */
-    downloadPtr->can_resume = 0;                  /* Set if download can resume */
-    downloadPtr->invalid = 0;                    /* Set if error encountered during download */
-    downloadPtr->http_code = 0;                   /* http return code */
+    /* TODO - Parse response header */
+    downloadPtr->can_resume = 0;                    /* Set if download can resume */
+    downloadPtr->invalid = 0;                       /* Set if error encountered during download */
+    downloadPtr->http_code = 0;                     /* http return code */
     downloadPtr->unescaped = "";
     downloadPtr->referer = "";
     downloadPtr->cookie = "";
@@ -191,11 +191,8 @@ int DownloaderCore::dlPerform()
                 outfile.open(downloadPtr->saveAs, std::ofstream::out);
             }
         }
-        /* Check if the file was correctly opened */
         if (!outfile) {
-            /* TODO - throw an actual exception */
-            /* TODO - write to log */
-            //std::cout << "Error while opening the file for writing. \n";
+            Log() << "Error while opening the file for writing.";
         }
 
         /* Make our header callback functor write to stdout */
@@ -208,7 +205,7 @@ int DownloaderCore::dlPerform()
             curlpp::options::WriteFunction *wfunc = new curlpp::options::WriteFunction(std::bind(&WriteCallbackFunctor::Write, &fObject, &request, _1, _2, _3));
             request.setOpt(wfunc);
 
-            /* Set the header callback to enable cURL to write header to stdout */
+            /* Set the header callback to enable cURL to write header to "unknown" */
             curlpp::options::HeaderFunction *hfunc = new curlpp::options::HeaderFunction(std::bind(&HeaderCallbackFunctor::Write, &oObject, &request, _1, _2, _3));
             request.setOpt(hfunc);
 
@@ -227,26 +224,20 @@ int DownloaderCore::dlPerform()
         request.perform();
     }
     catch (curlpp::LogicError & e) {
-        std::ofstream curlpp_ofstr;
-        // TODO - Use Log class
-        curlpp_ofstr.open("logs/runtime_errors.txt", std::ofstream::out);
-        curlpp_ofstr << e.what();
+        Log() << e.what();
         {
             std::lock_guard<std::mutex> guard(*dlMutPtr);
             downloadPtr->status = downloadStatus::ERROR;
         }
     }
     catch (curlpp::RuntimeError & e) {
-        std::ofstream curlpp_ofstr;
-        curlpp_ofstr.open("logs/curlpp/curlpp_runtime_error.txt", std::ofstream::out);
-        long size = strlen(e.what());
         /* Callback aborted means that the transfer was paused from the progress functor */
         const char cba[] = "Callback aborted";
         if (!strcmp(e.what(), cba)) {
             //do nothing since it means that we paused the transfer
         }
         else {
-            curlpp_ofstr.write(e.what(), size);
+            Log() << e.what();
             {
                 std::lock_guard<std::mutex> guard(*dlMutPtr);
                 downloadPtr->status = downloadStatus::ERROR;
