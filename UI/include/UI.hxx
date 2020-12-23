@@ -18,8 +18,8 @@ class UI
         ~UI();
 
         /* Initialized by the constructor */
-        std::unique_ptr<Controller> controller;
         std::unique_ptr<Settings> settings;
+        std::unique_ptr<Controller> controller;
 
         /* Main windows are stored into a vector */
         std::vector<std::unique_ptr<CursesWindow>> main_windows;
@@ -142,13 +142,13 @@ class UI
 
         /* Details window routine */
         std::unique_ptr<CursesWindow> det_win; 
-        void paintDetWin(const std::string& item_name);
+        void paintDetailsWin(const std::string& item_name);
         std::unique_ptr<CursesForm> det_form;
-        void setDetForm();
+        void setDetailsForm();
 
         std::string initDownloadDetailsTitle(const std::string& item_name);
         int navigateDownloadDetailsWindow(const std::string& filename);
-        int resizeDownloadDetailsWindow(const std::string& filename);
+        void resizeDownloadDetailsWindow(const std::string& filename);
 
         /* Download progress bar updated in a separate thread */
         std::unique_ptr<CursesWindow> progress_win;

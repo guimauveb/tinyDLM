@@ -1,7 +1,7 @@
 #include "../include/UI.hxx"
 
 UI::UI()
-    :controller{std::make_unique<Controller>()}
+    :settings{std::make_unique<Settings>()}, controller{std::make_unique<Controller>()}
 {
     initSettings();
     initCurses();
@@ -30,7 +30,6 @@ UI::~UI()
 // Read settings from existing .conf file or initialize one with default values using system information.
 void UI::initSettings()
 {
-    settings = std::make_unique<Settings>();
     // If settings returns a first_start error code, print the new_user_welcome_window
     if (settings->load().code == ErrorCode::first_start_ok) {
         /* TODO - initNewUserWin()
@@ -74,6 +73,7 @@ void UI::initColors()
     /* Highlighted download status colors */
     init_pair(12, COLOR_GREEN, COLOR_WHITE);
     init_pair(13, COLOR_YELLOW, COLOR_WHITE);
+
     init_pair(14, COLOR_RED, COLOR_WHITE);
     /* Progress bar color pair */
     init_pair(16, COLOR_GREEN, COLOR_GREEN);
@@ -316,6 +316,30 @@ void UI::paintShowHelpWindow(std::unique_ptr<CursesWindow>& win)
 {
     /* Display keys and their associated functions at the bottom of the window */
     win->printInMiddle(0, 0, col / 4, msgHelp, COLOR_PAIR(7));
+}
+
+/* TODO - Abstract away printInMiddleWithBackground() */
+std::string UI::initDownloadDetailsTitle(const std::string& itemName)
+{
+    std::string it = itemName;
+    it.erase(it.find('\0'));
+
+    const std::string label_truncated = " ... - Details ";
+    const std::string label = " - Details ";
+
+    it.reserve(it.length() + 1);
+    it.insert(it.begin(), ' ');
+
+    if (it.length() > 20) {
+        it.resize(20);
+        it.append(label_truncated);
+    }
+    else {
+        it.append(label);
+    }
+    it.push_back('\0');
+
+    return it;
 }
 
 /* TODO - Abstract away printInMiddleWithBackground() */
@@ -608,7 +632,6 @@ int UI::showSettings()
 
     // Init a subwin for the menu
     settings_window->setDerwin(1, 20, p_max.y - 2, (p_max.x - 20) / 2);
-    // init downloads menu == init any menu. TODO - Create initMenu()
     settings_menu = initMenu(tmp_items);
 
     setSettingsForm();
@@ -629,16 +652,6 @@ int UI::showSettings()
     settings_menu->clearItems();
 
     return r;
-}
-
-void UI::setSettingsMenu()
-{
-    settings_menu->menuOptsOn(O_SHOWDESC);
-    settings_menu->setMenuDer(settings_window);
-
-    settings_menu->setMenuFormat(1, 2);
-    settings_menu->setMenuMark(" * ");
-    settings_menu->postMenu();
 }
 
 int UI::navigateSettings()
@@ -928,8 +941,8 @@ int UI::showDownloadDetails(const std::string& item_name)
     det_form = initForm(2);
 
     det_win = initWin(window_size_map["detSz"], "det");
-    setDetForm();
-    paintDetWin(item_name);
+    setDetailsForm();
+    paintDetailsWin(item_name);
 
     det_form->populateField(REQ_FIRST_FIELD, controller->getURL(item_name));
     det_form->populateField(REQ_LAST_FIELD, item_name);
@@ -974,20 +987,28 @@ int UI::addNewDownload()
     return r;
 }
 
-// TODO - Abstract out the two following functions
+// TODO - Abstract out the 3 following functions
+void UI::setSettingsMenu()
+{
+    settings_menu->menuOptsOn(O_SHOWDESC);
+    settings_menu->setMenuDer(settings_window);
+
+    settings_menu->setMenuFormat(1, 2);
+    settings_menu->setMenuMark(" * ");
+    settings_menu->postMenu();
+}
+
 void UI::setDownloadsMenu()
 {
     point p_max = main_windows.at(main_window_index)->getMaxyx();
     menu->menuOptsOn(O_SHOWDESC);
     menu->setMenuSub(main_windows.at(main_window_index));
 
-    /* Fill the entire window with items. (-2) corresponds to top and bottom borders that we ignore */
     menu->setMenuFormat(p_max.y - 2, 0);
     menu->setMenuMark(" * ");
     menu->postMenu();
 }
 
-/* Remark: */ 
 void UI::setAddDownloadMenu()
 {
     add_dl_menu->menuOptsOn(O_SHOWDESC);
@@ -1036,7 +1057,7 @@ void UI::setSettingsForm()
 }
 
 /* Init details window form in order to populate */
-void UI::setDetForm()
+void UI::setDetailsForm()
 {
     point maxyx = det_win->getMaxyx();
 
@@ -1082,6 +1103,7 @@ void UI::setAddDownloadForm()
     add_dl_form->postForm();
 }
 
+// TODO - Abstract out the 3 following functions. How can I save all window data into the instance ?
 void UI::resizeSettingsWindow(std::string max_speed, std::string max_sim_transfers, std::string dir)
 {
     refresh();
@@ -1092,11 +1114,8 @@ void UI::resizeSettingsWindow(std::string max_speed, std::string max_sim_transfe
 
     std::vector<std::string> tmp_items = {"Save", "Close"};
     point p_max = settings_window->getMaxyx();
-    //point pBeg = settings_win->getBegyx();
 
-    // Init a subwin for the menu
     settings_window->setDerwin(1, 20, p_max.y - 2, (p_max.x - 20) / 2);
-    // init downloads menu == init any menu 
     settings_menu = initMenu(tmp_items);
 
     setSettingsForm();
@@ -1115,7 +1134,7 @@ void UI::resizeSettingsWindow(std::string max_speed, std::string max_sim_transfe
     settings_window->refreshWin();
 }
 
-int UI::resizeDownloadDetailsWindow(const std::string& filename)
+void UI::resizeDownloadDetailsWindow(const std::string& filename)
 {
     stopProgressBarThread();
 
@@ -1124,15 +1143,13 @@ int UI::resizeDownloadDetailsWindow(const std::string& filename)
 
     det_form = initForm(2);
     det_win->resizeWin(window_size_map["detSz"]);
-    setDetForm();
-    paintDetWin(filename);
+    setDetailsForm();
+    paintDetailsWin(filename);
     det_form->populateField(REQ_FIRST_FIELD, controller->getURL(filename));
     det_form->populateField(REQ_LAST_FIELD, filename);
 
     det_win->refreshWin();
     startProgressBarThread(filename);
-
-    return 0;
 }
 
 void UI::resizeAddDownloadWindow(std::string url, std::string filename)
@@ -1441,7 +1458,7 @@ void UI::updateDownloadsMenu()
     setDownloadsMenu();
 }
 
-void UI::paintDetWin(const std::string& itemName)
+void UI::paintDetailsWin(const std::string& itemName)
 {
     point maxyx = det_win->getMaxyx();
     det_win->drawBox(0, 0);
@@ -1451,29 +1468,6 @@ void UI::paintDetWin(const std::string& itemName)
     det_win->printInMiddle(maxyx.y - 2, 2 * maxyx.x / 4, maxyx.x / 4, msgResume, COLOR_PAIR(8));
     det_win->printInMiddle(maxyx.y - 2, 3 * maxyx.x / 4, maxyx.x / 4, msgKill, COLOR_PAIR(8));
     det_win->printInMiddle(1, 0, maxyx.x, initDownloadDetailsTitle(itemName), COLOR_PAIR(8));
-}
-
-std::string UI::initDownloadDetailsTitle(const std::string& itemName)
-{
-    std::string it = itemName;
-    it.erase(it.find('\0'));
-
-    const std::string label_truncated = " ... - Details ";
-    const std::string label = " - Details ";
-
-    it.reserve(it.length() + 1);
-    it.insert(it.begin(), ' ');
-
-    if (it.length() > 20) {
-        it.resize(20);
-        it.append(label_truncated);
-    }
-    else {
-        it.append(label);
-    }
-    it.push_back('\0');
-
-    return it;
 }
 
 void UI::startProgressBarThread(const std::string& filename)
