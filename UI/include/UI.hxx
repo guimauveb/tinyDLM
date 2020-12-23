@@ -122,8 +122,6 @@ class UI
          * protected by a mutex. */
         bool update_status = false;
 
-        /* TODO - move to the designated function */
-        int row = 0, col = 0;
 
         /* Program's subwindows - 'Add a download' window / 'Details' window - 'Progress bar' window  */
         std::unique_ptr<CursesForm> initForm(size_t num_fields);
@@ -148,7 +146,7 @@ class UI
         std::unique_ptr<CursesForm> det_form;
         void setDetForm();
 
-        const std::string initDownloadDetailsTitle(const std::string& item_name);
+        std::string initDownloadDetailsTitle(const std::string& item_name);
         int navigateDownloadDetailsWindow(const std::string& filename);
         int resizeDownloadDetailsWindow(const std::string& filename);
 
@@ -167,9 +165,7 @@ class UI
 
         /* Map holding window sizes */
         std::map<const std::string, WinSize> window_size_map;
-
-        /* TODO - make it selectionable by the user */
-        const int low_speed_limit = 56;
-        const int low_speed_time_limit = 60;
+        /* Terminal dimensions */
+        int row = 0, col = 0;
 };
 

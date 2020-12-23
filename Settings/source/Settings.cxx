@@ -15,6 +15,7 @@ Error Settings::load()
      *      Else create default values using system information.
      */
 
+    // TODO - readConfigFile()
     // Temporary
     return setDefaults();
 }
@@ -47,14 +48,13 @@ Error Settings::setDefaults()
     return err;
 }
 
-// TODO - readConfigFile()
-// Write config file to ~
+// Write config file to ~/.tinyDLM.conf
 void Settings::writeConfigFile(const std::string& h_dir, const std::string& dir, const std::string& max_speed, const std::string& max_sim_trans)
 {
     const std::string conf_file_path = h_dir + ".tinyDLM";
     FileIO(conf_file_path) << "downloads_directory=" << dir <<
-        "\nmax_download_speed=" << max_speed << 
-        "\nmax_simultaneous_transfers=" << max_sim_trans;
+                              "\nmax_download_speed=" << max_speed << 
+                              "\nmax_simultaneous_transfers=" << max_sim_trans;
 }
 
 // Returns true if the path returned a valid directory. Else signal error in settings window.

@@ -87,6 +87,7 @@ void UI::setWindowsSize()
     getmaxyx(stdscr, nrow, ncol);
 
     /* Program minimum diemnsions */
+    // TODO - checkTerminalDimensions()
     if (nrow >= 26) {
         row = nrow;
     }
@@ -111,7 +112,6 @@ void UI::setWindowsSize()
     window_size_map["addSz"]      = {18, col - (col / 2), (row / 4) - 2, col / 4};
     window_size_map["detSz"]      = {18, col - (col / 2), (row / 4) - 2, col / 4};
     window_size_map["progSz"]     = {4, (col - (col / 2)) -10, row / 2, col / 4 + 4};
-    // TODO - Set settings window dimensions (same as help window for now)
     window_size_map["settingsSz"]  = {18, col - (col / 2), (row / 4) - 2, col / 4};
     window_size_map["helpSz"]     = {18, col - (col / 2), (row / 4) - 2, col / 4};
 }
@@ -273,8 +273,6 @@ void UI::resizeUI()
     refreshMainWindows();
 }
 
-
-
 /* Init main windows */
 void UI::initMainWindows()
 {
@@ -320,9 +318,9 @@ void UI::paintShowHelpWindow(std::unique_ptr<CursesWindow>& win)
     win->printInMiddle(0, 0, col / 4, msgHelp, COLOR_PAIR(7));
 }
 
+/* TODO - Abstract away printInMiddleWithBackground() */
 void UI::paintHelpWindow(std::unique_ptr<CursesWindow>& win)
 {
-    /* TODO - paint white background title */
     const int begy = 1;
     const point maxyx = win->getMaxyx();
     char *title_help = (char*)malloc(((col / 2) + 1)*sizeof(char));
@@ -369,7 +367,7 @@ void UI::paintHelpWindow(std::unique_ptr<CursesWindow>& win)
     free(title_help);
 }
 
-// TODO - abstract out the two following functions
+/* TODO - Abstract away printInMiddleWithBackground() */
 void UI::paintTopWindow(std::unique_ptr<CursesWindow>& topWin)
 {
     /* Print a whole black on white row at the top of the main window that will be the size of the terminal
@@ -390,6 +388,7 @@ void UI::paintTopWindow(std::unique_ptr<CursesWindow>& topWin)
     free(titleMain);
 }
 
+/* TODO - Abstract away printInMiddleWithBackground() */
 void UI::paintSettingsWindow(std::unique_ptr<CursesWindow>& win) 
 {
     const int begy = 1;
@@ -428,6 +427,41 @@ void UI::paintSettingsWindow(std::unique_ptr<CursesWindow>& win)
 
     win->drawBox(0, 0);
     free(title_settings);
+}
+
+/* TODO - Abstract away printInMiddleWithBackground() */
+void UI::paintAddDownloadWin()
+{
+    char *title_add = (char*)malloc(((col / 2) + 1)*sizeof(char));
+    title_add[col / 2] = '\0';
+
+    std::string add_nl = addNewLabel;
+    point maxyx = add_dl_win->getMaxyx();
+
+    int i = 0;
+    for (i = 0; i < (col / 2 - 18) / 2; ++i)
+        title_add[i] = ' ';
+
+    if (add_nl.length() >= strlen(title_add)) {
+        ;
+    }
+    else {
+
+        for (size_t j = 0; j < add_nl.length(); ++j) {
+            title_add[i++] = add_nl[j];
+        }
+        for (; i < col / 2 ; ++i) {
+            title_add[i] = ' ';
+        }
+        add_dl_win->printInMiddle(1, 0, maxyx.x , title_add, COLOR_PAIR(8));
+
+    }
+
+    add_dl_win->addStr(3, 3, addURL);
+    add_dl_win->addStr(10, 3, addSaveAs);
+    add_dl_win->drawBox(0, 0);
+
+    free(title_add);
 }
 
 /* Populate the status window with downloads informations such as their status / speed / progress */
@@ -497,18 +531,6 @@ void UI::populateStatusWin(const std::vector<DownloadWinInfo>& vec)
         main_windows.at(status_window_index)->printInMiddle(y, 3 * p.x / 4, p.x / 4, vec.at(offset).status, stcolor);
         y++;
     }
-}
-
-void UI::setDownloadsMenu()
-{
-    point p_max = main_windows.at(main_window_index)->getMaxyx();
-    menu->menuOptsOn(O_SHOWDESC);
-    menu->setMenuSub(main_windows.at(main_window_index));
-
-    /* Fill the entire window with items. (-2) corresponds to top and bottom borders that we ignore */
-    menu->setMenuFormat(p_max.y - 2, 0);
-    menu->setMenuMark(" * ");
-    menu->postMenu();
 }
 
 /* Display downloads as a menu */
@@ -633,14 +655,7 @@ int UI::navigateSettings()
 
     int currField = 0;
 
-    // TODO - cursor pos
     int curPos = 0;
-    // curPos 0 -> Maximum number of simultaneous transfers
-    // curPos 1 -> Maximum transfer speed
-    // curPos 2 -> Downloads directory
-    // curPos 3 -> Save button
-    // curPos 4 -> Close button
-
     point maxyx = settings_window->getMaxyx();
 
     curs_set(1);   
@@ -649,7 +664,6 @@ int UI::navigateSettings()
     settings_form->formDriver(REQ_FIRST_FIELD);
 
     while ((ch = getch())) {
-
         switch (ch) {
             case KEY_RESIZE:
                 {
@@ -753,8 +767,8 @@ int UI::navigateSettings()
                     }
                     break;
                 }
-                // TODO - helper function, clean input
             case 10:
+                // TODO - helper function, clean input
                 {
                     if (curPos == 0 || curPos == 1 || curPos == 2) {
                         settings_form->formDriver(' ');
@@ -780,17 +794,15 @@ int UI::navigateSettings()
                             // convert to int
                             // throw error if incorrect value
 
-                            // TODO - Testing d_dir
                             d_dir = trimSpaces(d_dir);
-                            //d_dir.push_back('\0');
                             Error e = settings->setDownloadsDirectory(d_dir);
 
                             // Error.code is set to 0 unless something went wrong.
-                            if (e.code == ErrorCode::err_ok) {
-                                settings_window->addStr(12, 1, "Settings succesfully modified.");
+                            if (e.code != ErrorCode::err_ok) {
+                                settings_window->addStr(12, 1, e.message);
                             }
                             else {
-                                settings_window->addStr(12, 1, e.message);
+                                settings_window->addStr(12, 1, "Settings succesfully modified.");
                             }
 
                             // TODO - Signal controller that settings were changed
@@ -831,8 +843,8 @@ int UI::navigateSettings()
         }
 
         if (resize) {
-            resizeSettingsWindow(settings_form->getFieldBuffer(0), settings_form->getFieldBuffer(1),
-                    settings_form->getFieldBuffer(2));
+            resizeSettingsWindow(std::string(settings_form->getFieldBuffer(0)), std::string(settings_form->getFieldBuffer(1)),
+                    std::string(settings_form->getFieldBuffer(2)));
             /* Restore errors */
             if (dir_err) {
                 //settings_window->printInMiddle(9, 0, maxyx.x, msg_err, COLOR_PAIR(1));
@@ -925,10 +937,9 @@ int UI::showDownloadDetails(const std::string& item_name)
 
     /* Disable cursor */
     curs_set(0);
-    /* Navigate through the details window */
 
-    int r = navigateDownloadDetailsWindow(item_name);
-    return r;
+    /* Navigate through the details window */
+    return navigateDownloadDetailsWindow(item_name);
 }
 
 int UI::addNewDownload()
@@ -941,14 +952,12 @@ int UI::addNewDownload()
     add_dl_form = initForm(2);
     add_dl_win = initWin(window_size_map["addSz"], "add");
 
-    std::vector<std::string> tmp_items = {"Start", "Schedule", "Close"};
+    std::vector<std::string> menu_items = {"Start", "Schedule", "Close"};
     point p_max = add_dl_win->getMaxyx();
-    //point pBeg = add_dl_win->getBegyx();
 
     // Init a subwin for the menu
     add_dl_win->setDerwin(1, 34, p_max.y - 2, (p_max.x - 34) / 2);
-    // init downloads menu == init any menu. TODO - Create initMenu() 
-    add_dl_menu = initMenu(tmp_items);
+    add_dl_menu = initMenu(menu_items);
 
     setAddDownloadForm();
     setAddDownloadMenu();
@@ -965,53 +974,28 @@ int UI::addNewDownload()
     return r;
 }
 
+// TODO - Abstract out the two following functions
+void UI::setDownloadsMenu()
+{
+    point p_max = main_windows.at(main_window_index)->getMaxyx();
+    menu->menuOptsOn(O_SHOWDESC);
+    menu->setMenuSub(main_windows.at(main_window_index));
+
+    /* Fill the entire window with items. (-2) corresponds to top and bottom borders that we ignore */
+    menu->setMenuFormat(p_max.y - 2, 0);
+    menu->setMenuMark(" * ");
+    menu->postMenu();
+}
+
 /* Remark: */ 
 void UI::setAddDownloadMenu()
 {
-    //point p_max = add_dl_win->getMaxyx();
-    //point pBeg = add_dl_win->getBegyx();
     add_dl_menu->menuOptsOn(O_SHOWDESC);
-    //add_dl_menu->setMenuWin(add_dl_win);
     add_dl_menu->setMenuDer(add_dl_win);
-    //add_dl_menu->setMenuSubDer(add_dl_win, 1, 34, p_max.y - 2, (p_max.x - 34) / 2);
 
     add_dl_menu->setMenuFormat(1, 3);
     add_dl_menu->setMenuMark(" * ");
     add_dl_menu->postMenu();
-}
-
-void UI::paintAddDownloadWin()
-{
-    char *title_add = (char*)malloc(((col / 2) + 1)*sizeof(char));
-    title_add[col / 2] = '\0';
-
-    std::string add_nl = addNewLabel;
-    point maxyx = add_dl_win->getMaxyx();
-
-    int i = 0;
-    for (i = 0; i < (col / 2 - 18) / 2; ++i)
-        title_add[i] = ' ';
-
-    if (add_nl.length() >= strlen(title_add)) {
-        ;
-    }
-    else {
-
-        for (size_t j = 0; j < add_nl.length(); ++j) {
-            title_add[i++] = add_nl[j];
-        }
-        for (; i < col / 2 ; ++i) {
-            title_add[i] = ' ';
-        }
-        add_dl_win->printInMiddle(1, 0, maxyx.x , title_add, COLOR_PAIR(8));
-
-    }
-
-    add_dl_win->addStr(3, 3, addURL);
-    add_dl_win->addStr(10, 3, addSaveAs);
-    add_dl_win->drawBox(0, 0);
-
-    free(title_add);
 }
 
 std::unique_ptr<CursesForm> UI::initForm(size_t numFields)
@@ -1019,6 +1003,7 @@ std::unique_ptr<CursesForm> UI::initForm(size_t numFields)
     return std::make_unique<CursesForm>(numFields);
 }
 
+// TODO - Abstract out the 3 following functions
 void UI::setSettingsForm()
 {
     point maxyx = settings_window->getMaxyx();
@@ -1047,7 +1032,6 @@ void UI::setSettingsForm()
     /* Initialize settings_form */
     settings_form->initForm();
     settings_form->setFormSubwin(settings_window);
-
     settings_form->postForm();
 }
 
@@ -1064,6 +1048,7 @@ void UI::setDetForm()
     det_form->setFieldBack(0, A_UNDERLINE);
     det_form->setFieldBack(0, O_AUTOSKIP);
     det_form->fieldOptsOff(0, O_STATIC);
+
     det_form->setFieldBack(1, A_UNDERLINE);
     det_form->setFieldBack(1, O_AUTOSKIP);
     det_form->fieldOptsOff(1, O_STATIC);
@@ -1071,7 +1056,6 @@ void UI::setDetForm()
     /* Initialize det_form */
     det_form->initForm();
     det_form->setFormSubwin(det_win);
-
     det_form->postForm();
 }
 
@@ -1087,6 +1071,7 @@ void UI::setAddDownloadForm()
     add_dl_form->setFieldBack(0, A_UNDERLINE);
     add_dl_form->setFieldBack(0, O_AUTOSKIP);
     add_dl_form->fieldOptsOff(0, O_STATIC);
+
     add_dl_form->setFieldBack(1, A_UNDERLINE);
     add_dl_form->setFieldBack(1, O_AUTOSKIP);
     add_dl_form->fieldOptsOff(1, O_STATIC);
@@ -1094,7 +1079,6 @@ void UI::setAddDownloadForm()
     /* Initialize add_dl_form */
     add_dl_form->initForm();
     add_dl_form->setFormSubwin(add_dl_win);
-
     add_dl_form->postForm();
 }
 
@@ -1119,9 +1103,6 @@ void UI::resizeSettingsWindow(std::string max_speed, std::string max_sim_transfe
     setSettingsMenu();
     paintSettingsWindow(settings_window);
 
-    max_speed.push_back('\0');
-    max_sim_transfers.push_back('\0');
-    dir.push_back('\0');
     max_speed = trimSpaces(max_speed);
     max_sim_transfers = trimSpaces(max_sim_transfers);
     dir = trimSpaces(dir);
@@ -1138,7 +1119,6 @@ int UI::resizeDownloadDetailsWindow(const std::string& filename)
 {
     stopProgressBarThread();
 
-    //endwin();
     refresh();
     resizeUI();
 
@@ -1151,6 +1131,7 @@ int UI::resizeDownloadDetailsWindow(const std::string& filename)
 
     det_win->refreshWin();
     startProgressBarThread(filename);
+
     return 0;
 }
 
@@ -1164,19 +1145,15 @@ void UI::resizeAddDownloadWindow(std::string url, std::string filename)
 
     std::vector<std::string> tmp_items = {"Start", "Schedule", "Close"};
     point p_max = add_dl_win->getMaxyx();
-    //point pBeg = add_dl_win->getBegyx();
 
     // Init a subwin for the menu
     add_dl_win->setDerwin(1, 34, p_max.y - 2, (p_max.x - 34) / 2);
-    // init downloads menu == init any menu 
     add_dl_menu = initMenu(tmp_items);
 
     setAddDownloadForm();
     setAddDownloadMenu();
     paintAddDownloadWin();
 
-    url.push_back('\0');
-    filename.push_back('\0');
     url = trimSpaces(url);
     filename = trimSpaces(filename);
 
@@ -1199,21 +1176,13 @@ int UI::navigateAddDownloadWindow()
 
     int currField = 0;
 
-    // TODO - cursor pos
     int curPos = 0;
-    // curPos 0 -> first field
-    // curPos 1 -> second field
-    // curPos 2 -> Start button
-    // curPos 3 -> Schedule button
-    // curPos 4 -> Close button
-
     curs_set(1);   
     add_dl_win->wMove(4, 4);
     add_dl_win->refreshWin();
 
     while ((ch = getch())) {
         point maxyx = add_dl_win->getMaxyx();
-
         switch (ch) {
             case KEY_RESIZE:
                 {
@@ -1439,7 +1408,7 @@ int UI::navigateAddDownloadWindow()
         }
 
         if (resizeAdd) {
-            resizeAddDownloadWindow(add_dl_form->getFieldBuffer(0), add_dl_form->getFieldBuffer(1));
+            resizeAddDownloadWindow(std::string(add_dl_form->getFieldBuffer(0)), std::string(add_dl_form->getFieldBuffer(1)));
             /* Restore errors */
             if (fileErr) {
                 add_dl_win->printInMiddle(13, 0, maxyx.x, msgInvalidFilename, COLOR_PAIR(1));
@@ -1472,7 +1441,6 @@ void UI::updateDownloadsMenu()
     setDownloadsMenu();
 }
 
-
 void UI::paintDetWin(const std::string& itemName)
 {
     point maxyx = det_win->getMaxyx();
@@ -1485,14 +1453,17 @@ void UI::paintDetWin(const std::string& itemName)
     det_win->printInMiddle(1, 0, maxyx.x, initDownloadDetailsTitle(itemName), COLOR_PAIR(8));
 }
 
-const std::string UI::initDownloadDetailsTitle(const std::string& itemName)
+std::string UI::initDownloadDetailsTitle(const std::string& itemName)
 {
     std::string it = itemName;
     it.erase(it.find('\0'));
+
     const std::string label_truncated = " ... - Details ";
     const std::string label = " - Details ";
+
     it.reserve(it.length() + 1);
     it.insert(it.begin(), ' ');
+
     if (it.length() > 20) {
         it.resize(20);
         it.append(label_truncated);

@@ -15,7 +15,7 @@ class Log {
         Log(int e_level) 
             :error_level(e_level)
         {}
-        
+
         // Write buffer content on destruction
         ~Log()
         {
