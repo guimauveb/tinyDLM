@@ -64,12 +64,12 @@ The code uses the following style convention:
 
 ## Missing features coming soon 
     - [X] Duplicate filename checker 
-    - [IN PROGRESS] Add multiple links at the same time 
-    - [DOING] Create a "settings" window
+    - [X] Create a "settings" window
     - [X] Set download directory (transfers are stored by default in ~/Downloads/tinyDownloads/) 
     - [X] Set the default number of simultaneous transfers to the number of CPU cores / threads
     - [DOING] Set the number of max simultaneous transfers  
     - [DOING] Set maximum download speed
+    - [DOING] Add multiple links at the same time 
     - [ ] Limit download speed in DownloaderCore 
     - [ ] Schedule download start  
     - [ ] Compute / Display ETA  

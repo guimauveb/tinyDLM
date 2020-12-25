@@ -318,7 +318,7 @@ void UI::paintShowHelpWindow(std::unique_ptr<CursesWindow>& win)
     win->printInMiddle(0, 0, col / 4, msgHelp, COLOR_PAIR(7));
 }
 
-// TODO - printInMiddleWithBackground() for the 5 following functions
+// TODO - printInMiddleWithBackground() for the 5  following functions
 /* TODO - Abstract away printInMiddleWithBackground() */
 std::string UI::initDownloadDetailsTitle(const std::string& itemName)
 {
