@@ -104,16 +104,11 @@ class UI
         /* All windows are initialized by initWin() */
         std::unique_ptr<CursesWindow> initWin(WinSize& size, const std::string& name);
 
-        void paintTopWindow(std::unique_ptr<CursesWindow>& win);
         void paintLabelsWindow(std::unique_ptr<CursesWindow>& win);
-        //void paintMainWindow(std::unique_ptr<CursesWindow>& win);
-        void paintShowHelpWindow(std::unique_ptr<CursesWindow>& win);
         void paintSettingsWindow(std::unique_ptr<CursesWindow>& win);
-        //void paintDownloadsInfosWindow(std::unique_ptr<CursesWindow>& win);
 
         std::unique_ptr<CursesMenu> initMenu(std::vector<std::string> items_data);
         void setDownloadsMenu();
-        //void paintDownloadsStatusWin(std::unique_ptr<CursesWindow>& win);
         void populateStatusWin(const std::vector<DownloadWinInfo>& vec);
         /* Update status window in a designated thread */
         void updateDownloadsStatusWindow();
@@ -121,7 +116,6 @@ class UI
          * list window, otherwise set to false. Used by the status window thread and the main thread so it's
          * protected by a mutex. */
         bool update_status = false;
-
 
         /* Program's subwindows - 'Add a download' window / 'Details' window - 'Progress bar' window  */
         std::unique_ptr<CursesForm> initForm(size_t num_fields);

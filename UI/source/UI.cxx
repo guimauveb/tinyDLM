@@ -253,7 +253,7 @@ void UI::resizeUI()
     setWindowsSize();
 
     main_windows.at(top_bar_window_index)->resizeWin(window_size_map["topBarSz"]);
-    paintTopWindow(main_windows.at(top_bar_window_index));
+    main_windows.at(top_bar_window_index)->printInMiddleWithBackground(0, 0, 0, tinyDLM_label, COLOR_PAIR(8));
 
     main_windows.at(labels_window_index)->resizeWin(window_size_map["labelsSz"]);
     paintLabelsWindow(main_windows.at(labels_window_index));
@@ -262,11 +262,10 @@ void UI::resizeUI()
     menu->clearMenu();
     menu->clearItems();
     main_windows.at(main_window_index)->resizeWin(window_size_map["mainWinSz"]);
-
     main_windows.at(status_window_index)->resizeWin(window_size_map["statusSz"]);
 
     main_windows.at(show_help_window_index)->resizeWin(window_size_map["pHelpSz"]);
-    paintShowHelpWindow(main_windows.at(show_help_window_index));
+    main_windows.at(show_help_window_index)->printInMiddle(0, 0, col / 4, msgHelp, COLOR_PAIR(7));
 
     main_windows.at(infos_window_index)->resizeWin(window_size_map["infosSz"]);
 
@@ -279,7 +278,7 @@ void UI::initMainWindows()
 
     /* Window containing top bar title */
     main_windows.emplace_back(initWin(window_size_map["topBarSz"], "topBar"));
-    paintTopWindow(main_windows.at(top_bar_window_index));
+    main_windows.at(top_bar_window_index)->printInMiddleWithBackground(0, 0, 0, tinyDLM_label, COLOR_PAIR(8));
 
     /* Top window containing labels such as "name", "url","speed" etc  */
     main_windows.emplace_back(initWin(window_size_map["labelsSz"], "labels"));
@@ -293,7 +292,7 @@ void UI::initMainWindows()
 
     /* Winodow displaying help message */ 
     main_windows.emplace_back(initWin(window_size_map["pHelpSz"], "help"));
-    paintShowHelpWindow(main_windows.at(show_help_window_index));
+    main_windows.at(show_help_window_index)->printInMiddle(0, 0, col / 4, msgHelp, COLOR_PAIR(7));
 
     /* Not used for now */
     main_windows.emplace_back(initWin(window_size_map["infosSz"], "infos"));
@@ -308,18 +307,6 @@ void UI::paintLabelsWindow(std::unique_ptr<CursesWindow>& win)
     win->printInMiddle(0, 7 * col / 8, col / 8, labelStatus, COLOR_PAIR(7));
 }
 
-//void UI::paintMainWindow(std::unique_ptr<CursesWindow>& win) {}
-//void UI::paintDownloadsStatusWin(std::unique_ptr<CursesWindow>& win) {}
-//void UI::paintDownloadsInfosWindow(std::unique_ptr<CursesWindow>& win) {}
-
-void UI::paintShowHelpWindow(std::unique_ptr<CursesWindow>& win)
-{
-    /* Display keys and their associated functions at the bottom of the window */
-    win->printInMiddle(0, 0, col / 4, msgHelp, COLOR_PAIR(7));
-}
-
-// TODO - printInMiddleWithBackground() for the 5  following functions
-/* TODO - Abstract away printInMiddleWithBackground() */
 std::string UI::initDownloadDetailsTitle(const std::string& itemName)
 {
     std::string it = itemName;
@@ -346,71 +333,25 @@ std::string UI::initDownloadDetailsTitle(const std::string& itemName)
 /* TODO - Abstract away printInMiddleWithBackground() */
 void UI::paintHelpWindow(std::unique_ptr<CursesWindow>& win)
 {
-    const int begy = 1;
     const point maxyx = win->getMaxyx();
-    char *title_help = (char*)malloc(((col / 2) + 1)*sizeof(char));
 
-    title_help[col / 2] = '\0';
+    win->printInMiddleWithBackground(0, 0, 0, msgHelpMenu, COLOR_PAIR(8));
 
-    std::string title_nl = msgHelpMenu;
-
-    int i = 0;
-    // col / 2 - strlen char*
-    for (i = 0; i < (col / 2 - 10) / 2; ++i)
-        title_help[i] = ' ';
-
-    if (title_nl.length() >= strlen(title_help)) {
-        ;
-    }
-    else {
-
-        for (size_t j = 0; j < title_nl.length(); ++j) {
-            title_help[i++] = title_nl[j];
-        }
-        for (; i < col / 2 ; ++i) {
-            title_help[i] = ' ';
-        }
-        win->printInMiddle(1, 0, maxyx.x , title_help, COLOR_PAIR(8));
-
-    }
-
-    win->addStr(begy + 2, 0, msgHelpAdd);
-    win->addStr(begy + 3, 0, msgHelpArrowKeys);
-    win->addStr(begy + 4, 0, msgHelpReturn);
-    win->addStr(begy + 5, 0, msgHelpPause);
-    win->addStr(begy + 6, 0, msgHelpPauseAll);
-    win->addStr(begy + 7, 0, msgHelpResume);
-    win->addStr(begy + 8, 0, msgHelpResumeAll);
-    win->addStr(begy + 9, 0, msgHelpClear);
-    win->addStr(begy + 10, 0, msgHelpKill);
-    win->addStr(begy + 12, 0, msgHelpKillAll);
-    win->addStr(begy + 11, 0, msgHelpSettings);
-    win->addStr(begy + 13, 0, msgHelpExit);
-    win->printInMiddle(begy + 15, 0, maxyx.x, msgHelpCloseWin, COLOR_PAIR(7));
+    win->addStr(3, 0, msgHelpAdd);
+    win->addStr(4, 0, msgHelpArrowKeys);
+    win->addStr(5, 0, msgHelpReturn);
+    win->addStr(6, 0, msgHelpPause);
+    win->addStr(7, 0, msgHelpPauseAll);
+    win->addStr(8, 0, msgHelpResume);
+    win->addStr(9, 0, msgHelpResumeAll);
+    win->addStr(10, 0, msgHelpClear);
+    win->addStr(11, 0, msgHelpKill);
+    win->addStr(13, 0, msgHelpKillAll);
+    win->addStr(12, 0, msgHelpSettings);
+    win->addStr(14, 0, msgHelpExit);
+    win->printInMiddle(16, 0, maxyx.x, msgHelpCloseWin, COLOR_PAIR(7));
 
     win->drawBox(0, 0);
-    free(title_help);
-}
-
-/* TODO - Abstract away printInMiddleWithBackground() */
-void UI::paintTopWindow(std::unique_ptr<CursesWindow>& topWin)
-{
-    /* Print a whole black on white row at the top of the main window that will be the size of the terminal
-     * window width */
-    char *titleMain = (char*)malloc((col + 1)*sizeof(char));
-    int i = 0;
-
-    for (i = 0; i < (int)liteDL_label.length(); ++i) {
-        titleMain[i] = liteDL_label.at(i);
-    }
-    for (; i < col; ++i) {
-        titleMain[i] = ' ';
-    }
-    titleMain[i] = '\0';
-
-    topWin->printInMiddle(0, 0, col, titleMain, COLOR_PAIR(8));
-
-    free(titleMain);
 }
 
 /* TODO - Abstract away printInMiddleWithBackground() */
@@ -1468,7 +1409,9 @@ void UI::paintDetailsWin(const std::string& itemName)
     det_win->printInMiddle(maxyx.y - 2, maxyx.x / 4, maxyx.x / 4, msgPause, COLOR_PAIR(8));
     det_win->printInMiddle(maxyx.y - 2, 2 * maxyx.x / 4, maxyx.x / 4, msgResume, COLOR_PAIR(8));
     det_win->printInMiddle(maxyx.y - 2, 3 * maxyx.x / 4, maxyx.x / 4, msgKill, COLOR_PAIR(8));
-    det_win->printInMiddle(1, 0, maxyx.x, initDownloadDetailsTitle(itemName), COLOR_PAIR(8));
+
+
+    det_win->printInMiddleWithBackground(1, 0, maxyx.x, initDownloadDetailsTitle(itemName), COLOR_PAIR(8));
 }
 
 void UI::startProgressBarThread(const std::string& filename)

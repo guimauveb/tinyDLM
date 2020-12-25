@@ -1,6 +1,6 @@
 #include "../include/dialogs.hxx"
 
-const std::string liteDL_label  = "tinyDLM v1.1";
+const std::string tinyDLM_label  = "tinyDLM";
 const std::string workInProg    = "Work in progress";
 
 const std::string tinyDLMWelcome = " tinyDLM - A tiny download manager ";

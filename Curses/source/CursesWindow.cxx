@@ -1,35 +1,18 @@
 #include "../include/CursesWindow.hxx"
-//#include <fstream>
 
 CursesWindow::CursesWindow(int r, int c, int by, int bx, std::string name)
-    :row{r}, col{c}, begy{by}, begx{bx}
+    :row{r}, col{c}, begy{by}, begx{bx}, win_name{name}
 {
-    winName = name;
-    //    std::ofstream ofstr;
-    //    std::string e = "Allocating memory for window " + winName;
-    //    ofstr.open("newwin.txt", std::ios::app);
-    //    ofstr << e << '\n';
-    //    ofstr.close();
     if ((win = newwin(row, col, begy, begx)) == NULL) {
-        //        std::ofstream ofstr;
-        //        std::string e = "Error while allocating memory for window: " + winName;
-        //        ofstr.open("newwin_log.txt", std::ios::out);
-        //        ofstr << e;
-        //        ofstr.close();
+        Log() << "Could not allocate memory for window " << win_name; 
+        exit(1);
     }
     wrefresh(win);
 }
 
 CursesWindow::~CursesWindow()
 {
-    //    std::ofstream ofstr;
-    //    std::string e = "Freeing memory of window " + winName;
-    //    ofstr.open("del_win_log.txt", std::ios::out);
-    //    ofstr << e << '\n';
-    //    ofstr.close();
-    if (win != nullptr) {
-        delwin(win);
-    }
+    delwin(win);
 }
 
 WINDOW *CursesWindow::getRawPtr()
@@ -72,20 +55,16 @@ void CursesWindow::resetWin()
 /* Couldn't get wresize() to work properly. Calling delwin() then newwin() instead */
 void CursesWindow::resizeWin(WinSize new_size)
 {
-    //werase(win);
-    //wresize(win, new_size.row, new_size.col);
-
-    if (win != NULL) {
-        delwin(win);
-        //        int d = delwin(win);
-        //        if (d == ERR) {
-        //            std::ofstream ofstr;
-        //            std::string e = "Error while freeing memory of window " + winName;
-        //            ofstr.open("del_win_log.txt", std::ios::out);
-        //            ofstr << e << '\n';
-        //            ofstr.close();
-        //        }
+    if (win != nullptr) {
+        if (delwin(win) == ERR) {
+            Log() << "Error while freeing memory of window " << win_name;
+        }
     }
+
+    row = new_size.row;
+    col = new_size.col;
+    begy = new_size.begy;
+    begx = new_size.begx;
 
     win = newwin(new_size.row, new_size.col, new_size.begy, new_size.begx);
 }
@@ -112,12 +91,31 @@ void CursesWindow::printInMiddle(int starty, int startx, int width, std::string 
     refresh();
 }
 
-void CursesWindow::printAtTop(int starty, int startx, int width, std::string str, chtype color)
+// Pass text coordinates, text, color pair, row size
+void CursesWindow::printInMiddleWithBackground(int y, int x, int str_begin, const std::string& str, chtype color)
 {
+    char *banner = (char*)malloc((col + 1)*sizeof(char));
+    int i = 0;
 
+    // First for loop = print background before str begining
+    for (; i < str_begin; ++i) {
+        banner[i] = ' '; 
+    }
+    // Second for loop - print str starting at str_begin
+    for (; i < (int)str.length(); ++i) {
+        banner[i] = str.at(i);
+    }
+    // Third for loop - print background color after str
+    for (; i < col; ++i) {
+        banner[i] = ' ';
+    }
+    banner[i] = '\0';
+
+    wattron(win, color);
+    mvwprintw(win, y, x, "%s", banner);
+    wattroff(win, color);
 }
 
-/* TODO - pass pointers */
 point CursesWindow::getBegyx()
 {
     int by, bx;
@@ -125,7 +123,6 @@ point CursesWindow::getBegyx()
     return point {.y = by, .x = bx};
 }
 
-/* TODO - pass pointers */
 point CursesWindow::getMaxyx()
 {
     int my, mx;

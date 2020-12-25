@@ -3,7 +3,7 @@
 
 #include <string>
 
-extern const std::string liteDL_label;
+extern const std::string tinyDLM_label;
 extern const std::string workInProg;
 
 extern const std::string tinyDLMWelcome;
