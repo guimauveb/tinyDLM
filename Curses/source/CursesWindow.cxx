@@ -102,8 +102,8 @@ void CursesWindow::printInMiddleWithBackground(int y, int x, int str_begin, cons
         banner[i] = ' '; 
     }
     // Second for loop - print str starting at str_begin
-    for (; i < (int)str.length(); ++i) {
-        banner[i] = str.at(i);
+    for (int j = 0; j < (int)str.length(); ++j) {
+        banner[i++] = str.at(j);
     }
     // Third for loop - print background color after str
     for (; i < col; ++i) {
@@ -114,6 +114,8 @@ void CursesWindow::printInMiddleWithBackground(int y, int x, int str_begin, cons
     wattron(win, color);
     mvwprintw(win, y, x, "%s", banner);
     wattroff(win, color);
+
+    free(banner);
 }
 
 point CursesWindow::getBegyx()

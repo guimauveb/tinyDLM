@@ -2,7 +2,6 @@
  *  - Adding multiple downloads at the same time DOING
  *  - Modify some settings (among them what follows)
  *  - Chose number of simultaneous downloads (default to number of cores / threads ) 
- *  - Select downloads directory
  *  - Limit download speed 
  */
 #include "tinyDLM.hxx"
@@ -36,7 +35,7 @@ int main()
                     {
                         /* Make sure that the menu is not empty */
                         if (ui->controller->isActive()) {
-                            ui->menu->menuDriver(REQ_DOWN_ITEM);
+                            ui->downloads_menu->menuDriver(REQ_DOWN_ITEM);
                             ui->statusDriver(KEY_DOWN);
                         }
                         break;
@@ -46,7 +45,7 @@ int main()
                     {
                         /* Make sure that the menu is not empty */
                         if (ui->controller->isActive()) {
-                            ui->menu->menuDriver(REQ_UP_ITEM);
+                            ui->downloads_menu->menuDriver(REQ_UP_ITEM);
                             ui->statusDriver(KEY_UP); 
                         }
                         break;
@@ -64,7 +63,7 @@ int main()
 
                         /* showDetails returns true if the download was killed and that we should update the
                          * menu */
-                        if (ui->showDownloadDetails(ui->menu->getItemName())) {
+                        if (ui->showDownloadDetails(ui->downloads_menu->getItemName())) {
                             ui->updateDownloadsMenu();
                             ui->resetStatusDriver();
                             ui->main_windows.at(ui->status_window_index)->resetWin();
@@ -113,7 +112,7 @@ int main()
                         if (!ui->controller->isActive()) {
                             break;
                         }
-                        ui->controller->pause(ui->menu->getItemName());
+                        ui->controller->pause(ui->downloads_menu->getItemName());
                         break;
                     }
 
@@ -135,7 +134,7 @@ int main()
                             break;
                         }
                         ui->stopStatusUpdate();
-                        ui->controller->resume(ui->menu->getItemName());
+                        ui->controller->resume(ui->downloads_menu->getItemName());
                         ui->startStatusUpdate();
                         break;
                     }
@@ -171,7 +170,7 @@ int main()
                             break;
                         }
                         ui->stopStatusUpdate();
-                        ui->controller->stop(ui->menu->getItemName()); 
+                        ui->controller->stop(ui->downloads_menu->getItemName()); 
                         ui->updateDownloadsMenu();
                         ui->resetStatusDriver();
                         ui->main_windows.at(ui->status_window_index)->resetWin();

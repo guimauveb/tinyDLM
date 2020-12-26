@@ -55,7 +55,7 @@ class UI
         int showDownloadDetails(const std::string& item_name);
 
         /* Menu holding downloads items */
-        std::unique_ptr<CursesMenu> menu;
+        std::unique_ptr<CursesMenu> downloads_menu;
 
         void updateDownloadsMenu();
 
@@ -91,8 +91,8 @@ class UI
         std::unique_ptr<CursesForm> settings_form;
         std::unique_ptr<CursesMenu> settings_menu;
         int navigateSettings();
-        void setSettingsForm();
-        void setSettingsMenu();
+        void setSettingsForm(std::unique_ptr<CursesWindow>& win, std::unique_ptr<CursesForm>& form);
+        void setSettingsMenu(std::unique_ptr<CursesWindow>& win, std::unique_ptr<CursesMenu>& menu);
         void resizeSettingsWindow(std::string max_speed, std::string max_sim_transfers, std::string dir);
 
         /* Window holding the welcome message at first start */
@@ -108,7 +108,7 @@ class UI
         void paintSettingsWindow(std::unique_ptr<CursesWindow>& win);
 
         std::unique_ptr<CursesMenu> initMenu(std::vector<std::string> items_data);
-        void setDownloadsMenu();
+        void setDownloadsMenu(std::unique_ptr<CursesWindow>& win, std::unique_ptr<CursesMenu>& menu);
         void populateStatusWin(const std::vector<DownloadWinInfo>& vec);
         /* Update status window in a designated thread */
         void updateDownloadsStatusWindow();
@@ -125,9 +125,9 @@ class UI
         std::unique_ptr<CursesWindow> add_dl_menu_win;
         std::unique_ptr<CursesForm> add_dl_form;
         std::unique_ptr<CursesMenu> add_dl_menu;
-        void paintAddDownloadWin();
-        void setAddDownloadForm();
-        void setAddDownloadMenu();
+        void paintAddDownloadWin(std::unique_ptr<CursesWindow>& win);
+        void setAddDownloadForm(std::unique_ptr<CursesWindow>& win, std::unique_ptr<CursesForm>& form);
+        void setAddDownloadMenu(std::unique_ptr<CursesWindow>& win, std::unique_ptr<CursesMenu>& menu);
 
         /* Navigate through the 'Add a download' subwindow */
         int navigateAddDownloadWindow();
@@ -136,11 +136,11 @@ class UI
 
         /* Details window routine */
         std::unique_ptr<CursesWindow> det_win; 
-        void paintDetailsWin(const std::string& item_name);
+        void paintDetailsWin(std::unique_ptr<CursesWindow>& win, const std::string& item_name);
         std::unique_ptr<CursesForm> det_form;
-        void setDetailsForm();
+        void setDetailsForm(std::unique_ptr<CursesWindow>& win, std::unique_ptr<CursesForm>& form);
 
-        std::string initDownloadDetailsTitle(const std::string& item_name);
+        std::string initDownloadDetailsTitle(std::string item_name);
         int navigateDownloadDetailsWindow(const std::string& filename);
         void resizeDownloadDetailsWindow(const std::string& filename);
 
