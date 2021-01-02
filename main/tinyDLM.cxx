@@ -1,4 +1,5 @@
 /* TODO in version 1.2:
+ *  - Use a SQL DB to store downloads!
  *  - Adding multiple downloads at the same time DOING
  *  - Modify some settings (among them what follows)
  *  - Chose number of simultaneous downloads (default to number of cores / threads ) 

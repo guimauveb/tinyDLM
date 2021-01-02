@@ -73,8 +73,8 @@ void UI::initColors()
     /* Highlighted download status colors */
     init_pair(12, COLOR_GREEN, COLOR_WHITE);
     init_pair(13, COLOR_YELLOW, COLOR_WHITE);
-
     init_pair(14, COLOR_RED, COLOR_WHITE);
+
     /* Progress bar color pair */
     init_pair(16, COLOR_GREEN, COLOR_GREEN);
 }
@@ -121,6 +121,15 @@ void UI::resetStatusDriver()
     initStatusDriver();
 }
 
+void UI::initStatusDriver()
+{
+    point p_max = main_windows.at(3)->getMaxyx();
+    top_item = 0;
+    bottom_item = p_max.y - 2;
+    current_item_number = 0;
+    y_offset = 0;
+}
+
 void UI::statusDriver(int c)
 {
     point p_max = main_windows.at(3)->getMaxyx();
@@ -145,15 +154,7 @@ void UI::statusDriver(int c)
     }
 }
 
-void UI::initStatusDriver()
-{
-    point p_max = main_windows.at(3)->getMaxyx();
-    top_item = 0;
-    bottom_item = p_max.y - 2;
-    current_item_number = 0;
-    y_offset = 0;
-}
-
+// TODO - Remove
 std::unique_ptr<CursesWindow> UI::initWin(WinSize& size, const std::string& name)
 {
     return std::make_unique<CursesWindow>(size.row, size.col, size.begy, size.begx, name);

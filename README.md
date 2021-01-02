@@ -70,10 +70,10 @@ The code uses the following style convention:
     - [DOING] Set the number of max simultaneous transfers  
     - [DOING] Set maximum download speed
     - [DOING] Add multiple links at the same time 
+    - [ ] Use a database to store downloads state
     - [ ] Limit download speed in DownloaderCore 
     - [ ] Schedule download start  
     - [ ] Compute / Display ETA  
-    - [ ] Save downloads on exit and restore them on the next launch  
 
 
 
