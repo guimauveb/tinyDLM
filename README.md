@@ -66,14 +66,14 @@ The code uses the following style convention:
 
 **NOTE:** I'm still working on improving the code and code style.
 
-## Missing features coming soon 
+## Missing features that I certainly won't implement
     - [X] Duplicate filename checker 
     - [X] Create a "settings" window
     - [X] Set download directory (transfers are stored by default in ~/Downloads/tinyDownloads/) 
     - [X] Set the default number of simultaneous transfers to the number of CPU cores / threads
-    - [DOING] Set the number of max simultaneous transfers  
-    - [DOING] Set maximum download speed
-    - [DOING] Add multiple links at the same time 
+    - [ ] Set the number of max simultaneous transfers  
+    - [ ] Set maximum download speed
+    - [ ] Add multiple links at the same time 
     - [ ] Use a database to store downloads state
     - [ ] Limit download speed in DownloaderCore 
     - [ ] Schedule download start  
