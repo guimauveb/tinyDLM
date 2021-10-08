@@ -27,7 +27,7 @@ I plan on adding some other useful features like limiting the number of simultan
     - Displays current transfer status
     - Signals user input and URL / HTTP errors
     - Very low CPU / memory consumption
-    - (DOING) Partially supports adding multiple links at the same time
+    - Partially supports adding multiple links at the same time
 
 ## Installation 
 
