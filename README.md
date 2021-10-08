@@ -47,10 +47,14 @@ Works on **Linux Debian based distributions** and **macOS (>= 10.14)**
 
 
 ## Tested on: 
-- **macOS Big Sur (>= 11.0)**
+- ~~macOS Big Sur (>= 11.0)~~
 - **macOS Mojave (10.14.6)** 
 - **Linux Ubuntu (20.04 LTS)**
 - **Kali Linux (20.03)**
+
+## Notes
+**On macOS Big Sur, since an unkown change the linker is unable to find some libraries. Unfortunately I don't have time to investigate. It still works fine on Linux and previous macOS versions.**
+
 
 ## Details about the code
 The code uses the following style convention:
